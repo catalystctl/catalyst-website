@@ -1,0 +1,158 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+interface ScreenshotGroup {
+  title: string;
+  screenshots: { name: string; path: string; }[];
+}
+
+const screenshotGroups: ScreenshotGroup[] = [
+  {
+    title: "Authentication",
+    screenshots: [
+      { name: "Login", path: "/img/screenshots/auth/login.png" },
+      { name: "Register", path: "/img/screenshots/auth/register.png" },
+      { name: "Forgot Password", path: "/img/screenshots/auth/forgot-password.png" },
+    ],
+  },
+  {
+    title: "User Panel",
+    screenshots: [
+      { name: "Dashboard", path: "/img/screenshots/user/dashboard.png" },
+      { name: "Servers", path: "/img/screenshots/user/servers.png" },
+      { name: "Server Console", path: "/img/screenshots/user/server-console.png" },
+      { name: "Server Files", path: "/img/screenshots/user/server-files.png" },
+      { name: "SFTP Access", path: "/img/screenshots/user/server-sftp.png" },
+      { name: "Server Metrics", path: "/img/screenshots/user/server-metrics.png" },
+      { name: "Server Backups", path: "/img/screenshots/user/server-backups.png" },
+      { name: "Server Databases", path: "/img/screenshots/user/server-databases.png" },
+      { name: "Server Tasks", path: "/img/screenshots/user/server-tasks.png" },
+      { name: "Server Alerts", path: "/img/screenshots/user/server-alerts.png" },
+      { name: "Mod Manager", path: "/img/screenshots/user/server-modmanager.png" },
+      { name: "Plugin Manager", path: "/img/screenshots/user/server-pluginmanager.png" },
+      { name: "Configuration", path: "/img/screenshots/user/server-configuration.png" },
+      { name: "Server Users", path: "/img/screenshots/user/server-users.png" },
+      { name: "Server Settings", path: "/img/screenshots/user/server-settings.png" },
+      { name: "Admin Tab", path: "/img/screenshots/user/server-admin.png" },
+      { name: "Profile", path: "/img/screenshots/user/profile.png" },
+      { name: "Details — Tasks", path: "/img/screenshots/user/server-details-tasks.png" },
+    ],
+  },
+  {
+    title: "Admin Panel",
+    screenshots: [
+      { name: "Dashboard", path: "/img/screenshots/admin/admin-dashboard.png" },
+      { name: "Users", path: "/img/screenshots/admin/admin-users.png" },
+      { name: "Roles", path: "/img/screenshots/admin/admin-roles.png" },
+      { name: "All Servers", path: "/img/screenshots/admin/admin-servers.png" },
+      { name: "Nodes", path: "/img/screenshots/admin/admin-nodes.png" },
+      { name: "Node Details", path: "/img/screenshots/admin/node-details.png" },
+      { name: "Allocations", path: "/img/screenshots/admin/node-allocations.png" },
+      { name: "Templates", path: "/img/screenshots/admin/admin-templates.png" },
+      { name: "Template Details", path: "/img/screenshots/admin/template-details.png" },
+      { name: "Databases", path: "/img/screenshots/admin/admin-database.png" },
+      { name: "Activity", path: "/img/screenshots/admin/admin-network.png" },
+      { name: "System", path: "/img/screenshots/admin/admin-system.png" },
+      { name: "Security", path: "/img/screenshots/admin/admin-security.png" },
+      { name: "Theme", path: "/img/screenshots/admin/admin-theme-settings.png" },
+      { name: "Alerts", path: "/img/screenshots/admin/admin-alerts.png" },
+      { name: "Audit Logs", path: "/img/screenshots/admin/admin-audit-logs.png" },
+      { name: "API Keys", path: "/img/screenshots/admin/admin-api-keys.png" },
+      { name: "Plugins", path: "/img/screenshots/admin/admin-plugins.png" },
+    ],
+  },
+];
+
+const total = screenshotGroups.reduce((sum, g) => sum + g.screenshots.length, 0);
+const GITHUB_URL = "https://github.com/catalystctl/catalyst";
+---
+
+<Layout title="Screenshots" description="Browse all Catalyst screenshots — authentication, user panel, and admin panel views.">
+  <!-- Ambient glow -->
+  <div class="pointer-events-none fixed inset-0 -z-10">
+    <div class="absolute -left-24 top-12 h-64 w-64 rounded-full bg-primary/5 blur-3xl"></div>
+    <div class="absolute right-10 top-1/3 h-72 w-72 rounded-full bg-primary/3 blur-3xl"></div>
+  </div>
+
+  <div class="max-w-6xl mx-auto px-4 py-6 space-y-6">
+
+    <!-- Page header — matches panel PageHeader component -->
+    <div class="rounded-xl border border-border bg-card px-6 py-4 shadow-surface-dark">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 class="font-display text-2xl font-bold text-foreground">Screenshots</h1>
+          <p class="text-sm text-muted-foreground">{total} pages captured at 1080p via Playwright.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          {screenshotGroups.map((group, i) => (
+            <a
+              href={`#group-${i}`}
+              class="inline-flex items-center rounded-md border border-transparent bg-surface-2 text-xs font-medium text-foreground px-2 py-0.5 transition-colors hover:bg-surface-3"
+            >
+              {group.title}
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- Screenshot groups — matches panel Sidebar section pattern + card grid -->
+    {screenshotGroups.map((group, i) => (
+      <section id={`group-${i}`} class="scroll-mt-20 space-y-3">
+        <!-- Section header — matches panel Sidebar section label -->
+        <div class="flex items-center gap-3">
+          <span class="text-[11px] font-semibold uppercase tracking-widest text-zinc-500 px-3 py-2">{group.title}</span>
+          <div class="h-px flex-1 bg-zinc-800"></div>
+          <span class="text-xs text-zinc-500 font-mono">{group.screenshots.length}</span>
+        </div>
+
+        <!-- Grid — matches panel card grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {group.screenshots.map((shot) => (
+            <a
+              href={shot.path}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="group rounded-xl border border-border bg-card overflow-hidden shadow-surface-dark transition-all duration-200 hover:border-zinc-700 hover:shadow-elevated-dark"
+            >
+              <div class="aspect-video bg-zinc-950 overflow-hidden">
+                <img
+                  src={shot.path}
+                  alt={shot.name}
+                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+              </div>
+              <div class="px-4 py-3 border-t border-zinc-800 flex items-center justify-between">
+                <span class="text-sm font-medium text-foreground">{shot.name}</span>
+                <svg class="w-4 h-4 text-muted-foreground opacity-0 transition-all group-hover:opacity-100 group-hover:text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                </svg>
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
+    ))}
+
+    <!-- CTA — matches panel dashed border empty state -->
+    <div class="flex flex-col items-center justify-center rounded-xl border border-dashed border-border px-4 py-10 text-center">
+      <svg class="w-8 h-8 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
+      </svg>
+      <p class="mt-2 text-sm text-muted-foreground">Want to see the code behind these screenshots?</p>
+      <a
+        href={GITHUB_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="mt-4 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-all duration-200 hover:bg-primary-600"
+      >
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+        </svg>
+        Get Started on GitHub
+      </a>
+    </div>
+
+  </div>
+</Layout>

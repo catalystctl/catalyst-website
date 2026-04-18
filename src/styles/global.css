@@ -1,0 +1,331 @@
+@import "tailwindcss";
+
+@config "../../tailwind.config.js";
+
+/* ═══════════════════════════════════════════════════════════
+   OBSIDIAN DESIGN SYSTEM
+   Matching the Catalyst panel exactly — dark-first industrial
+   control panel with warm zinc surfaces, vibrant teal accent,
+   and clean geometric typography.
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Accent Palette ── */
+  --accent-teal: 174 80% 46%;
+  --accent-teal-light: 174 72% 56%;
+  --accent-teal-muted: 174 80% 46% / 0.15;
+
+  /* ── Semantic Colors ── */
+  --success: 160 84% 39%;
+  --success-muted: 160 84% 39% / 0.15;
+  --warning: 38 92% 50%;
+  --warning-muted: 38 92% 50% / 0.15;
+  --danger: 0 84% 60%;
+  --danger-muted: 0 84% 60% / 0.15;
+  --info: 217 91% 60%;
+  --info-muted: 217 91% 60% / 0.15;
+
+  /* ── Dark Mode Tokens ── */
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+  --muted: 240 3.7% 15.9%;
+  --muted-foreground: 240 5% 64.9%;
+  --popover: 240 10% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --card: 240 10% 3.9%;
+  --card-foreground: 0 0% 98%;
+  --border: 240 3.7% 15.9%;
+  --input: 240 3.7% 15.9%;
+  --primary: var(--accent-teal);
+  --primary-foreground: 240 10% 3.9%;
+  --secondary: 240 3.7% 15.9%;
+  --secondary-foreground: 0 0% 98%;
+  --accent: var(--accent-teal);
+  --accent-foreground: 240 10% 3.9%;
+  --destructive: var(--danger);
+  --destructive-foreground: 0 0% 100%;
+  --ring: var(--accent-teal);
+  --radius: 0.5rem;
+
+  /* ── Zinc Scale (Dark) ── */
+  --zinc-50: 0 0% 98%;
+  --zinc-100: 240 4.8% 95.9%;
+  --zinc-200: 240 5.9% 90%;
+  --zinc-300: 240 4.9% 83.9%;
+  --zinc-400: 240 5% 64.9%;
+  --zinc-500: 240 3.8% 46.1%;
+  --zinc-600: 240 5.2% 33.9%;
+  --zinc-700: 240 5.9% 24%;
+  --zinc-800: 240 3.7% 15.9%;
+  --zinc-900: 240 10% 3.9%;
+  --zinc-950: 240 10% 3.9%;
+
+  /* ── Surface Elevation (Dark) ── */
+  --surface-0: 240 10% 3.9%;
+  --surface-1: 240 10% 5.9%;
+  --surface-2: 240 3.7% 15.9%;
+  --surface-3: 240 5.9% 24%;
+
+  /* ── Scrollbar ── */
+  --scrollbar-track: transparent;
+  --scrollbar-thumb: 240 3.7% 15.9%;
+  --scrollbar-thumb-hover: 240 5% 33.9%;
+
+  color-scheme: dark;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BASE STYLES
+   ═══════════════════════════════════════════════════════════ */
+
+* {
+  border-color: hsl(var(--border));
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: 'DM Sans Variable', system-ui, -apple-system, sans-serif;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TYPOGRAPHY
+   ═══════════════════════════════════════════════════════════ */
+
+.font-display {
+  font-family: 'Outfit Variable', system-ui, sans-serif;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono Variable', 'Fira Code', monospace;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SCROLLBAR STYLING
+   ═══════════════════════════════════════════════════════════ */
+
+html,
+body {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--scrollbar-thumb)) hsl(var(--scrollbar-track));
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--scrollbar-thumb)) hsl(var(--scrollbar-track));
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track,
+*::-webkit-scrollbar-track {
+  background: hsl(var(--scrollbar-track));
+  border-radius: 3px;
+}
+
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb,
+*::-webkit-scrollbar-thumb {
+  background: hsl(var(--scrollbar-thumb));
+  border-radius: 3px;
+}
+
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover,
+*::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--scrollbar-thumb-hover));
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ANIMATIONS
+   ═══════════════════════════════════════════════════════════ */
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.animate-fade-up {
+  animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease both;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
+.delay-600 { animation-delay: 0.6s; }
+.delay-700 { animation-delay: 0.7s; }
+
+/* ═══════════════════════════════════════════════════════════
+   COMPONENT PATTERNS
+   ═══════════════════════════════════════════════════════════ */
+
+/* Card — matches panel Card component */
+.obsidian-card {
+  border-radius: 0.75rem;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--card));
+  color: hsl(var(--card-foreground));
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  transition: all 0.2s ease;
+}
+
+.obsidian-card:hover {
+  border-color: hsl(var(--surface-3));
+}
+
+/* Button — matches panel Button variants */
+.obsidian-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.obsidian-btn-default {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+}
+.obsidian-btn-default:hover {
+  background: hsl(174 80% 40%);
+}
+
+.obsidian-btn-outline {
+  border: 1px solid hsl(var(--border));
+  background: transparent;
+  color: hsl(var(--foreground));
+}
+.obsidian-btn-outline:hover {
+  background: hsl(var(--surface-2));
+  color: hsl(var(--foreground));
+}
+
+.obsidian-btn-ghost {
+  background: transparent;
+  color: hsl(var(--foreground));
+}
+.obsidian-btn-ghost:hover {
+  background: hsl(var(--surface-2));
+}
+
+/* Badge — matches panel Badge component */
+.obsidian-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 0.375rem;
+  border: 1px solid transparent;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: colors 0.2s ease;
+}
+
+.obsidian-badge-default {
+  border-color: transparent;
+  background: hsl(var(--primary) / 0.15);
+  color: hsl(var(--primary));
+}
+
+.obsidian-badge-secondary {
+  border-color: transparent;
+  background: hsl(var(--surface-2));
+  color: hsl(var(--foreground));
+}
+
+/* Terminal cursor */
+.cursor-blink::after {
+  content: "▋";
+  animation: blink 1s step-end infinite;
+  color: hsl(var(--primary));
+  margin-left: 2px;
+}
+
+/* Screenshot card */
+.screenshot-card {
+  border-radius: 0.75rem;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--card));
+  overflow: hidden;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.screenshot-card:hover {
+  border-color: hsl(var(--surface-3));
+  transform: translateY(-2px);
+}
+
+.screenshot-card img {
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.screenshot-card:hover img {
+  transform: scale(1.02);
+}
+
+/* Nav blur — matches panel surface-0 */
+.nav-blur {
+  backdrop-filter: blur(16px) saturate(1.8);
+  -webkit-backdrop-filter: blur(16px) saturate(1.8);
+}
+
+/* Section divider — subtle zinc line */
+.section-divider {
+  height: 1px;
+  background: hsl(var(--border));
+}

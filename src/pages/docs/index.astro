@@ -4,136 +4,78 @@ import { getCollection } from 'astro:content';
 
 const entries = await getCollection('docs');
 
-interface SidebarGroup {
+interface DocGroup {
   label: string;
-  slug: string;
   items: { title: string; slug: string; description?: string; order: number }[];
 }
 
-const groups = new Map<string, SidebarGroup>();
+const groups = new Map<string, DocGroup>();
 
 for (const e of entries) {
   const parts = e.id.split('/');
-  let group: SidebarGroup;
+  let group: DocGroup;
 
   if (parts.length >= 2) {
-    const groupSlug = parts.slice(0, -1).join('/');
-    const groupLabel = parts.slice(0, -1).map(p => p.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())).join(' / ');
-    if (!groups.has(groupSlug)) {
-      groups.set(groupSlug, { label: groupLabel, slug: groupSlug, items: [] });
-    }
-    group = groups.get(groupSlug)!;
+    const slug = parts.slice(0, -1).join('/');
+    const label = parts.slice(0, -1).map(p => p.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())).join(' / ');
+    if (!groups.has(slug)) groups.set(slug, { label, items: [] });
+    group = groups.get(slug)!;
   } else {
-    const groupSlug = '_root';
-    if (!groups.has(groupSlug)) {
-      groups.set(groupSlug, { label: 'Overview', slug: '', items: [] });
-    }
-    group = groups.get(groupSlug)!;
+    if (!groups.has('_root')) groups.set('_root', { label: 'Overview', items: [] });
+    group = groups.get('_root')!;
   }
 
-  group.items.push({
-    title: e.data.title,
-    slug: e.id,
-    description: e.data.description,
-    order: e.data.order,
-  });
+  group.items.push({ title: e.data.title, slug: e.id, description: e.data.description, order: e.data.order });
 }
 
 const sidebar = Array.from(groups.values())
-  .sort((a, b) => {
-    if (a.label === 'Overview') return -1;
-    if (b.label === 'Overview') return 1;
-    return a.label.localeCompare(b.label);
-  })
-  .map(g => ({
-    ...g,
-    items: g.items.sort((a, b) => a.order - b.order),
-  }));
-
-const total = entries.length;
+  .sort((a, b) => a.label === 'Overview' ? -1 : b.label === 'Overview' ? 1 : a.label.localeCompare(b.label))
+  .map(g => ({ ...g, items: g.items.sort((a, b) => a.order - b.order) }));
 ---
 
-<Layout title="Documentation" description="Catalyst documentation — guides for installation, configuration, nodes, plugins, and more.">
-  <!-- Ambient glow -->
-  <div class="pointer-events-none fixed inset-0 -z-10">
-    <div class="absolute left-1/4 top-0 h-[500px] w-[500px] rounded-full bg-primary/[0.03] blur-[120px]"></div>
-  </div>
+<Layout title="Documentation" description="Catalyst documentation — installation, configuration, nodes, plugins.">
+  <div class="max-w-3xl mx-auto px-6 sm:px-10 py-16">
 
-  <div class="max-w-5xl mx-auto px-4 sm:px-6">
+    <h1 class="font-display text-4xl font-bold text-zinc-50 mb-3">Documentation</h1>
+    <p class="text-lg text-zinc-500 mb-12">Everything you need to set up and run Catalyst.</p>
 
-    <!-- Hero -->
-    <div class="pt-16 pb-14 animate-fade-up">
-      <div class="flex items-center gap-2.5 mb-5">
-        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 ring-1 ring-primary/20">
-          <svg class="w-4.5 h-4.5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
-          </svg>
-        </div>
-        <span class="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium text-primary">
-          {total} pages
-        </span>
-      </div>
-
-      <h1 class="font-display text-4xl sm:text-5xl font-bold text-zinc-50 tracking-tight leading-[1.1]">
-        Documentation
-      </h1>
-      <p class="mt-4 text-lg sm:text-xl text-zinc-400 max-w-xl leading-relaxed">
-        Everything you need to install, configure, and run Catalyst.
-      </p>
-
-      <!-- Quick links -->
-      <div class="mt-8 flex flex-wrap items-center gap-3">
-        <a
-          href={sidebar[0]?.items?.[0] ? `/docs/${sidebar[0].items[0].slug}/` : '/docs/'}
-          class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground shadow-sm transition-all duration-200 hover:bg-primary-600"
-        >
-          Get started
-          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
-        </a>
-        <a
-          href="https://github.com/catalystctl/catalyst"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="inline-flex items-center gap-2 rounded-lg border border-zinc-800 px-4 py-2.5 text-sm font-medium text-zinc-300 transition-all duration-200 hover:bg-zinc-800/50 hover:text-zinc-100"
-        >
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-          View source
-        </a>
-      </div>
+    <div class="space-y-12">
+      {sidebar.map(group => (
+        <section>
+          <h2 class="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-600 mb-4">{group.label}</h2>
+          <div class="space-y-1">
+            {group.items.map(item => (
+              <a
+                href={`/docs/${item.slug}/`}
+                class="group flex items-center justify-between rounded-lg px-4 py-3 -mx-1 transition-colors hover:bg-zinc-800/30"
+              >
+                <div>
+                  <span class="text-[15px] text-zinc-300 group-hover:text-primary transition-colors">{item.title}</span>
+                  {item.description && (
+                    <span class="block text-sm text-zinc-600 mt-0.5">{item.description}</span>
+                  )}
+                </div>
+                <svg class="w-4 h-4 text-zinc-700 group-hover:text-primary shrink-0 opacity-0 group-hover:opacity-100 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                </svg>
+              </a>
+            ))}
+          </div>
+        </section>
+      ))}
     </div>
 
-    <!-- Doc groups -->
-    <div class="pb-24 space-y-4">
-      {sidebar.map((group, gi) => (
-        <div class="animate-fade-up delay-{(gi + 1) * 100}" style={`animation-delay: ${(gi + 1) * 80}ms`}>
-          <div class="rounded-xl border border-zinc-800/60 bg-zinc-900/20 overflow-hidden transition-all duration-300 hover:border-zinc-700/60 hover:bg-zinc-900/40">
-            <!-- Group header -->
-            <div class="flex items-center gap-3 px-5 py-3.5 border-b border-zinc-800/40">
-              <span class="text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-500">{group.label}</span>
-              <span class="text-[9px] font-mono text-zinc-700">{group.items.length}</span>
-            </div>
-            <!-- Items -->
-            <div class="divide-y divide-zinc-800/30">
-              {group.items.map((item) => (
-                <a
-                  href={`/docs/${item.slug}/`}
-                  class="group flex items-center justify-between gap-4 px-5 py-3.5 transition-all duration-150 hover:bg-zinc-800/20"
-                >
-                  <div class="min-w-0">
-                    <span class="text-sm font-medium text-zinc-300 group-hover:text-primary transition-colors">{item.title}</span>
-                    {item.description && (
-                      <span class="block text-xs text-zinc-600 mt-0.5 truncate">{item.description}</span>
-                    )}
-                  </div>
-                  <svg class="w-4 h-4 shrink-0 text-zinc-700 group-hover:text-primary opacity-0 group-hover:opacity-100 transition-all -translate-x-1 group-hover:translate-x-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                  </svg>
-                </a>
-              ))}
-            </div>
-          </div>
-        </div>
-      ))}
+    <div class="mt-20 pt-8 border-t border-zinc-800/50 text-center">
+      <p class="text-sm text-zinc-600 mb-4">Contributions welcome</p>
+      <a
+        href="https://github.com/catalystctl/catalyst-website"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary-600 transition-colors"
+      >
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        Edit on GitHub
+      </a>
     </div>
   </div>
 </Layout>

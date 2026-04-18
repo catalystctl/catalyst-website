@@ -12,9 +12,12 @@ export interface Props {
 const { title, description = "Fast, secure, modern game server management platform." } = Astro.props;
 const currentPath = Astro.url.pathname;
 
+// BASE_URL includes trailing slash: "/" in dev, "/catalyst-website/" in prod
+const B = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "") + "/";
+
 const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/screenshots", label: "Screenshots" },
+  { href: B, label: "Home" },
+  { href: B + "screenshots", label: "Screenshots" },
 ];
 
 const GITHUB_URL = "https://github.com/catalystctl/catalyst";
@@ -26,7 +29,7 @@ const GITHUB_URL = "https://github.com/catalystctl/catalyst";
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
-    <link rel="icon" href="/favicon.ico" />
+    <link rel="icon" href={B + "favicon.ico"} />
     <meta name="generator" content={Astro.generator} />
     <title>{title === "Home" ? "Catalyst" : `${title} — Catalyst`}</title>
   </head>
@@ -35,8 +38,8 @@ const GITHUB_URL = "https://github.com/catalystctl/catalyst";
     <!-- Top nav — matches panel Header component exactly -->
     <header class="sticky top-0 z-50 flex items-center justify-between border-b border-zinc-800 bg-surface-1/80 backdrop-blur-md shadow-surface-dark px-4 h-14">
       <div class="flex items-center gap-3">
-        <a href="/" class="flex items-center gap-2">
-          <img src="/logo.png" alt="Catalyst logo" class="h-6 w-6 rounded" />
+        <a href={B} class="flex items-center gap-2">
+          <img src={B + "logo.png"} alt="Catalyst logo" class="h-6 w-6 rounded" />
           <span class="font-display text-lg font-semibold text-zinc-100">Catalyst</span>
         </a>
       </div>
@@ -47,7 +50,7 @@ const GITHUB_URL = "https://github.com/catalystctl/catalyst";
             href={link.href}
             class:list={[
               "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
-              currentPath === link.href
+              currentPath === link.href || (link.href === B && currentPath === B)
                 ? "bg-primary text-primary-foreground shadow-sm"
                 : "text-zinc-400 hover:bg-surface-2 hover:text-zinc-100",
             ]}

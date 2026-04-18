@@ -1,6 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 
+const B = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "") + "/";
 const GITHUB_URL = "https://github.com/catalystctl/catalyst";
 
 const stats = [
@@ -104,7 +105,7 @@ const features = [
             </svg>
           </a>
           <a
-            href="/screenshots"
+            href={B + "screenshots"}
             class="inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-transparent px-4 py-2 text-sm font-medium text-zinc-200 transition-all duration-200 hover:bg-surface-2 hover:text-zinc-100"
           >
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -247,7 +248,7 @@ const features = [
             <p class="text-sm text-muted-foreground">Captured at 1080p via Playwright.</p>
           </div>
           <div class="flex items-center gap-2">
-            <a href="/screenshots" class="inline-flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80 transition-colors">
+            <a href={B + "screenshots"} class="inline-flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80 transition-colors">
               View all
               <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -258,10 +259,10 @@ const features = [
       </div>
       <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
-          { src: "/img/screenshots/user/dashboard.png", alt: "Dashboard" },
-          { src: "/img/screenshots/user/server-console.png", alt: "Server Console" },
-          { src: "/img/screenshots/admin/admin-dashboard.png", alt: "Admin Dashboard" },
-          { src: "/img/screenshots/admin/admin-nodes.png", alt: "Admin Nodes" },
+          { src: B + "img/screenshots/user/dashboard.png", alt: "Dashboard" },
+          { src: B + "img/screenshots/user/server-console.png", alt: "Server Console" },
+          { src: B + "img/screenshots/admin/admin-dashboard.png", alt: "Admin Dashboard" },
+          { src: B + "img/screenshots/admin/admin-nodes.png", alt: "Admin Nodes" },
         ].map((shot) => (
           <div class="group rounded-xl border border-border bg-card overflow-hidden shadow-surface-dark transition-all duration-200 hover:border-zinc-700 hover:shadow-elevated-dark">
             <div class="aspect-video bg-zinc-950 overflow-hidden">

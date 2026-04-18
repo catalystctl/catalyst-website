@@ -63,6 +63,15 @@ const screenshotGroups: ScreenshotGroup[] = [
   },
 ];
 
+const B = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "") + "/";
+
+// Prefix all screenshot paths with the base URL
+for (const group of screenshotGroups) {
+  for (const shot of group.screenshots) {
+    shot.path = B + shot.path.slice(1);
+  }
+}
+
 const total = screenshotGroups.reduce((sum, g) => sum + g.screenshots.length, 0);
 const GITHUB_URL = "https://github.com/catalystctl/catalyst";
 ---

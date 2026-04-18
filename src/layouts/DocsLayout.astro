@@ -1,0 +1,411 @@
+---
+import Layout from './Layout.astro';
+import type { CollectionEntry } from 'astro:content';
+import { getCollection, render } from 'astro:content';
+
+export interface Props {
+  entry: CollectionEntry<'docs'>;
+  entries: CollectionEntry<'docs'>[];
+}
+
+const { entry, entries } = Astro.props;
+
+// Build sidebar tree from file structure
+interface SidebarGroup {
+  label: string;
+  slug: string;
+  items: { title: string; slug: string; order: number }[];
+}
+
+const groups = new Map<string, SidebarGroup>();
+
+for (const e of entries) {
+  const parts = e.id.split('/');
+  let group: SidebarGroup;
+
+  if (parts.length >= 2) {
+    const groupSlug = parts.slice(0, -1).join('/');
+    const groupLabel = parts.slice(0, -1).map(p => p.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())).join(' / ');
+    if (!groups.has(groupSlug)) {
+      groups.set(groupSlug, { label: groupLabel, slug: groupSlug, items: [] });
+    }
+    group = groups.get(groupSlug)!;
+  } else {
+    const groupSlug = '_root';
+    if (!groups.has(groupSlug)) {
+      groups.set(groupSlug, { label: 'Overview', slug: '', items: [] });
+    }
+    group = groups.get(groupSlug)!;
+  }
+
+  group.items.push({
+    title: e.data.title,
+    slug: e.id,
+    order: e.data.order,
+  });
+}
+
+// Sort groups and items
+const sidebar = Array.from(groups.values())
+  .sort((a, b) => {
+    if (a.slug === '_root') return -1;
+    if (b.slug === '_root') return 1;
+    return a.slug.localeCompare(b.slug);
+  })
+  .map(g => ({
+    ...g,
+    items: g.items.sort((a, b) => a.order - b.order),
+  }));
+
+const currentSlug = entry.id;
+
+// Prev/next navigation
+const sortedEntries = entries
+  .map(e => ({ id: e.id, title: e.data.title }))
+  .sort((a, b) => a.id.localeCompare(b.id));
+const currentIndex = sortedEntries.findIndex(e => e.id === currentSlug);
+const prev = currentIndex > 0 ? sortedEntries[currentIndex - 1] : null;
+const next = currentIndex < sortedEntries.length - 1 ? sortedEntries[currentIndex + 1] : null;
+
+const { Content } = await render(entry);
+---
+
+<Layout title={entry.data.title} description={entry.data.description || `${entry.data.title} — Catalyst Documentation`} type="article">
+  <div class="flex">
+    <!-- Sidebar -->
+    <aside class="hidden lg:block w-64 shrink-0 border-r border-zinc-800 sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto">
+      <nav class="px-4 py-6 space-y-6" aria-label="Documentation navigation">
+        <!-- Docs title -->
+        <div class="flex items-center gap-2 px-3 mb-2">
+          <svg class="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+          </svg>
+          <span class="text-[11px] font-semibold uppercase tracking-widest text-zinc-500">Documentation</span>
+        </div>
+
+        {sidebar.map(group => (
+          <div>
+            <!-- Group label — matches panel Sidebar section pattern -->
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-[11px] font-semibold uppercase tracking-widest text-zinc-500 px-3 py-1">{group.label}</span>
+            </div>
+            <div class="space-y-0.5">
+              {group.items.map(item => {
+                const href = `/docs/${item.slug}/`;
+                const active = item.slug === currentSlug;
+                return (
+                  <a
+                    href={href}
+                    class:list={[
+                      "flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm transition-all duration-200",
+                      active
+                        ? "bg-primary/15 text-primary font-medium"
+                        : "text-zinc-400 hover:bg-surface-2 hover:text-zinc-100",
+                    ]}
+                  >
+                    {active && <span class="h-1.5 w-1.5 rounded-full bg-primary" />}
+                    {!active && <span class="h-1.5 w-1.5 rounded-full bg-transparent" />}
+                    {item.title}
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </nav>
+    </aside>
+
+    <!-- Mobile nav toggle -->
+    <button
+      id="mobile-nav-toggle"
+      class="lg:hidden fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg"
+      aria-label="Toggle navigation"
+    >
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+      </svg>
+    </button>
+
+    <!-- Mobile sidebar overlay -->
+    <div id="mobile-nav-overlay" class="lg:hidden fixed inset-0 z-40 hidden">
+      <div class="absolute inset-0 bg-black/60" id="mobile-nav-backdrop"></div>
+      <aside class="absolute left-0 top-14 bottom-0 w-72 bg-surface-1 border-r border-zinc-800 overflow-y-auto">
+        <nav class="px-4 py-6 space-y-6" aria-label="Documentation navigation (mobile)">
+          <div class="flex items-center gap-2 px-3 mb-2">
+            <svg class="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+            </svg>
+            <span class="text-[11px] font-semibold uppercase tracking-widest text-zinc-500">Documentation</span>
+          </div>
+
+          {sidebar.map(group => (
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="text-[11px] font-semibold uppercase tracking-widest text-zinc-500 px-3 py-1">{group.label}</span>
+              </div>
+              <div class="space-y-0.5">
+                {group.items.map(item => {
+                  const href = `/docs/${item.slug}/`;
+                  const active = item.slug === currentSlug;
+                  return (
+                    <a
+                      href={href}
+                      class:list={[
+                        "flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm transition-all duration-200",
+                        active
+                          ? "bg-primary/15 text-primary font-medium"
+                          : "text-zinc-400 hover:bg-surface-2 hover:text-zinc-100",
+                      ]}
+                    >
+                      {active && <span class="h-1.5 w-1.5 rounded-full bg-primary" />}
+                      {!active && <span class="h-1.5 w-1.5 rounded-full bg-transparent" />}
+                      {item.title}
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </nav>
+      </aside>
+    </div>
+
+    <!-- Content -->
+    <div class="flex-1 min-w-0">
+      <div class="max-w-3xl mx-auto px-6 py-10">
+        <!-- Breadcrumb -->
+        <nav class="flex items-center gap-1.5 text-sm text-zinc-500 mb-6" aria-label="Breadcrumb">
+          <a href="/" class="hover:text-zinc-300 transition-colors">Home</a>
+          <span>/</span>
+          <a href="/docs/" class="hover:text-zinc-300 transition-colors">Docs</a>
+          {entry.id.includes('/') && (
+            <>
+              <span>/</span>
+              {entry.id.split('/').slice(0, -1).map(part => (
+                <span class="text-zinc-400">{part.replace(/-/g, ' ')}</span>
+              ))}
+            </>
+          )}
+        </nav>
+
+        <!-- Page title -->
+        <header class="mb-8">
+          <h1 class="font-display text-3xl font-bold text-foreground">{entry.data.title}</h1>
+          {entry.data.description && (
+            <p class="mt-2 text-lg text-muted-foreground">{entry.data.description}</p>
+          )}
+        </header>
+
+        <!-- Markdown content -->
+        <article class="prose-docs">
+          <Content />
+        </article>
+
+        <!-- Prev/Next navigation -->
+        {(prev || next) && (
+          <footer class="mt-16 flex items-stretch gap-4">
+            {prev && (
+              <a href={`/docs/${prev.id}/`} class="flex-1 rounded-xl border border-border bg-card p-4 transition-all duration-200 hover:border-zinc-700 group">
+                <span class="text-xs text-zinc-500 mb-1 block">Previous</span>
+                <span class="text-sm font-medium text-foreground group-hover:text-primary transition-colors">&larr; {prev.title}</span>
+              </a>
+            )}
+            {next && (
+              <a href={`/docs/${next.id}/`} class="flex-1 rounded-xl border border-border bg-card p-4 text-right transition-all duration-200 hover:border-zinc-700 group">
+                <span class="text-xs text-zinc-500 mb-1 block">Next</span>
+                <span class="text-sm font-medium text-foreground group-hover:text-primary transition-colors">{next.title} &rarr;</span>
+              </a>
+            )}
+          </footer>
+        )}
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const toggle = document.getElementById('mobile-nav-toggle');
+    const overlay = document.getElementById('mobile-nav-overlay');
+    const backdrop = document.getElementById('mobile-nav-backdrop');
+
+    toggle?.addEventListener('click', () => {
+      overlay?.classList.toggle('hidden');
+    });
+
+    backdrop?.addEventListener('click', () => {
+      overlay?.classList.add('hidden');
+    });
+  </script>
+</Layout>
+
+<style>
+  /* Prose styling for docs — matches Obsidian dark theme */
+  .prose-docs {
+    color: hsl(var(--foreground));
+    line-height: 1.75;
+    font-size: 0.9375rem;
+  }
+
+  .prose-docs h2 {
+    font-family: 'Outfit Variable', system-ui, sans-serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: hsl(var(--foreground));
+    margin-top: 2.5rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid hsl(var(--border));
+  }
+
+  .prose-docs h3 {
+    font-family: 'Outfit Variable', system-ui, sans-serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: hsl(var(--foreground));
+    margin-top: 2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .prose-docs p {
+    margin-bottom: 1rem;
+  }
+
+  .prose-docs a {
+    color: hsl(var(--primary));
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 0.2s;
+  }
+
+  .prose-docs a:hover {
+    color: hsl(var(--accent-teal-light));
+  }
+
+  .prose-docs ul, .prose-docs ol {
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+  }
+
+  .prose-docs li {
+    margin-bottom: 0.25rem;
+  }
+
+  .prose-docs ul li::marker {
+    color: hsl(var(--primary));
+  }
+
+  .prose-docs ol li::marker {
+    color: hsl(var(--primary));
+    font-weight: 600;
+  }
+
+  .prose-docs strong {
+    color: hsl(var(--foreground));
+    font-weight: 600;
+  }
+
+  .prose-docs code {
+    font-family: 'JetBrains Mono Variable', monospace;
+    font-size: 0.85em;
+    background: hsl(var(--surface-2));
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.25rem;
+    padding: 0.15rem 0.4rem;
+  }
+
+  .prose-docs pre {
+    font-family: 'JetBrains Mono Variable', monospace;
+    font-size: 0.85rem;
+    background: hsl(var(--surface-0));
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.75rem;
+    padding: 1rem 1.25rem;
+    overflow-x: auto;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+
+  .prose-docs pre code {
+    background: transparent;
+    border: none;
+    padding: 0;
+    font-size: inherit;
+  }
+
+  .prose-docs blockquote {
+    border-left: 3px solid hsl(var(--primary));
+    background: hsl(var(--surface-1));
+    border-radius: 0 0.5rem 0.5rem 0;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.5rem;
+    color: hsl(var(--muted-foreground));
+  }
+
+  .prose-docs blockquote p {
+    margin-bottom: 0;
+  }
+
+  .prose-docs hr {
+    border: none;
+    border-top: 1px solid hsl(var(--border));
+    margin: 2rem 0;
+  }
+
+  .prose-docs table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+  }
+
+  .prose-docs th {
+    text-align: left;
+    font-weight: 600;
+    color: hsl(var(--foreground));
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid hsl(var(--border));
+    background: hsl(var(--surface-1));
+  }
+
+  .prose-docs td {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid hsl(var(--border));
+  }
+
+  .prose-docs tr:hover td {
+    background: hsl(var(--surface-1));
+  }
+
+  .prose-docs img {
+    border-radius: 0.75rem;
+    border: 1px solid hsl(var(--border));
+    margin: 1.5rem 0;
+  }
+
+  /* Admonition / callout styling via blockquote variants */
+  .prose-docs :global(.callout) {
+    border-radius: 0.75rem;
+    border: 1px solid hsl(var(--border));
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .prose-docs :global(.callout-info) {
+    border-left: 3px solid hsl(var(--info));
+    background: hsl(var(--info-muted));
+  }
+
+  .prose-docs :global(.callout-warning) {
+    border-left: 3px solid hsl(var(--warning));
+    background: hsl(var(--warning-muted));
+  }
+
+  .prose-docs :global(.callout-danger) {
+    border-left: 3px solid hsl(var(--danger));
+    background: hsl(var(--danger-muted));
+  }
+
+  .prose-docs :global(.callout-success) {
+    border-left: 3px solid hsl(var(--success));
+    background: hsl(var(--success-muted));
+  }
+</style>

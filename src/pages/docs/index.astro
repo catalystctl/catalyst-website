@@ -1,0 +1,105 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const entries = await getCollection('docs');
+
+// Group by directory
+interface SidebarGroup {
+  label: string;
+  items: { title: string; slug: string; description?: string; order: number }[];
+}
+
+const groups = new Map<string, SidebarGroup>();
+
+for (const e of entries) {
+  const parts = e.id.split('/');
+  let group: SidebarGroup;
+
+  if (parts.length >= 2) {
+    const groupSlug = parts.slice(0, -1).join('/');
+    const groupLabel = parts.slice(0, -1).map(p => p.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())).join(' / ');
+    if (!groups.has(groupSlug)) {
+      groups.set(groupSlug, { label: groupLabel, items: [] });
+    }
+    group = groups.get(groupSlug)!;
+  } else {
+    const groupSlug = '_root';
+    if (!groups.has(groupSlug)) {
+      groups.set(groupSlug, { label: 'Overview', items: [] });
+    }
+    group = groups.get(groupSlug)!;
+  }
+
+  group.items.push({
+    title: e.data.title,
+    slug: e.id,
+    description: e.data.description,
+    order: e.data.order,
+  });
+}
+
+const sidebar = Array.from(groups.values())
+  .sort((a, b) => {
+    if (a.label === 'Overview') return -1;
+    if (b.label === 'Overview') return 1;
+    return a.label.localeCompare(b.label);
+  })
+  .map(g => ({
+    ...g,
+    items: g.items.sort((a, b) => a.order - b.order),
+  }));
+---
+
+<Layout title="Documentation" description="Catalyst documentation — guides for installation, configuration, nodes, plugins, and more.">
+  <div class="max-w-4xl mx-auto px-4 py-10 space-y-8">
+    <!-- Header -->
+    <div class="space-y-2">
+      <h1 class="font-display text-3xl font-bold text-foreground">Documentation</h1>
+      <p class="text-lg text-muted-foreground">Everything you need to set up and run Catalyst.</p>
+    </div>
+
+    <!-- Doc groups -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {sidebar.map(group => (
+        <div class="rounded-xl border border-border bg-card p-5 shadow-surface-dark">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-[11px] font-semibold uppercase tracking-widest text-zinc-500 px-3 py-1">{group.label}</span>
+          </div>
+          <div class="space-y-1">
+            {group.items.map(item => (
+              <a
+                href={`/docs/${item.slug}/`}
+                class="group flex items-center justify-between rounded-lg px-3 py-2 transition-all duration-200 hover:bg-surface-2"
+              >
+                <span class="text-sm text-foreground group-hover:text-primary transition-colors">{item.title}</span>
+                <svg class="w-4 h-4 text-zinc-600 group-hover:text-primary opacity-0 group-hover:opacity-100 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                </svg>
+              </a>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- CTA -->
+    <div class="flex flex-col items-center justify-center rounded-xl border border-dashed border-border px-4 py-10 text-center">
+      <svg class="w-8 h-8 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+      </svg>
+      <p class="mt-2 text-sm text-muted-foreground">Contributions welcome! Open a PR to improve the docs.</p>
+      <a
+        href="https://github.com/catalystctl/catalyst-website"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="mt-4 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-all duration-200 hover:bg-primary-600"
+      >
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+        </svg>
+        Edit on GitHub
+      </a>
+    </div>
+  </div>
+</Layout>

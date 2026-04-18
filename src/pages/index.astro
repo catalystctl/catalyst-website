@@ -51,7 +51,7 @@ const features = [
 ];
 ---
 
-<Layout title="Home">
+<Layout title="Home" description="Catalyst is a fast, secure, and modern game server management platform built with Rust, TypeScript, and containerd. Deploy game servers with Docker Compose in 60 seconds." />
   <!-- Ambient glow — matches panel AppLayout -->
   <div class="pointer-events-none fixed inset-0 -z-10">
     <div class="absolute -left-24 top-12 h-64 w-64 rounded-full bg-primary/5 blur-3xl"></div>
@@ -60,7 +60,8 @@ const features = [
 
   <div class="max-w-6xl mx-auto px-4 py-6 space-y-6">
 
-    <!-- ═══ HERO — matches panel DashboardPage hero card exactly ═══ -->
+    <!-- HERO -->
+    <section aria-label="Catalyst overview">
     <div class="relative overflow-hidden rounded-xl border border-primary/20 bg-gradient-to-br from-primary/20 via-primary/10 to-transparent p-8">
       <div class="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-primary/10 blur-3xl"></div>
       <div class="absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-primary/5 blur-3xl"></div>
@@ -136,9 +137,8 @@ const features = [
         </div>
       </div>
     </div>
-
-    <!-- ═══ QUICK ACTIONS — matches panel DashboardPage quick action grid ═══ -->
-    <div>
+    </section>
+    <section aria-label="Features">
       <div class="flex items-center justify-between mb-4">
         <div>
           <h2 class="font-display text-lg font-semibold text-foreground">Features</h2>
@@ -166,9 +166,10 @@ const features = [
           </a>
         ))}
       </div>
-    </div>
+    </section>
 
-    <!-- ═══ INSTALL + RESOURCE BARS — matches panel two-column layout ═══ -->
+    <!-- INSTALL + ARCHITECTURE -->
+    <section aria-label="Quick start and architecture">
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-5">
 
       <!-- Install (3 cols) — matches panel resource card -->
@@ -238,8 +239,10 @@ const features = [
         </div>
       </div>
     </div>
+    </section>
 
-    <!-- ═══ SCREENSHOTS PREVIEW — matches panel PageHeader + card grid ═══ -->
+    <!-- SCREENSHOTS -->
+    <section aria-label="Screenshots preview">
     <div>
       <div class="rounded-xl border border-border bg-card px-6 py-4 shadow-surface-dark mb-4">
         <div class="flex flex-wrap items-center justify-between gap-4">
@@ -266,14 +269,16 @@ const features = [
         ].map((shot) => (
           <div class="group rounded-xl border border-border bg-card overflow-hidden shadow-surface-dark transition-all duration-200 hover:border-zinc-700 hover:shadow-elevated-dark">
             <div class="aspect-video bg-zinc-950 overflow-hidden">
-              <img src={shot.src} alt={shot.alt} class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+              <img src={shot.src} alt={shot.alt} class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" width="384" height="216" />
             </div>
           </div>
         ))}
       </div>
     </div>
+    </section>
 
-    <!-- ═══ CTA — matches panel empty state / dashed border pattern ═══ -->
+    <!-- CTA -->
+    <section aria-label="Call to action">
     <div class="relative overflow-hidden rounded-xl border border-primary/20 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-8 text-center">
       <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-primary/[0.06] rounded-full blur-3xl pointer-events-none"></div>
       <div class="relative z-10">
@@ -302,6 +307,7 @@ const features = [
         </div>
       </div>
     </div>
+    </section>
 
   </div>
 </Layout>

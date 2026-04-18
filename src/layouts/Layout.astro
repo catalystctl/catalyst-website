@@ -7,20 +7,58 @@ import '../styles/global.css';
 export interface Props {
   title: string;
   description?: string;
+  ogImage?: string;
+  canonicalUrl?: string;
+  type?: "website" | "article";
 }
 
-const { title, description = "Fast, secure, modern game server management platform." } = Astro.props;
-const currentPath = Astro.url.pathname;
+const {
+  title,
+  description = "Catalyst is a fast, secure, and modern game server management platform. Built with Rust, TypeScript, and containerd — the Pterodactyl replacement.",
+  ogImage,
+  canonicalUrl,
+  type = "website",
+} = Astro.props;
 
-// BASE_URL includes trailing slash: "/" in dev, "/catalyst-website/" in prod
 const B = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "") + "/";
+const siteUrl = Astro.site?.toString().replace(/\/+$/, "") || "https://catalystctl.github.io";
+const fullUrl = canonicalUrl || new URL(Astro.url.pathname, siteUrl).toString();
+const fullTitle = title === "Home" ? "Catalyst — Modern Game Server Management" : `${title} — Catalyst`;
+const ogImageUrl = ogImage ? new URL(ogImage, siteUrl).toString() : undefined;
 
 const navLinks = [
   { href: B, label: "Home" },
-  { href: B + "screenshots", label: "Screenshots" },
+  { href: B + "screenshots/", label: "Screenshots" },
 ];
 
 const GITHUB_URL = "https://github.com/catalystctl/catalyst";
+
+// JSON-LD structured data
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Catalyst",
+  "description": description,
+  "url": siteUrl + import.meta.env.BASE_URL,
+  "applicationCategory": "ServerApplication",
+  "operatingSystem": "Linux",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD",
+  },
+  "programmingLanguage": ["TypeScript", "Rust"],
+  "license": "https://www.gnu.org/licenses/gpl-3.0.en.html",
+  "codeRepository": GITHUB_URL,
+  "featureList": [
+    "Real-time console streaming via WebSocket",
+    "containerd runtime for superior performance",
+    "RBAC with 20+ granular permissions",
+    "60+ REST API endpoints",
+    "Plugin system for extensibility",
+    "Automatic crash detection and recovery",
+  ],
+};
 ---
 
 <!doctype html>
@@ -28,29 +66,60 @@ const GITHUB_URL = "https://github.com/catalystctl/catalyst";
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Primary Meta Tags -->
+    <title>{fullTitle}</title>
+    <meta name="title" content={fullTitle} />
     <meta name="description" content={description} />
-    <link rel="icon" href={B + "favicon.ico"} />
+    <meta name="keywords" content="game server management, pterodactyl alternative, catalyst, game server panel, server hosting, containerd, rust, typescript, minecraft server, game server control panel" />
+    <meta name="robots" content="index, follow" />
     <meta name="generator" content={Astro.generator} />
-    <title>{title === "Home" ? "Catalyst" : `${title} — Catalyst`}</title>
+    <link rel="canonical" href={fullUrl} />
+
+    <!-- Favicon -->
+    <link rel="icon" href={B + "favicon.ico"} />
+    <link rel="icon" type="image/svg+xml" href={B + "favicon.svg"} />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content={type} />
+    <meta property="og:url" content={fullUrl} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:site_name" content="Catalyst" />
+    <meta property="og:locale" content="en_US" />
+    {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
+    {ogImageUrl && <meta property="og:image:width" content="1200" />}
+    {ogImageUrl && <meta property="og:image:height" content="630" />}
+    {ogImageUrl && <meta property="og:image:alt" content={fullTitle} />}
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={fullUrl} />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   </head>
 
   <body class="min-h-screen bg-background text-foreground">
-    <!-- Top nav — matches panel Header component exactly -->
+    <!-- Top nav -->
     <header class="sticky top-0 z-50 flex items-center justify-between border-b border-zinc-800 bg-surface-1/80 backdrop-blur-md shadow-surface-dark px-4 h-14">
       <div class="flex items-center gap-3">
-        <a href={B} class="flex items-center gap-2">
-          <img src={B + "logo.png"} alt="Catalyst logo" class="h-6 w-6 rounded" />
+        <a href={B} class="flex items-center gap-2" aria-label="Catalyst home">
+          <img src={B + "logo.png"} alt="Catalyst logo" class="h-6 w-6 rounded" width="24" height="24" />
           <span class="font-display text-lg font-semibold text-zinc-100">Catalyst</span>
         </a>
       </div>
 
-      <div class="flex items-center gap-1">
+      <nav class="flex items-center gap-1" aria-label="Main navigation">
         {navLinks.map((link) => (
           <a
             href={link.href}
             class:list={[
               "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
-              currentPath === link.href || (link.href === B && currentPath === B)
+              Astro.url.pathname === link.href || (link.href === B && Astro.url.pathname === B)
                 ? "bg-primary text-primary-foreground shadow-sm"
                 : "text-zinc-400 hover:bg-surface-2 hover:text-zinc-100",
             ]}
@@ -58,42 +127,43 @@ const GITHUB_URL = "https://github.com/catalystctl/catalyst";
             {link.label}
           </a>
         ))}
-        <div class="w-px h-5 bg-zinc-800 mx-2"></div>
+        <div class="w-px h-5 bg-zinc-800 mx-2" aria-hidden="true"></div>
         <a
           href={GITHUB_URL}
           target="_blank"
           rel="noopener noreferrer"
           class="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-xs font-medium text-primary-foreground shadow-sm transition-all duration-200 hover:bg-primary-600"
+          aria-label="View Catalyst on GitHub"
         >
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
             <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
           </svg>
           <span class="hidden sm:inline">GitHub</span>
         </a>
-      </div>
+      </nav>
     </header>
 
     <main>
       <slot />
     </main>
 
-    <!-- Footer — matches panel BrandFooter pattern -->
+    <!-- Footer -->
     <footer class="border-t border-zinc-800 mt-24">
       <div class="max-w-6xl mx-auto px-4 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div class="flex items-center gap-1 text-xs text-muted-foreground/60">
           Made with
-          <svg class="inline h-3 w-3 fill-rose-400 text-rose-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg class="inline h-3 w-3 fill-rose-400 text-rose-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
           </svg>
           by
           <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" class="font-medium text-foreground/70 hover:text-foreground transition-colors">Catalyst</a>
           &middot; GPLv3
         </div>
-        <div class="flex items-center gap-4">
+        <nav class="flex items-center gap-4" aria-label="Footer navigation">
           <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" class="text-xs text-muted-foreground hover:text-foreground transition-colors">GitHub</a>
           <a href="https://github.com/catalystctl/catalyst/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer" class="text-xs text-muted-foreground hover:text-foreground transition-colors">Contributing</a>
           <a href="https://github.com/catalystctl/catalyst/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" class="text-xs text-muted-foreground hover:text-foreground transition-colors">License</a>
-        </div>
+        </nav>
       </div>
     </footer>
   </body>

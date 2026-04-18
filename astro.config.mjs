@@ -5,8 +5,8 @@ import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://catalystctl.github.io",
-  base: "/catalyst-website",
+  site: "https://catalystctl.com",
+  base: "/",
   trailingSlash: "always",
   compressHTML: true,
   build: {

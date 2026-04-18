@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://catalystctl.github.io/catalyst-website/sitemap-index.xml
+Sitemap: https://catalystctl.com/sitemap-index.xml

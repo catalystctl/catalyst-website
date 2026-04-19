@@ -25,3 +25,4 @@ pnpm-debug.log*
 
 # copied from submodule at build time
 public/img/screenshots/
+.pi-lens/

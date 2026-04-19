@@ -56,7 +56,13 @@ const idx = sorted.findIndex(e => e.id === currentSlug);
 const prev = idx > 0 ? sorted[idx - 1] : null;
 const next = idx < sorted.length - 1 ? sorted[idx + 1] : null;
 
-const { Content } = await render(entry);
+const { Content, headings } = await render(entry);
+
+// ── TOC: h2 + h3 only ──
+const toc = headings
+  .filter(h => h.depth === 2 || h.depth === 3)
+  .map(h => ({ depth: h.depth, slug: h.slug, text: h.text }));
+const hasToc = toc.length > 0;
 ---
 
 <Layout title={entry.data.title} description={entry.data.description || `${entry.data.title} — Catalyst Documentation`} type="article">
@@ -69,7 +75,7 @@ const { Content } = await render(entry);
   <div class="flex min-h-[calc(100vh-3.5rem)]">
 
     <!-- ═══ SIDEBAR ═══ -->
-    <aside class="hidden lg:block w-60 shrink-0 border-r border-zinc-800/50 sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto bg-zinc-950/30">
+    <aside class="hidden lg:block w-56 shrink-0 border-r border-zinc-800/50 sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto bg-zinc-950/30">
       <nav class="px-3 py-6" aria-label="Documentation">
         <a href="/docs/" class="flex items-center gap-2.5 px-3 mb-5 text-zinc-400 hover:text-zinc-200 transition-colors">
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -141,7 +147,7 @@ const { Content } = await render(entry);
 
     <!-- ═══ CONTENT ═══ -->
     <div class="flex-1 min-w-0">
-      <article class="max-w-3xl mx-auto px-6 sm:px-10 lg:px-16 py-12 lg:py-16">
+      <article class="max-w-6xl mx-auto px-6 sm:px-10 lg:px-16 py-12 lg:py-16">
 
         <!-- Mobile header -->
         <div class="lg:hidden flex items-center gap-3 mb-8">
@@ -169,9 +175,38 @@ const { Content } = await render(entry);
           )}
         </header>
 
-        <!-- Markdown body -->
-        <div class="doc">
-          <Content />
+        <!-- Body + TOC row -->
+        <div class="flex gap-12">
+          <!-- Markdown body -->
+          <div class="doc min-w-0 flex-1">
+            <Content />
+          </div>
+
+          <!-- ═══ RIGHT TOC RAIL ═══ -->
+          {hasToc && (
+            <aside class="hidden xl:block w-48 shrink-0" aria-label="Table of contents">
+              <nav class="sticky top-20 overflow-y-auto max-h-[calc(100vh-6rem)] pb-8">
+                <div class="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-600 mb-3">On this page</div>
+                <ul class="space-y-1 border-l border-zinc-800/50">
+                  {toc.map(h => (
+                    <li>
+                      <a
+                        href={`#${h.slug}`}
+                        class:list={[
+                          "block py-1 pl-3 text-[13px] leading-snug transition-colors border-l-2 -ml-px",
+                          h.depth === 3 ? "pl-6" : "",
+                          "text-zinc-500 hover:text-zinc-300 border-transparent hover:border-zinc-600",
+                        ]}
+                        data-toc-link
+                      >
+                        {h.text}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            </aside>
+          )}
         </div>
 
         <!-- Prev / Next -->
@@ -215,205 +250,27 @@ const { Content } = await render(entry);
     document.getElementById('mobile-menu-btn')?.addEventListener('click', open);
     document.getElementById('drawer-close')?.addEventListener('click', close);
     document.getElementById('drawer-backdrop')?.addEventListener('click', close);
+
+    // TOC scroll-spy
+    const tocLinks = document.querySelectorAll('[data-toc-link]');
+    if (tocLinks.length) {
+      const doc = document.querySelector('.doc');
+      const headings = doc ? [...doc.querySelectorAll('h2[id], h3[id]')] : [];
+      const onScroll = () => {
+        let active = headings[0];
+        for (const h of headings) {
+          if (h.getBoundingClientRect().top <= 80) active = h;
+        }
+        tocLinks.forEach(a => {
+          const match = a.getAttribute('href') === `#${active?.id}`;
+          a.classList.toggle('text-zinc-200', match);
+          a.classList.toggle('border-primary', match);
+          a.classList.toggle('text-zinc-500', !match);
+          a.classList.toggle('border-transparent', !match);
+        });
+      };
+      addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    }
   </script>
 </Layout>
-
-<style>
-  /* ═══════════════════════════════════════════
-     DOC PROSE — Clean, spacious, readable
-     ═══════════════════════════════════════════ */
-
-  .doc {
-    color: hsl(0 0% 82%);
-    line-height: 1.85;
-    font-size: 1rem;
-  }
-
-  /* Headings — bright, spaced, separated */
-  .doc h2 {
-    font-family: 'Outfit Variable', system-ui, sans-serif;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: hsl(0 0% 95%);
-    margin-top: 4rem;
-    margin-bottom: 1.25rem;
-    padding-top: 2rem;
-    border-top: 1px solid hsl(240 3.7% 15.9%);
-    scroll-margin-top: 5rem;
-  }
-
-  .doc h3 {
-    font-family: 'Outfit Variable', system-ui, sans-serif;
-    font-size: 1.15rem;
-    font-weight: 600;
-    color: hsl(0 0% 90%);
-    margin-top: 2.5rem;
-    margin-bottom: 0.75rem;
-    scroll-margin-top: 5rem;
-  }
-
-  /* Body text */
-  .doc p {
-    margin-bottom: 1.5rem;
-  }
-
-  .doc > *:first-child {
-    margin-top: 0;
-  }
-
-  /* Links */
-  .doc a {
-    color: hsl(174 80% 56%);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    text-decoration-color: hsl(174 80% 46% / 0.3);
-    transition: text-decoration-color 0.15s;
-  }
-
-  .doc a:hover {
-    text-decoration-color: hsl(174 80% 46% / 0.8);
-  }
-
-  /* Lists */
-  .doc ul, .doc ol {
-    margin-bottom: 1.5rem;
-    padding-left: 1.5rem;
-  }
-
-  .doc ul { list-style-type: disc; }
-  .doc ol { list-style-type: decimal; }
-
-  .doc li {
-    margin-bottom: 0.5rem;
-    padding-left: 0.25rem;
-  }
-
-  .doc li::marker {
-    color: hsl(174 80% 46% / 0.5);
-  }
-
-  .doc ol li::marker {
-    color: hsl(174 80% 46%);
-    font-weight: 600;
-  }
-
-  /* Inline code */
-  .doc :not(pre) > code {
-    font-family: 'JetBrains Mono Variable', monospace;
-    font-size: 0.85em;
-    background: hsl(240 3.7% 15.9% / 0.7);
-    border-radius: 4px;
-    padding: 0.15em 0.4em;
-    color: hsl(174 72% 70%);
-  }
-
-  /* Code blocks */
-  .doc pre {
-    font-family: 'JetBrains Mono Variable', monospace;
-    font-size: 0.85rem;
-    line-height: 1.7;
-    background: hsl(240 10% 2%);
-    border: 1px solid hsl(240 3.7% 15.9% / 0.5);
-    border-radius: 10px;
-    padding: 1.25rem 1.5rem;
-    overflow-x: auto;
-    margin: 1.5rem 0 2rem;
-  }
-
-  .doc pre code {
-    background: none;
-    border: none;
-    padding: 0;
-    font-size: inherit;
-    color: hsl(0 0% 80%);
-  }
-
-  /* Blockquotes */
-  .doc blockquote {
-    margin: 1.5rem 0;
-    padding: 1rem 1.25rem;
-    border-left: 3px solid hsl(174 80% 46% / 0.4);
-    background: hsl(240 3.7% 15.9% / 0.25);
-    border-radius: 0 8px 8px 0;
-    color: hsl(0 0% 68%);
-  }
-
-  .doc blockquote p:last-child {
-    margin-bottom: 0;
-  }
-
-  .doc blockquote strong {
-    color: hsl(0 0% 85%);
-  }
-
-  /* Tables */
-  .doc table {
-    width: 100%;
-    margin: 1.5rem 0 2rem;
-    font-size: 0.875rem;
-    border: 1px solid hsl(240 3.7% 15.9% / 0.5);
-    border-radius: 8px;
-    border-collapse: separate;
-    border-spacing: 0;
-    overflow: hidden;
-  }
-
-  .doc th {
-    text-align: left;
-    font-weight: 600;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: hsl(0 0% 65%);
-    padding: 0.75rem 1rem;
-    background: hsl(240 3.7% 15.9% / 0.4);
-    border-bottom: 1px solid hsl(240 3.7% 15.9% / 0.5);
-  }
-
-  .doc td {
-    padding: 0.6rem 1rem;
-    border-bottom: 1px solid hsl(240 3.7% 15.9% / 0.2);
-    color: hsl(0 0% 78%);
-  }
-
-  .doc tr:last-child td {
-    border-bottom: none;
-  }
-
-  .doc tr:hover td {
-    background: hsl(240 3.7% 15.9% / 0.15);
-  }
-
-  /* Horizontal rule */
-  .doc hr {
-    border: none;
-    height: 1px;
-    background: hsl(240 3.7% 15.9% / 0.5);
-    margin: 3rem 0;
-  }
-
-  /* Images */
-  .doc img {
-    border-radius: 10px;
-    border: 1px solid hsl(240 3.7% 15.9% / 0.4);
-    margin: 2rem 0;
-  }
-
-  /* Strong */
-  .doc strong {
-    color: hsl(0 0% 92%);
-    font-weight: 600;
-  }
-
-  /* Callouts */
-  .doc :global(.callout) {
-    border-radius: 8px;
-    border: 1px solid hsl(240 3.7% 15.9% / 0.4);
-    padding: 1rem 1.25rem;
-    margin-bottom: 1.5rem;
-  }
-  .doc :global(.callout-info) { border-left: 3px solid hsl(217 91% 60%); background: hsl(217 91% 60% / 0.08); }
-  .doc :global(.callout-warning) { border-left: 3px solid hsl(38 92% 50%); background: hsl(38 92% 50% / 0.08); }
-  .doc :global(.callout-danger) { border-left: 3px solid hsl(0 84% 60%); background: hsl(0 84% 60% / 0.08); }
-  .doc :global(.callout-success) { border-left: 3px solid hsl(160 84% 39%); background: hsl(160 84% 39% / 0.08); }
-</style>

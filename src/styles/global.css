@@ -329,3 +329,265 @@ body::-webkit-scrollbar-thumb:hover,
   height: 1px;
   background: hsl(var(--border));
 }
+
+/* ═══════════════════════════════════════════════════════
+   DOC PROSE — Override Tailwind resets for markdown content
+   Must be in global.css (loaded after Tailwind) to win.
+   ═══════════════════════════════════════════════════════ */
+
+.doc {
+  color: hsl(0 0% 82%);
+  line-height: 1.85;
+  font-size: 1rem;
+}
+
+.doc > *:first-child {
+  margin-top: 0;
+}
+
+/* ── Headings ── */
+.doc h1 {
+  font-family: 'Outfit Variable', system-ui, sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: hsl(0 0% 95%);
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.2;
+}
+
+.doc h2 {
+  font-family: 'Outfit Variable', system-ui, sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: hsl(0 0% 95%);
+  margin-top: 3.5rem;
+  margin-bottom: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid hsl(240 3.7% 15.9%);
+  line-height: 1.3;
+  scroll-margin-top: 5rem;
+}
+
+.doc h3 {
+  font-family: 'Outfit Variable', system-ui, sans-serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: hsl(0 0% 92%);
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
+  scroll-margin-top: 5rem;
+}
+
+.doc h4 {
+  font-family: 'Outfit Variable', system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: hsl(0 0% 88%);
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+/* ── Body text ── */
+.doc p {
+  margin-top: 0;
+  margin-bottom: 1.25rem;
+}
+
+/* ── Links ── */
+.doc a {
+  color: hsl(174 80% 56%);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: hsl(174 80% 46% / 0.3);
+  transition: text-decoration-color 0.15s;
+}
+
+.doc a:hover {
+  text-decoration-color: hsl(174 80% 46% / 0.8);
+}
+
+/* ── Lists — undo Tailwind reset ── */
+.doc ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-top: 0;
+  margin-bottom: 1.25rem;
+}
+
+.doc ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin-top: 0;
+  margin-bottom: 1.25rem;
+}
+
+.doc li {
+  display: list-item;
+  margin-bottom: 0.4rem;
+  padding-left: 0.25rem;
+}
+
+.doc li::marker {
+  color: hsl(174 80% 46% / 0.5);
+}
+
+.doc ol > li::marker {
+  color: hsl(174 80% 46%);
+  font-weight: 600;
+}
+
+.doc li > ul,
+.doc li > ol {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+/* ── Inline code ── */
+.doc :not(pre) > code {
+  font-family: 'JetBrains Mono Variable', monospace;
+  font-size: 0.85em;
+  background: hsl(240 3.7% 15.9% / 0.7);
+  border-radius: 4px;
+  padding: 0.15em 0.4em;
+  color: hsl(174 72% 70%);
+  font-weight: 500;
+}
+
+/* ── Code blocks ── */
+.doc pre {
+  font-family: 'JetBrains Mono Variable', monospace;
+  font-size: 0.85rem;
+  line-height: 1.7;
+  background: hsl(240 10% 2%) !important;
+  border: 1px solid hsl(240 3.7% 15.9% / 0.5);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  overflow-x: auto;
+  margin: 1.25rem 0 2rem;
+  color: hsl(0 0% 80%) !important;
+}
+
+.doc pre code {
+  background: none !important;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+  color: inherit !important;
+  font-weight: 400;
+}
+
+/* ── Blockquotes ── */
+.doc blockquote {
+  margin: 1.5rem 0;
+  padding: 1rem 1.25rem;
+  border-left: 3px solid hsl(174 80% 46% / 0.4);
+  background: hsl(240 3.7% 15.9% / 0.25);
+  border-radius: 0 8px 8px 0;
+  color: hsl(0 0% 68%);
+  font-style: normal;
+}
+
+.doc blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+.doc blockquote strong {
+  color: hsl(0 0% 85%);
+}
+
+/* ── Tables — undo Tailwind collapse reset ── */
+.doc table {
+  width: 100%;
+  margin: 1.25rem 0 2rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  border: 1px solid hsl(240 3.7% 15.9% / 0.5);
+  border-radius: 8px;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  text-indent: 0;
+}
+
+.doc th {
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: hsl(0 0% 65%);
+  padding: 0.65rem 1rem;
+  background: hsl(240 3.7% 15.9% / 0.4);
+  border-bottom: 1px solid hsl(240 3.7% 15.9% / 0.5);
+}
+
+.doc td {
+  padding: 0.55rem 1rem;
+  border-bottom: 1px solid hsl(240 3.7% 15.9% / 0.2);
+  color: hsl(0 0% 78%);
+  vertical-align: top;
+}
+
+.doc tr:last-child td {
+  border-bottom: none;
+}
+
+.doc tbody tr:hover td {
+  background: hsl(240 3.7% 15.9% / 0.15);
+}
+
+.doc td code {
+  font-size: 0.85em;
+}
+
+/* ── Horizontal rule ── */
+.doc hr {
+  border: none;
+  height: 1px;
+  background: hsl(240 3.7% 15.9% / 0.5);
+  margin: 2.5rem 0;
+}
+
+/* ── Images ── */
+.doc img {
+  border-radius: 10px;
+  border: 1px solid hsl(240 3.7% 15.9% / 0.4);
+  margin: 2rem 0;
+}
+
+/* ── Strong ── */
+.doc strong {
+  color: hsl(0 0% 92%);
+  font-weight: 600;
+}
+
+/* ── Callouts ── */
+.doc :global(.callout) {
+  border-radius: 8px;
+  border: 1px solid hsl(240 3.7% 15.9% / 0.4);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.doc :global(.callout-info) {
+  border-left: 3px solid hsl(217 91% 60%);
+  background: hsl(217 91% 60% / 0.08);
+}
+
+.doc :global(.callout-warning) {
+  border-left: 3px solid hsl(38 92% 50%);
+  background: hsl(38 92% 50% / 0.08);
+}
+
+.doc :global(.callout-danger) {
+  border-left: 3px solid hsl(0 84% 60%);
+  background: hsl(0 84% 60% / 0.08);
+}
+
+.doc :global(.callout-success) {
+  border-left: 3px solid hsl(160 84% 39%);
+  background: hsl(160 84% 39% / 0.08);
+}

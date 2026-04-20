@@ -68,8 +68,8 @@
 
   /* ── Scrollbar ── */
   --scrollbar-track: transparent;
-  --scrollbar-thumb: 240 3.7% 15.9%;
-  --scrollbar-thumb-hover: 240 5% 33.9%;
+  --scrollbar-thumb: 240 5% 20%;
+  --scrollbar-thumb-hover: 174 40% 35%;
 
   color-scheme: dark;
 }

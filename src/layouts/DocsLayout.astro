@@ -75,8 +75,8 @@ const hasToc = toc.length > 0;
   <div class="flex min-h-[calc(100vh-3.5rem)]">
 
     <!-- ═══ SIDEBAR ═══ -->
-    <aside class="hidden lg:block w-56 shrink-0 border-r border-zinc-800/50 sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto bg-zinc-950/30">
-      <nav class="px-3 py-6" aria-label="Documentation">
+    <aside class="hidden lg:flex flex-col w-56 shrink-0 border-r border-zinc-800/50 sticky top-14 h-[calc(100vh-3.5rem)] bg-zinc-950/30">
+      <nav class="px-3 py-6 overflow-y-auto flex-1" aria-label="Documentation">
         <a href="/docs/" class="flex items-center gap-2.5 px-3 mb-5 text-zinc-400 hover:text-zinc-200 transition-colors">
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
@@ -92,16 +92,39 @@ const hasToc = toc.length > 0;
                 const href = `/docs/${item.slug}/`;
                 const active = item.slug === currentSlug;
                 return (
-                  <a
-                    href={href}
-                    class:list={[
-                      "relative block rounded-md px-3 py-[6px] text-[13px] leading-snug transition-colors",
-                      active ? "text-zinc-100 bg-zinc-800/80 font-medium" : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/30",
-                    ]}
-                  >
-                    {active && <span class="absolute left-0 top-1/2 -translate-y-1/2 w-[2.5px] h-4 rounded-full bg-primary" />}
-                    {item.title}
-                  </a>
+                  <div>
+                    <a
+                      href={href}
+                      class:list={[
+                        "relative flex items-center justify-between rounded-md px-3 py-[6px] text-[13px] leading-snug transition-colors",
+                        active ? "text-zinc-100 bg-zinc-800/80 font-medium" : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/30",
+                      ]}
+                    >
+                      <span class:list={["flex items-center gap-1.5"]}>
+                        {active && <span class="absolute left-0 top-1/2 -translate-y-1/2 w-[2.5px] h-4 rounded-full bg-primary" />}
+                        {item.title}
+                      </span>
+                      {active && hasToc && (
+                        <svg class="w-3.5 h-3.5 shrink-0 text-zinc-500 transition-transform duration-200 toc-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                      )}
+                    </a>
+                    {active && hasToc && (
+                      <div class="toc-nested ml-3 pl-3 border-l border-zinc-800/50 mt-1 space-y-px">
+                        {toc.map(h => (
+                          <a
+                            href={`#${h.slug}`}
+                            class:list={[
+                              "block py-[3px] text-[12px] leading-snug transition-colors rounded",
+                              h.depth === 3 ? "pl-4 text-zinc-600 hover:text-zinc-400" : "text-zinc-500 hover:text-zinc-300",
+                            ]}
+                            data-toc-link
+                          >
+                            {h.text}
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 );
               })}
             </div>
@@ -129,13 +152,36 @@ const hasToc = toc.length > 0;
                   const href = `/docs/${item.slug}/`;
                   const active = item.slug === currentSlug;
                   return (
-                    <a href={href} class:list={[
-                      "relative block rounded-md px-3 py-[6px] text-[13px] transition-colors",
-                      active ? "text-zinc-100 bg-zinc-800/80 font-medium" : "text-zinc-500 hover:text-zinc-300",
-                    ]}>
-                      {active && <span class="absolute left-0 top-1/2 -translate-y-1/2 w-[2.5px] h-4 rounded-full bg-primary" />}
-                      {item.title}
-                    </a>
+                    <div>
+                      <a href={href} class:list={[
+                        "relative flex items-center justify-between rounded-md px-3 py-[6px] text-[13px] transition-colors",
+                        active ? "text-zinc-100 bg-zinc-800/80 font-medium" : "text-zinc-500 hover:text-zinc-300",
+                      ]}>
+                        <span class:list={["flex items-center gap-1.5"]}>
+                          {active && <span class="absolute left-0 top-1/2 -translate-y-1/2 w-[2.5px] h-4 rounded-full bg-primary" />}
+                          {item.title}
+                        </span>
+                        {active && hasToc && (
+                          <svg class="w-3.5 h-3.5 shrink-0 text-zinc-500 transition-transform duration-200 toc-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                        )}
+                      </a>
+                      {active && hasToc && (
+                        <div class="toc-nested ml-3 pl-3 border-l border-zinc-800/50 mt-1 space-y-px">
+                          {toc.map(h => (
+                            <a
+                              href={`#${h.slug}`}
+                              class:list={[
+                                "block py-[3px] text-[12px] leading-snug transition-colors rounded",
+                                h.depth === 3 ? "pl-4 text-zinc-600 hover:text-zinc-400" : "text-zinc-500 hover:text-zinc-300",
+                              ]}
+                              data-toc-link
+                            >
+                              {h.text}
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   );
                 })}
               </div>
@@ -175,38 +221,9 @@ const hasToc = toc.length > 0;
           )}
         </header>
 
-        <!-- Body + TOC row -->
-        <div class="flex gap-12">
-          <!-- Markdown body -->
-          <div class="doc min-w-0 flex-1">
-            <Content />
-          </div>
-
-          <!-- ═══ RIGHT TOC RAIL ═══ -->
-          {hasToc && (
-            <aside class="hidden xl:block w-48 shrink-0" aria-label="Table of contents">
-              <nav class="sticky top-20 overflow-y-auto max-h-[calc(100vh-6rem)] pb-8">
-                <div class="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-600 mb-3">On this page</div>
-                <ul class="space-y-1 border-l border-zinc-800/50">
-                  {toc.map(h => (
-                    <li>
-                      <a
-                        href={`#${h.slug}`}
-                        class:list={[
-                          "block py-1 pl-3 text-[13px] leading-snug transition-colors border-l-2 -ml-px",
-                          h.depth === 3 ? "pl-6" : "",
-                          "text-zinc-500 hover:text-zinc-300 border-transparent hover:border-zinc-600",
-                        ]}
-                        data-toc-link
-                      >
-                        {h.text}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
-            </aside>
-          )}
+        <!-- Markdown body -->
+        <div class="doc">
+          <Content />
         </div>
 
         <!-- Prev / Next -->
@@ -251,23 +268,49 @@ const hasToc = toc.length > 0;
     document.getElementById('drawer-close')?.addEventListener('click', close);
     document.getElementById('drawer-backdrop')?.addEventListener('click', close);
 
+    // TOC expand/collapse
+    const chevrons = document.querySelectorAll('.toc-chevron');
+    const nested = document.querySelectorAll('.toc-nested');
+    const tocKey = 'catalyst-toc-open';
+    const tocOpen = localStorage.getItem(tocKey) !== 'false';
+
+    chevrons.forEach(c => c.style.transform = tocOpen ? 'rotate(180deg)' : 'rotate(0deg)');
+    nested.forEach(n => n.style.display = tocOpen ? '' : 'none');
+
+    chevrons.forEach(c => {
+      c.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const open = c.style.transform === 'rotate(180deg)';
+        chevrons.forEach(ch => ch.style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)');
+        nested.forEach(n => n.style.display = open ? 'none' : '');
+        localStorage.setItem(tocKey, open ? 'false' : 'true');
+      });
+    });
+
     // TOC scroll-spy
     const tocLinks = document.querySelectorAll('[data-toc-link]');
     if (tocLinks.length) {
       const doc = document.querySelector('.doc');
       const headings = doc ? [...doc.querySelectorAll('h2[id], h3[id]')] : [];
+      let lastActiveId = '';
       const onScroll = () => {
         let active = headings[0];
         for (const h of headings) {
           if (h.getBoundingClientRect().top <= 80) active = h;
         }
+        const activeId = active?.id || '';
         tocLinks.forEach(a => {
-          const match = a.getAttribute('href') === `#${active?.id}`;
-          a.classList.toggle('text-zinc-200', match);
-          a.classList.toggle('border-primary', match);
+          const match = a.getAttribute('href') === `#${activeId}`;
+          a.classList.toggle('text-zinc-100', match);
+          a.classList.toggle('font-medium', match);
           a.classList.toggle('text-zinc-500', !match);
-          a.classList.toggle('border-transparent', !match);
+          a.classList.toggle('font-normal', !match);
+          if (match && activeId !== lastActiveId) {
+            a.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+          }
         });
+        lastActiveId = activeId;
       };
       addEventListener('scroll', onScroll, { passive: true });
       onScroll();

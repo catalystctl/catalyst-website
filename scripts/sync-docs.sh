@@ -81,14 +81,32 @@ while IFS= read -r line; do
     echo "$file_line" >> "$tmp_content"
   done < "$full_src"
 
+  # Strip manual Table of Contents blocks (## Table of Contents ... ---)
+  tmp_clean=$(mktemp)
+  in_toc=false
+  while IFS= read -r file_line; do
+    if [[ "$file_line" =~ ^##[[:space:]]Table.of.Contents ]]; then
+      in_toc=true
+      continue
+    fi
+    if $in_toc && [[ "$file_line" =~ ^---$ ]]; then
+      in_toc=false
+      continue
+    fi
+    $in_toc && continue
+    echo "$file_line" >> "$tmp_clean"
+  done < "$tmp_content"
+
   # Write destination: frontmatter + content
   mkdir -p "$(dirname "$full_dest")"
   {
     echo "$frontmatter"
     echo ""
     # Skip leading blank lines in content
-    sed '/./,$!d' "$tmp_content"
+    sed '/./,$!d' "$tmp_clean"
   } > "$full_dest"
+
+  rm -f "$tmp_content" "$tmp_clean"
 
   rm -f "$tmp_content"
 

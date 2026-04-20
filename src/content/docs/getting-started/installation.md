@@ -6,34 +6,6 @@ order: 1
 
 Complete instructions for deploying Catalyst, a production-grade game server management panel.
 
-## Table of Contents
-
-- [Prerequisites](#prerequisites)
-- [One-Line Install (Recommended)](#one-line-install-recommended)
-- [Quick Start (Docker Compose)](#quick-start-docker-compose)
-- [Standalone Docker (catalyst-docker)](#standalone-docker-catalyst-docker)
-- [Environment Variables](#environment-variables)
-  - [Required Variables](#required-variables)
-  - [General Settings](#general-settings)
-  - [Database Configuration](#database-configuration)
-  - [Redis Configuration](#redis-configuration)
-  - [Port Bindings](#port-bindings)
-  - [SFTP Configuration](#sftp-configuration)
-  - [Backup Configuration](#backup-configuration)
-  - [Server Limits](#server-limits)
-  - [Suspension Settings](#suspension-settings)
-  - [OAuth Providers](#oauth-providers)
-  - [S3 Backups](#s3-backups)
-- [Service Architecture](#service-architecture)
-- [Development Setup](#development-setup)
-- [Reverse Proxy Configuration](#reverse-proxy-configuration)
-  - [Nginx (Standalone)](#nginx-standalone)
-  - [Caddy](#caddy)
-- [SSL/TLS](#ssltls)
-- [Upgrading](#upgrading)
-- [Troubleshooting](#troubleshooting)
-
----
 
 ## Prerequisites
 

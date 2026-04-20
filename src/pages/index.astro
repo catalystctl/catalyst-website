@@ -51,7 +51,7 @@ const features = [
 ];
 ---
 
-<Layout title="Home" description="Catalyst is a fast, secure, and modern game server management platform built with Rust, TypeScript, and containerd. Deploy game servers with Docker Compose in 60 seconds." />
+<Layout title="Home" description="Catalyst is a fast, secure, and modern game server management platform built with Rust, TypeScript, and containerd. Deploy game servers with Docker Compose in 60 seconds.">
   <!-- Ambient glow — matches panel AppLayout -->
   <div class="pointer-events-none fixed inset-0 -z-10">
     <div class="absolute -left-24 top-12 h-64 w-64 rounded-full bg-primary/5 blur-3xl"></div>
@@ -177,11 +177,11 @@ const features = [
         <div class="flex items-center justify-between mb-4">
           <div>
             <h2 class="font-display text-lg font-semibold text-foreground">Quick Start</h2>
-            <p class="text-sm text-muted-foreground">Deploy in 60 seconds with Docker Compose.</p>
+            <p class="text-sm text-muted-foreground">Deploy in 60 seconds with the install script.</p>
           </div>
           <div class="flex items-center gap-1.5 rounded-full bg-primary/15 px-3 py-1 text-xs font-medium text-primary">
             <span class="h-1.5 w-1.5 rounded-full bg-primary"></span>
-            1 command
+            3 commands
           </div>
         </div>
 
@@ -193,16 +193,17 @@ const features = [
             <span class="text-xs text-zinc-500 ml-2 font-mono">terminal</span>
           </div>
           <div class="p-4 font-mono text-sm leading-7 console-output bg-zinc-950">
-            <div class="console-line"><span class="text-primary">$</span> <span class="text-zinc-400">git clone https://github.com/catalystctl/catalyst.git</span></div>
-            <div class="console-line"><span class="text-primary">$</span> <span class="text-zinc-400">cd catalyst && cp .env.example .env</span></div>
-            <div class="console-line text-zinc-600"># Set BETTER_AUTH_SECRET & POSTGRES_PASSWORD in .env</div>
-            <div class="console-line"><span class="text-primary">$</span> <span class="text-zinc-400">docker compose up -d --build</span></div>
+            <div class="console-line"><span class="text-primary">$</span> <span class="text-zinc-400">curl -fsSL https://raw.githubusercontent.com/</span></div>
+            <div class="console-line pl-5"><span class="text-zinc-400">catalystctl/catalyst/main/install.sh | bash</span></div>
+            <div class="console-line"><span class="text-primary">$</span> <span class="text-zinc-400">cd catalyst-docker && nano .env</span></div>
+            <div class="console-line text-zinc-600"># Set PUBLIC_URL at minimum</div>
+            <div class="console-line"><span class="text-primary">$</span> <span class="text-zinc-400">docker compose up -d</span></div>
             <div class="console-line mt-1"><span class="text-success font-semibold">✓</span> <span class="text-zinc-300">Panel live at</span> <span class="text-primary">http://localhost</span></div>
           </div>
         </div>
 
         <div class="mt-4 flex flex-wrap gap-2">
-          {["Docker Compose", "Podman Compose", "containerd"].map((t) => (
+          {["Docker Compose", "install.sh", "Auto-generated secrets"].map((t) => (
             <span class="inline-flex items-center rounded-md border border-transparent bg-surface-2 text-xs font-medium text-foreground px-2 py-0.5">{t}</span>
           ))}
         </div>

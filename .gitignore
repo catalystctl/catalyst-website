@@ -25,4 +25,11 @@ pnpm-debug.log*
 
 # copied from submodule at build time
 public/img/screenshots/
+src/content/docs/getting-started/getting-started.md
+src/content/docs/getting-started/installation.md
+src/content/docs/admin-guide/
+src/content/docs/user-guide/
+src/content/docs/nodes/agent.md
+src/content/docs/api-reference/
+src/content/docs/automation/
 .pi-lens/

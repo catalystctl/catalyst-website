@@ -2,6 +2,11 @@
 title: Installation
 description: Complete instructions for deploying Catalyst.
 order: 1
+keywords:
+  - catalyst install
+  - docker compose
+  - game server panel install
+  - catalyst deployment
 ---
 
 Complete instructions for deploying Catalyst, a production-grade game server management panel.

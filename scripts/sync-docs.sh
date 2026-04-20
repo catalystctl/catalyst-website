@@ -26,14 +26,17 @@ mkdir -p "$DEST"
 #   - description: frontmatter description (use "none" to omit)
 #   - order: numeric sort order within its section
 
+  # Format: external_filename|destination_path|title|description|order|keywords
+  #   - keywords: comma-separated list (optional, use "none" to omit)
+
 MAPPINGS="
-getting-started.md|getting-started/getting-started.md|Getting Started|A step-by-step walkthrough for setting up and using Catalyst for the first time.|0
-installation.md|getting-started/installation.md|Installation|Complete instructions for deploying Catalyst.|1
-admin-guide.md|admin-guide/admin-guide.md|Admin Guide|All administrative features — users, roles, nodes, templates, backups, security, and more.|0
-user-guide.md|user-guide/user-guide.md|User Guide|Dashboard, servers, console, files, SFTP, backups, scheduling, alerts, and profile settings.|0
-agent.md|nodes/agent.md|Agent Guide|The Rust-based node agent that manages game server containers.|1
-api-reference.md|api-reference/api-reference.md|API Reference|Complete reference for the REST API, WebSocket protocol, and SSE streaming.|0
-automation.md|automation/automation.md|Automation & Plugins|Scheduled tasks, webhooks, API automation, bulk operations, and plugins.|0
+getting-started.md|getting-started/getting-started.md|Getting Started|A step-by-step walkthrough for setting up and using Catalyst for the first time.|0|catalyst setup,first server,game server setup,catalyst tutorial
+installation.md|getting-started/installation.md|Installation|Complete instructions for deploying Catalyst.|1|catalyst install,docker compose,game server panel install,catalyst deployment
+admin-guide.md|admin-guide/admin-guide.md|Admin Guide|All administrative features — users, roles, nodes, templates, backups, security, and more.|0|catalyst admin,user management,server templates,node management,role permissions
+user-guide.md|user-guide/user-guide.md|User Guide|Dashboard, servers, console, files, SFTP, backups, scheduling, alerts, and profile settings.|0|catalyst user guide,server console,file manager,SFTP access,server backups
+agent.md|nodes/agent.md|Agent Guide|The Rust-based node agent that manages game server containers.|1|catalyst agent,node agent,containerd,rust agent,game server node
+api-reference.md|api-reference/api-reference.md|API Reference|Complete reference for the REST API, WebSocket protocol, and SSE streaming.|0|catalyst api,REST API,websocket,SSE streaming,game server API
+automation.md|automation/automation.md|Automation & Plugins|Scheduled tasks, webhooks, API automation, bulk operations, and plugins.|0|catalyst automation,scheduled tasks,webhooks,plugins,bulk operations
 "
 
 synced=0
@@ -43,13 +46,14 @@ while IFS= read -r line; do
   # Skip empty lines and comments
   [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
 
-  IFS='|' read -r src_file dest_path title description order <<< "$line"
+  IFS='|' read -r src_file dest_path title description order keywords <<< "$line"
 
   src_file=$(echo "$src_file" | xargs)  # trim whitespace
   dest_path=$(echo "$dest_path" | xargs)
   title=$(echo "$title" | xargs)
   description=$(echo "$description" | xargs)
   order=$(echo "$order" | xargs)
+  keywords=$(echo "$keywords" | xargs)
 
   full_src="$SRC/$src_file"
   full_dest="$DEST/$dest_path"
@@ -61,13 +65,25 @@ while IFS= read -r line; do
   fi
 
   # Build frontmatter
-  frontmatter="---"
-  frontmatter="$frontmatter"$'\n'"title: $title"
-  if [ "$description" != "none" ]; then
-    frontmatter="$frontmatter"$'\n'"description: $description"
-  fi
-  frontmatter="$frontmatter"$'\n'"order: $order"
-  frontmatter="$frontmatter"$'\n'"---"
+  tmp_fm=$(mktemp)
+  {
+    echo "---"
+    echo "title: $title"
+    if [ "$description" != "none" ]; then
+      echo "description: $description"
+    fi
+    echo "order: $order"
+    if [ -n "$keywords" ] && [ "$keywords" != "none" ]; then
+      echo "keywords:"
+      echo "$keywords" | tr ',' '\n' | while read -r kw; do
+        kw=$(echo "$kw" | xargs)
+        [ -n "$kw" ] && echo "  - $kw"
+      done
+    fi
+    echo "---"
+  } > "$tmp_fm"
+  frontmatter=$(cat "$tmp_fm")
+  rm -f "$tmp_fm"
 
   # Remove the existing first H1 from the source if present (it duplicates the title)
   # We'll strip lines until the first non-empty, non-comment content line that starts with #

@@ -10,6 +10,8 @@ export interface Props {
   ogImage?: string;
   canonicalUrl?: string;
   type?: "website" | "article";
+  publishDate?: string;
+  keywords?: string[];
 }
 
 const {
@@ -18,13 +20,15 @@ const {
   ogImage,
   canonicalUrl,
   type = "website",
+  publishDate,
+  keywords,
 } = Astro.props;
 
 const B = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "") + "/";
 const siteUrl = Astro.site?.toString().replace(/\/+$/, "") || "https://catalystctl.github.io";
 const fullUrl = canonicalUrl || new URL(Astro.url.pathname, siteUrl).toString();
 const fullTitle = title === "Home" ? "Catalyst — Modern Game Server Management" : `${title} — Catalyst`;
-const ogImageUrl = ogImage ? new URL(ogImage, siteUrl).toString() : undefined;
+const ogImageUrl = ogImage ? new URL(ogImage, siteUrl).toString() : siteUrl + B + "og-default.png";
 
 const navLinks = [
   { href: B, label: "Home" },
@@ -35,31 +39,61 @@ const navLinks = [
 const GITHUB_URL = "https://github.com/catalystctl/catalyst";
 
 // JSON-LD structured data
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  "name": "Catalyst",
-  "description": description,
-  "url": siteUrl + import.meta.env.BASE_URL,
-  "applicationCategory": "ServerApplication",
-  "operatingSystem": "Linux",
-  "offers": {
-    "@type": "Offer",
-    "price": "0",
-    "priceCurrency": "USD",
-  },
-  "programmingLanguage": ["TypeScript", "Rust"],
-  "license": "https://www.gnu.org/licenses/gpl-3.0.en.html",
-  "codeRepository": GITHUB_URL,
-  "featureList": [
-    "Real-time console streaming via WebSocket",
-    "containerd runtime for superior performance",
-    "RBAC with 20+ granular permissions",
-    "60+ REST API endpoints",
-    "Plugin system for extensibility",
-    "Automatic crash detection and recovery",
-  ],
-};
+const isArticle = type === "article";
+
+const jsonLd = isArticle
+  ? {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": title,
+      "description": description,
+      "url": fullUrl,
+      "author": {
+        "@type": "Organization",
+        "name": "Catalyst",
+        "url": GITHUB_URL,
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Catalyst",
+        "url": GITHUB_URL,
+        "logo": {
+          "@type": "ImageObject",
+          "url": siteUrl + import.meta.env.BASE_URL + "logo.png",
+        },
+      },
+      ...(publishDate && { "datePublished": publishDate }),
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "Catalyst Documentation",
+        "url": siteUrl + import.meta.env.BASE_URL + "docs/",
+      },
+    }
+  : {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Catalyst",
+      "description": description,
+      "url": siteUrl + import.meta.env.BASE_URL,
+      "applicationCategory": "ServerApplication",
+      "operatingSystem": "Linux",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+      },
+      "programmingLanguage": ["TypeScript", "Rust"],
+      "license": "https://www.gnu.org/licenses/gpl-3.0.en.html",
+      "codeRepository": GITHUB_URL,
+      "featureList": [
+        "Real-time console streaming via WebSocket",
+        "containerd runtime for superior performance",
+        "RBAC with 20+ granular permissions",
+        "60+ REST API endpoints",
+        "Plugin system for extensibility",
+        "Automatic crash detection and recovery",
+      ],
+    };
 ---
 
 <!doctype html>
@@ -75,6 +109,7 @@ const jsonLd = {
     <meta name="keywords" content="game server management, pterodactyl alternative, catalyst, game server panel, server hosting, containerd, rust, typescript, minecraft server, game server control panel" />
     <meta name="robots" content="index, follow" />
     <meta name="generator" content={Astro.generator} />
+    <meta name="keywords" content={(keywords || []).join(', ')} />
     <link rel="canonical" href={fullUrl} />
 
     <!-- Favicon -->
@@ -88,6 +123,9 @@ const jsonLd = {
     <meta property="og:description" content={description} />
     <meta property="og:site_name" content="Catalyst" />
     <meta property="og:locale" content="en_US" />
+    {isArticle && publishDate && <meta property="article:published_time" content={publishDate} />}
+    {isArticle && <meta property="article:author" content="Catalyst Team" />}
+    {isArticle && <meta property="article:section" content="Documentation" />}
     {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
     {ogImageUrl && <meta property="og:image:width" content="1200" />}
     {ogImageUrl && <meta property="og:image:height" content="630" />}

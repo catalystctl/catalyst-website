@@ -2,6 +2,12 @@
 title: Introduction
 description: What Catalyst is and why it exists.
 order: 0
+keywords:
+  - catalyst
+  - game server management
+  - pterodactyl alternative
+  - containerd
+  - rust
 ---
 
 Catalyst is a modern game server management platform built to replace Pterodactyl. It provides a full-featured web panel for managing game servers, nodes, users, and more.

@@ -43,15 +43,16 @@ function nameFromFile(relPath: string, groupKey: string): string {
   return toTitle(base.replace(/-/g, " "));
 }
 
-function walkPngs(dir: string): string[] {
+function walkPngs(dir: string, root?: string): string[] {
   const results: string[] = [];
+  const base = root ?? dir;
   const entries = readdirSync(dir, { withFileTypes: true });
   for (const entry of entries) {
     const full = join(dir, entry.name);
     if (entry.isDirectory()) {
-      results.push(...walkPngs(full));
+      results.push(...walkPngs(full, base));
     } else if (entry.isFile() && entry.name.toLowerCase().endsWith(".png") && entry.name !== ".png") {
-      results.push(relative(dir, full));
+      results.push(relative(base, full));
     }
   }
   return results;

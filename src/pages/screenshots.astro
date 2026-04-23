@@ -1,72 +1,90 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import { readdirSync, statSync } from "node:fs";
+import { join } from "node:path";
+
+const B = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "") + "/";
+const GITHUB_URL = "https://github.com/catalystctl/catalyst";
+
+/* ═══════════════════════════════════════════════════════════
+   DYNAMIC SCREENSHOT DISCOVERY
+   Reads public/img/screenshots/<group>/ and auto-builds
+   the list. Drop new images in and they appear automatically.
+   ═══════════════════════════════════════════════════════════ */
+
+const SHOT_DIR = "public/img/screenshots";
+
+const GROUP_MAP: Record<string, string> = {
+  auth: "Authentication",
+  user: "User Panel",
+  admin: "Admin Panel",
+};
+
+const ACRONYMS = new Set(["sftp", "api", "ark"]);
+
+function toTitle(str: string): string {
+  return str
+    .split(/[\s-]+/)
+    .map((w) => {
+      const lower = w.toLowerCase();
+      if (ACRONYMS.has(lower)) return lower.toUpperCase();
+      return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+    })
+    .join(" ");
+}
+
+function nameFromFile(filename: string, groupKey: string): string {
+  let base = filename.replace(/\.png$/i, "");
+  if (groupKey === "admin" && base.startsWith("admin-")) {
+    base = base.slice(6);
+  }
+  return toTitle(base.replace(/-/g, " "));
+}
+
+interface ScreenshotItem {
+  name: string;
+  path: string;
+}
 
 interface ScreenshotGroup {
   title: string;
-  screenshots: { name: string; path: string; }[];
+  screenshots: ScreenshotItem[];
 }
 
-const screenshotGroups: ScreenshotGroup[] = [
-  {
-    title: "Authentication",
-    screenshots: [
-      { name: "Forgot Password", path: "/img/screenshots/auth/forgot-password.png" },
-    ],
-  },
-  {
-    title: "User Panel",
-    screenshots: [
-      { name: "Dashboard", path: "/img/screenshots/user/dashboard.png" },
-      { name: "Servers", path: "/img/screenshots/user/servers.png" },
-      { name: "Server Console", path: "/img/screenshots/user/server-console.png" },
-      { name: "Server Details — Console", path: "/img/screenshots/user/server-details-console.png" },
-      { name: "Server Files", path: "/img/screenshots/user/server-files.png" },
-      { name: "Server Details — Files", path: "/img/screenshots/user/server-details-files.png" },
-      { name: "SFTP", path: "/img/screenshots/user/server-sftp.png" },
-      { name: "Server Details — SFTP", path: "/img/screenshots/user/server-details-sftp.png" },
-      { name: "Server Backups", path: "/img/screenshots/user/server-backups.png" },
-      { name: "Server Details — Backups", path: "/img/screenshots/user/server-details-backups.png" },
-      { name: "Admin Tab", path: "/img/screenshots/user/server-admin.png" },
-      { name: "Profile", path: "/img/screenshots/user/profile.png" },
-    ],
-  },
-  {
-    title: "Admin Panel",
-    screenshots: [
-      { name: "Dashboard", path: "/img/screenshots/admin/admin-dashboard.png" },
-      { name: "Users", path: "/img/screenshots/admin/admin-users.png" },
-      { name: "Roles", path: "/img/screenshots/admin/admin-roles.png" },
-      { name: "All Servers", path: "/img/screenshots/admin/admin-servers.png" },
-      { name: "Nodes", path: "/img/screenshots/admin/admin-nodes.png" },
-      { name: "Node Details", path: "/img/screenshots/admin/node-details.png" },
-      { name: "Allocations", path: "/img/screenshots/admin/node-allocations.png" },
-      { name: "Templates", path: "/img/screenshots/admin/admin-templates.png" },
-      { name: "Template Details", path: "/img/screenshots/admin/template-details.png" },
-      { name: "Databases", path: "/img/screenshots/admin/admin-database.png" },
-      { name: "Activity", path: "/img/screenshots/admin/admin-activity.png" },
-      { name: "System", path: "/img/screenshots/admin/admin-system.png" },
-      { name: "Security", path: "/img/screenshots/admin/admin-security.png" },
-      { name: "Migration", path: "/img/screenshots/admin/admin-migration.png" },
-      { name: "Theme", path: "/img/screenshots/admin/admin-theme-settings.png" },
-      { name: "Alerts", path: "/img/screenshots/admin/admin-alerts.png" },
-      { name: "Audit Logs", path: "/img/screenshots/admin/admin-audit-logs.png" },
-      { name: "API Keys", path: "/img/screenshots/admin/admin-api-keys.png" },
-      { name: "Plugins", path: "/img/screenshots/admin/admin-plugins.png" },
-    ],
-  },
-];
+const screenshotGroups: ScreenshotGroup[] = [];
 
-const B = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "") + "/";
-
-// Prefix all screenshot paths with the base URL
-for (const group of screenshotGroups) {
-  for (const shot of group.screenshots) {
-    shot.path = B + shot.path.slice(1);
-  }
+let groupKeys: string[];
+try {
+  groupKeys = readdirSync(SHOT_DIR).filter((d) => {
+    const s = statSync(join(SHOT_DIR, d));
+    return s.isDirectory() && d in GROUP_MAP;
+  });
+} catch {
+  groupKeys = [];
 }
 
-const total = screenshotGroups.reduce((sum, g) => sum + g.screenshots.length, 0);
-const GITHUB_URL = "https://github.com/catalystctl/catalyst";
+// Preserve consistent ordering
+const ORDER = ["auth", "user", "admin"];
+for (const key of ORDER) {
+  if (!groupKeys.includes(key)) continue;
+  const dirPath = join(SHOT_DIR, key);
+  const files = readdirSync(dirPath)
+    .filter((f) => f.toLowerCase().endsWith(".png"))
+    .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+
+  const screenshots = files.map((file) => ({
+    name: nameFromFile(file, key),
+    path: B + `img/screenshots/${key}/${file}`,
+  }));
+
+  screenshotGroups.push({
+    title: GROUP_MAP[key],
+    screenshots,
+  });
+}
+
+const allShots = screenshotGroups.flatMap((g) => g.screenshots.map((s) => ({ ...s, group: g.title })));
+const total = allShots.length;
 ---
 
 <Layout title="Screenshots" description="Browse all Catalyst screenshots at 1080p — authentication, user panel, server console, admin dashboard, nodes, plugins, and more." keywords={["catalyst screenshots", "game server panel", "admin dashboard", "server console", "file manager"]}>
@@ -78,14 +96,14 @@ const GITHUB_URL = "https://github.com/catalystctl/catalyst";
 
   <div class="max-w-6xl mx-auto px-4 py-6 space-y-6">
 
-    <!-- Page header — matches panel PageHeader component -->
+    <!-- Page header -->
     <div class="rounded-xl border border-border bg-card px-6 py-4 shadow-surface-dark">
       <div class="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 class="font-display text-2xl font-bold text-foreground">Screenshots</h1>
           <p class="text-sm text-muted-foreground">{total} pages captured at 1080p via Playwright.</p>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 flex-wrap">
           {screenshotGroups.map((group, i) => (
             <a
               href={`#group-${i}`}
@@ -98,46 +116,54 @@ const GITHUB_URL = "https://github.com/catalystctl/catalyst";
       </div>
     </div>
 
-    <!-- Screenshot groups — matches panel Sidebar section pattern + card grid -->
+    <!-- Screenshot groups -->
     {screenshotGroups.map((group, i) => (
       <section id={`group-${i}`} class="scroll-mt-20 space-y-3">
-        <!-- Section header — matches panel Sidebar section label -->
         <div class="flex items-center gap-3">
           <span class="text-[11px] font-semibold uppercase tracking-widest text-zinc-500 px-3 py-2">{group.title}</span>
           <div class="h-px flex-1 bg-zinc-800"></div>
           <span class="text-xs text-zinc-500 font-mono">{group.screenshots.length}</span>
         </div>
 
-        <!-- Grid — matches panel card grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {group.screenshots.map((shot) => (
-            <a
-              href={shot.path}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="group rounded-xl border border-border bg-card overflow-hidden shadow-surface-dark transition-all duration-200 hover:border-zinc-700 hover:shadow-elevated-dark"
+            <button
+              type="button"
+              data-lightbox
+              data-src={shot.path}
+              data-name={shot.name}
+              data-group={group.title}
+              class="group rounded-xl border border-border bg-card overflow-hidden shadow-surface-dark transition-all duration-200 hover:border-zinc-700 hover:shadow-elevated-dark text-left"
             >
               <div class="aspect-video bg-zinc-950 overflow-hidden">
+                <!-- Browser chrome — gives screenshots visual separation from dark bg -->
+                <div class="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 border-b border-zinc-800">
+                  <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
+                  <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
+                  <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
+                  <span class="ml-2 text-[10px] text-zinc-600 font-mono truncate flex-1 text-center">{shot.name}</span>
+                  <div class="w-8"></div>
+                </div>
                 <img
                   src={shot.path}
                   alt={`Catalyst ${shot.name} — ${group.title}`}
-                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  class="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
                   loading="lazy"
                 />
               </div>
               <div class="px-4 py-3 border-t border-zinc-800 flex items-center justify-between">
                 <span class="text-sm font-medium text-foreground">{shot.name}</span>
                 <svg class="w-4 h-4 text-muted-foreground opacity-0 transition-all group-hover:opacity-100 group-hover:text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
                 </svg>
               </div>
-            </a>
+            </button>
           ))}
         </div>
       </section>
     ))}
 
-    <!-- CTA — matches panel dashed border empty state -->
+    <!-- CTA -->
     <div class="flex flex-col items-center justify-center rounded-xl border border-dashed border-border px-4 py-10 text-center">
       <svg class="w-8 h-8 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
         <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
@@ -157,4 +183,123 @@ const GITHUB_URL = "https://github.com/catalystctl/catalyst";
     </div>
 
   </div>
+
+  <!-- Lightbox -->
+  <div id="lightbox" class="fixed inset-0 z-[100] hidden" role="dialog" aria-modal="true" aria-label="Screenshot viewer">
+    <div id="lightbox-backdrop" class="absolute inset-0 bg-black/90 backdrop-blur-sm transition-opacity opacity-0"></div>
+
+    <button id="lightbox-close" type="button" class="absolute top-3 right-3 z-20 p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 transition-colors" aria-label="Close">
+      <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+
+    <div class="absolute top-0 left-0 right-0 z-10 flex items-center justify-center px-16 py-3 pointer-events-none">
+      <div class="text-center">
+        <div id="lightbox-title" class="text-sm font-medium text-zinc-200"></div>
+        <div id="lightbox-counter" class="text-xs text-zinc-500 font-mono mt-0.5"></div>
+      </div>
+    </div>
+
+    <div class="relative z-10 flex items-center justify-center h-full px-4 sm:px-16 py-16">
+      <img id="lightbox-img" class="max-w-full max-h-[80vh] rounded-lg shadow-2xl border border-zinc-800 object-contain transition-transform duration-200" alt="" />
+    </div>
+
+    <button id="lightbox-prev" type="button" class="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 p-2 sm:p-3 rounded-xl bg-zinc-900/80 border border-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-800 hover:border-zinc-700 transition-all" aria-label="Previous screenshot">
+      <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+      </svg>
+    </button>
+
+    <button id="lightbox-next" type="button" class="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 p-2 sm:p-3 rounded-xl bg-zinc-900/80 border border-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-800 hover:border-zinc-700 transition-all" aria-label="Next screenshot">
+      <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+      </svg>
+    </button>
+
+    <div class="absolute bottom-3 left-0 right-0 z-10 text-center">
+      <span class="text-[11px] text-zinc-600">← → Arrow keys to navigate · ESC to close</span>
+    </div>
+  </div>
+
+  <script is:inline define:vars={{ shots: allShots }}>
+    (function () {
+      const lightbox = document.getElementById('lightbox');
+      const backdrop = document.getElementById('lightbox-backdrop');
+      const img = document.getElementById('lightbox-img');
+      const titleEl = document.getElementById('lightbox-title');
+      const counterEl = document.getElementById('lightbox-counter');
+      const closeBtn = document.getElementById('lightbox-close');
+      const prevBtn = document.getElementById('lightbox-prev');
+      const nextBtn = document.getElementById('lightbox-next');
+
+      const triggers = Array.from(document.querySelectorAll('[data-lightbox]'));
+      let currentIndex = -1;
+      let scrollY = 0;
+
+      function open(index) {
+        if (index < 0 || index >= shots.length) return;
+        currentIndex = index;
+        const shot = shots[index];
+        img.src = shot.path;
+        img.alt = shot.name;
+        titleEl.textContent = shot.name + (shot.group ? ' — ' + shot.group : '');
+        counterEl.textContent = (index + 1) + ' / ' + shots.length;
+
+        scrollY = window.scrollY;
+        document.body.style.top = '-' + scrollY + 'px';
+        document.body.style.position = 'fixed';
+        document.body.style.width = '100%';
+        document.body.style.overflow = 'hidden';
+
+        lightbox.classList.remove('hidden');
+        requestAnimationFrame(() => {
+          backdrop.classList.remove('opacity-0');
+        });
+      }
+
+      function close() {
+        backdrop.classList.add('opacity-0');
+        setTimeout(() => {
+          lightbox.classList.add('hidden');
+          img.src = '';
+          document.body.style.position = '';
+          document.body.style.top = '';
+          document.body.style.width = '';
+          document.body.style.overflow = '';
+          window.scrollTo(0, scrollY);
+        }, 200);
+      }
+
+      function prev() {
+        if (currentIndex > 0) open(currentIndex - 1);
+        else open(shots.length - 1);
+      }
+
+      function next() {
+        if (currentIndex < shots.length - 1) open(currentIndex + 1);
+        else open(0);
+      }
+
+      triggers.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const src = btn.dataset.src;
+          const idx = shots.findIndex((s) => s.path === src);
+          if (idx !== -1) open(idx);
+        });
+      });
+
+      closeBtn.addEventListener('click', close);
+      prevBtn.addEventListener('click', (e) => { e.stopPropagation(); prev(); });
+      nextBtn.addEventListener('click', (e) => { e.stopPropagation(); next(); });
+      backdrop.addEventListener('click', close);
+
+      document.addEventListener('keydown', (e) => {
+        if (lightbox.classList.contains('hidden')) return;
+        if (e.key === 'Escape') { e.preventDefault(); close(); }
+        else if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+        else if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
+      });
+    })();
+  </script>
 </Layout>

@@ -270,7 +270,13 @@ const features = [
         ].map((shot) => (
           <div class="group rounded-xl border border-border bg-card overflow-hidden shadow-surface-dark transition-all duration-200 hover:border-zinc-700 hover:shadow-elevated-dark">
             <div class="aspect-video bg-zinc-950 overflow-hidden">
-              <img src={shot.src} alt={shot.alt} class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" width="384" height="216" />
+              <!-- Browser chrome -->
+              <div class="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 border-b border-zinc-800">
+                <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
+                <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
+                <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
+              </div>
+              <img src={shot.src} alt={shot.alt} class="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105" loading="lazy" width="384" height="216" />
             </div>
           </div>
         ))}

@@ -1,7 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import { readdirSync, statSync } from "node:fs";
-import { join } from "node:path";
+import { join, relative } from "node:path";
 
 const B = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "") + "/";
 const GITHUB_URL = "https://github.com/catalystctl/catalyst";
@@ -35,12 +35,26 @@ function toTitle(str: string): string {
     .join(" ");
 }
 
-function nameFromFile(filename: string, groupKey: string): string {
-  let base = filename.replace(/\.png$/i, "");
+function nameFromFile(relPath: string, groupKey: string): string {
+  let base = relPath.replace(/\.png$/i, "").replace(/\//g, " — ");
   if (groupKey === "admin" && base.startsWith("admin-")) {
     base = base.slice(6);
   }
   return toTitle(base.replace(/-/g, " "));
+}
+
+function walkPngs(dir: string): string[] {
+  const results: string[] = [];
+  const entries = readdirSync(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      results.push(...walkPngs(full));
+    } else if (entry.isFile() && entry.name.toLowerCase().endsWith(".png") && entry.name !== ".png") {
+      results.push(relative(dir, full));
+    }
+  }
+  return results;
 }
 
 interface ScreenshotItem {
@@ -70,9 +84,9 @@ const ORDER = ["auth", "user", "admin"];
 for (const key of ORDER) {
   if (!groupKeys.includes(key)) continue;
   const dirPath = join(SHOT_DIR, key);
-  const files = readdirSync(dirPath)
-    .filter((f) => f.toLowerCase().endsWith(".png"))
-    .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+  const files = walkPngs(dirPath).sort((a, b) =>
+    a.localeCompare(b, undefined, { sensitivity: "base" })
+  );
 
   const screenshots = files.map((file) => ({
     name: nameFromFile(file, key),

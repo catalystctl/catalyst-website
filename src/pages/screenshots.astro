@@ -7,12 +7,14 @@ const B = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "") + "/";
 const GITHUB_URL = "https://github.com/catalystctl/catalyst";
 
 /* ═══════════════════════════════════════════════════════════
-   DYNAMIC SCREENSHOT DISCOVERY
-   Reads public/img/screenshots/<group>/ and auto-builds
-   the list. Drop new images in and they appear automatically.
+   DYNAMIC SCREENSHOT DISCOVERY — source of truth is the
+   catalyst submodule: catalyst/docs/screenshots/<group>/
+
+   Drop new .png files into the submodule and they appear
+   automatically on the next build. No manual list edits.
    ═══════════════════════════════════════════════════════════ */
 
-const SHOT_DIR = "public/img/screenshots";
+const SHOT_DIR = "catalyst/docs/screenshots";
 
 const GROUP_MAP: Record<string, string> = {
   auth: "Authentication",

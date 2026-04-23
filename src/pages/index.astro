@@ -1,8 +1,37 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import { readdirSync, statSync } from "node:fs";
+import { join } from "node:path";
 
 const B = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "") + "/";
 const GITHUB_URL = "https://github.com/catalystctl/catalyst";
+
+/* ── Dynamic screenshot preview (pulls from submodule) ── */
+const SHOT_DIR = "catalyst/docs/screenshots";
+const PREVIEW_ORDER = ["user", "admin", "auth"];
+
+function discoverPreviewShots(): { src: string; alt: string }[] {
+  const shots: { src: string; alt: string }[] = [];
+  for (const key of PREVIEW_ORDER) {
+    const dirPath = join(SHOT_DIR, key);
+    let files: string[] = [];
+    try {
+      files = readdirSync(dirPath)
+        .filter((f) => f.toLowerCase().endsWith(".png"))
+        .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+    } catch { /* directory missing */ }
+    for (const file of files) {
+      const name = file.replace(/\.png$/i, "").replace(/-/g, " ");
+      shots.push({
+        src: B + `img/screenshots/${key}/${file}`,
+        alt: `Catalyst ${name}`,
+      });
+    }
+  }
+  return shots.slice(0, 4);
+}
+
+const previewShots = discoverPreviewShots();
 
 const stats = [
   { label: "Servers", value: "60+", sub: "REST endpoints" },
@@ -262,12 +291,7 @@ const features = [
         </div>
       </div>
       <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {[
-          { src: B + "img/screenshots/user/dashboard.png", alt: "Catalyst User Dashboard" },
-          { src: B + "img/screenshots/user/server-console.png", alt: "Catalyst Server Console" },
-          { src: B + "img/screenshots/admin/admin-dashboard.png", alt: "Catalyst Admin Dashboard" },
-          { src: B + "img/screenshots/admin/admin-nodes.png", alt: "Catalyst Node Management" },
-        ].map((shot) => (
+        {previewShots.map((shot) => (
           <div class="group rounded-xl border border-border bg-card overflow-hidden shadow-surface-dark transition-all duration-200 hover:border-zinc-700 hover:shadow-elevated-dark">
             <div class="aspect-video bg-zinc-950 overflow-hidden">
               <!-- Browser chrome -->

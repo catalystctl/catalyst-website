@@ -1,44 +1,125 @@
 <svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
   <defs>
+    <!-- Warm-to-dark background gradient matching hero -->
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#0a0a0b"/>
-      <stop offset="100%" style="stop-color:#111113"/>
+      <stop offset="0%" stop-color="#141210"/>
+      <stop offset="45%" stop-color="#0f0f11"/>
+      <stop offset="100%" stop-color="#0a0a0c"/>
     </linearGradient>
-    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#14b8a6;stop-opacity:0.15"/>
-      <stop offset="100%" style="stop-color:#14b8a6;stop-opacity:0.02"/>
+
+    <!-- Large warm peach radial glow -->
+    <radialGradient id="glow" cx="30%" cy="35%" r="55%" fx="30%" fy="35%">
+      <stop offset="0%" stop-color="#c4854a" stop-opacity="0.14"/>
+      <stop offset="40%" stop-color="#c4854a" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#c4854a" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Subtle dot grid pattern -->
+    <pattern id="dots" width="48" height="48" patternUnits="userSpaceOnUse">
+      <circle cx="24" cy="24" r="0.6" fill="#ffffff" opacity="0.025"/>
+    </pattern>
+
+    <!-- Faint card reflection gradient -->
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#111113"/>
+      <stop offset="100%" stop-color="#0c0c0e"/>
     </linearGradient>
   </defs>
 
-  <!-- Background -->
+  <!-- Base background -->
   <rect width="1200" height="630" fill="url(#bg)"/>
 
-  <!-- Accent glow -->
-  <ellipse cx="150" cy="315" rx="400" ry="250" fill="url(#accent)"/>
+  <!-- Subtle dot grid overlay -->
+  <rect width="1200" height="630" fill="url(#dots)"/>
 
-  <!-- Border -->
-  <rect x="0" y="0" width="1200" height="630" rx="0" fill="none" stroke="#27272a" stroke-width="1"/>
+  <!-- Warm accent glow -->
+  <ellipse cx="320" cy="260" rx="520" ry="360" fill="url(#glow)"/>
+
+  <!-- 1px zinc border frame -->
+  <rect x="0.5" y="0.5" width="1199" height="629" fill="none" stroke="#27272a" stroke-width="1"/>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       LEFT-SIDE CONTENT
+       ═══════════════════════════════════════════════════════════ -->
+
+  <!-- Badge: Game Server Management -->
+  <rect x="80" y="196" width="216" height="28" rx="14" fill="rgba(196,133,74,0.08)" stroke="rgba(196,133,74,0.14)" stroke-width="1"/>
+  <!-- Spark icon -->
+  <path d="M100 207.5l-1.2 2.8-2.8 1.2 2.8 1.2 1.2 2.8 1.2-2.8 2.8-1.2-2.8-1.2z" fill="#c4854a"/>
+  <text x="112" y="215" font-family="Outfit, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#c4854a" letter-spacing="0.04em">Game Server Management</text>
 
   <!-- Title -->
-  <text x="80" y="280" font-family="system-ui, -apple-system, sans-serif" font-size="52" font-weight="700" fill="#fafafa">
-    Catalyst
-  </text>
+  <text x="80" y="298" font-family="Outfit, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="68" font-weight="700" fill="#fafafa" letter-spacing="-0.02em">Catalyst</text>
+
+  <!-- Peach accent underline -->
+  <rect x="80" y="318" width="72" height="3.5" rx="1.75" fill="#c4854a"/>
 
   <!-- Subtitle -->
-  <text x="80" y="330" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="#a1a1aa">
-    Modern Game Server Management
-  </text>
+  <text x="80" y="370" font-family="'DM Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="26" font-weight="500" fill="#a1a1aa">The game server panel that doesn't suck.</text>
 
   <!-- Tagline -->
-  <text x="80" y="380" font-family="system-ui, -apple-system, sans-serif" font-size="18" fill="#71717a">
-    Built with Rust, TypeScript, and containerd — the Pterodactyl replacement.
-  </text>
+  <text x="80" y="412" font-family="'DM Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="17" font-weight="400" fill="#71717a">Built with Rust, TypeScript, and containerd — the Pterodactyl replacement.</text>
 
   <!-- URL -->
-  <text x="80" y="580" font-family="system-ui, -apple-system, sans-serif" font-size="16" fill="#52525b">
-    catalystctl.com
-  </text>
+  <text x="80" y="584" font-family="'JetBrains Mono', 'Fira Code', ui-monospace, monospace" font-size="14" font-weight="500" fill="#52525b">catalystctl.com</text>
 
-  <!-- Accent line -->
-  <rect x="80" y="295" width="80" height="3" rx="1.5" fill="#14b8a6"/>
+  <!-- ═══════════════════════════════════════════════════════════
+       RIGHT-SIDE DECORATIVE UI CARD
+       ═══════════════════════════════════════════════════════════ -->
+
+  <!-- Main card silhouette -->
+  <g opacity="0.35">
+    <rect x="720" y="150" width="400" height="320" rx="16" fill="url(#cardGrad)" stroke="#27272a" stroke-width="1"/>
+
+    <!-- Window chrome dots -->
+    <circle cx="750" cy="176" r="5" fill="#ec6b5e" opacity="0.9"/>
+    <circle cx="770" cy="176" r="5" fill="#f3bf4f" opacity="0.9"/>
+    <circle cx="790" cy="176" r="5" fill="#61c253" opacity="0.9"/>
+
+    <!-- Address bar -->
+    <rect x="820" y="166" width="280" height="20" rx="6" fill="#18181b" stroke="#27272a" stroke-width="0.5"/>
+    <text x="835" y="180" font-family="'JetBrains Mono', monospace" font-size="9" fill="#52525b">localhost/dashboard</text>
+
+    <!-- Card content lines -->
+    <!-- Stat row -->
+    <rect x="750" y="210" width="80" height="50" rx="8" fill="#0c0c0e" stroke="#27272a" stroke-width="0.5"/>
+    <rect x="760" y="222" width="30" height="6" rx="3" fill="#52525b" opacity="0.5"/>
+    <rect x="760" y="238" width="50" height="10" rx="3" fill="#a1a1aa" opacity="0.3"/>
+
+    <rect x="840" y="210" width="80" height="50" rx="8" fill="#0c0c0e" stroke="#27272a" stroke-width="0.5"/>
+    <rect x="850" y="222" width="30" height="6" rx="3" fill="#52525b" opacity="0.5"/>
+    <rect x="850" y="238" width="50" height="10" rx="3" fill="#a1a1aa" opacity="0.3"/>
+
+    <rect x="930" y="210" width="80" height="50" rx="8" fill="#0c0c0e" stroke="#27272a" stroke-width="0.5"/>
+    <rect x="940" y="222" width="30" height="6" rx="3" fill="#52525b" opacity="0.5"/>
+    <rect x="940" y="238" width="50" height="10" rx="3" fill="#a1a1aa" opacity="0.3"/>
+
+    <rect x="1020" y="210" width="80" height="50" rx="8" fill="#0c0c0e" stroke="#27272a" stroke-width="0.5"/>
+    <rect x="1030" y="222" width="30" height="6" rx="3" fill="#52525b" opacity="0.5"/>
+    <rect x="1030" y="238" width="50" height="10" rx="3" fill="#a1a1aa" opacity="0.3"/>
+
+    <!-- Larger content blocks -->
+    <rect x="750" y="278" width="170" height="80" rx="10" fill="#0c0c0e" stroke="#27272a" stroke-width="0.5"/>
+    <rect x="765" y="295" width="60" height="8" rx="4" fill="#71717a" opacity="0.4"/>
+    <rect x="765" y="315" width="140" height="5" rx="2.5" fill="#52525b" opacity="0.3"/>
+    <rect x="765" y="328" width="120" height="5" rx="2.5" fill="#52525b" opacity="0.3"/>
+    <rect x="765" y="341" width="100" height="5" rx="2.5" fill="#52525b" opacity="0.3"/>
+
+    <rect x="930" y="278" width="170" height="80" rx="10" fill="#0c0c0e" stroke="#27272a" stroke-width="0.5"/>
+    <rect x="945" y="295" width="60" height="8" rx="4" fill="#71717a" opacity="0.4"/>
+    <rect x="945" y="315" width="140" height="5" rx="2.5" fill="#52525b" opacity="0.3"/>
+    <rect x="945" y="328" width="120" height="5" rx="2.5" fill="#52525b" opacity="0.3"/>
+    <rect x="945" y="341" width="100" height="5" rx="2.5" fill="#52525b" opacity="0.3"/>
+
+    <!-- Terminal bar -->
+    <rect x="750" y="374" width="350" height="76" rx="10" fill="#0c0c0e" stroke="#27272a" stroke-width="0.5"/>
+    <rect x="765" y="390" width="90" height="5" rx="2.5" fill="#c4854a" opacity="0.4"/>
+    <rect x="865" y="390" width="200" height="5" rx="2.5" fill="#52525b" opacity="0.3"/>
+    <rect x="765" y="405" width="320" height="5" rx="2.5" fill="#52525b" opacity="0.2"/>
+    <rect x="765" y="420" width="280" height="5" rx="2.5" fill="#52525b" opacity="0.2"/>
+    <rect x="765" y="435" width="180" height="5" rx="2.5" fill="#61c253" opacity="0.3"/>
+  </g>
+
+  <!-- Bottom-right ambient glow for balance -->
+  <ellipse cx="1050" cy="520" rx="200" ry="120" fill="#c4854a" opacity="0.03"/>
 </svg>

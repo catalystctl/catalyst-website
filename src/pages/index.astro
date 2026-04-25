@@ -174,7 +174,7 @@ const healthChecks = [
             </div>
           </div>
         </div>
-        <img src={heroShot} alt="Catalyst dashboard" class="w-full object-cover object-top" loading="eager" style="max-height: 520px;" />
+        <img src={heroShot} alt="Catalyst dashboard" class="w-full object-cover object-top max-h-[240px] sm:max-h-[400px] lg:max-h-[520px]" loading="eager" />
       </div>
       <!-- Ambient glow -->
       <div class="absolute -bottom-10 left-1/4 right-1/4 h-24 bg-primary/[0.03] blur-3xl rounded-full pointer-events-none"></div>
@@ -259,8 +259,8 @@ const healthChecks = [
       <p class="mt-2 text-2xl sm:text-3xl font-display font-semibold text-foreground tracking-tight">How we stack up.</p>
     </div>
 
-    <div class="rounded-xl border border-zinc-800/60 overflow-hidden" data-reveal>
-      <table class="w-full text-left border-collapse">
+    <div class="rounded-xl border border-zinc-800/60 overflow-hidden overflow-x-auto" data-reveal>
+      <table class="w-full min-w-[500px] text-left border-collapse">
         <thead>
           <tr class="border-b border-zinc-800/60 bg-surface-1">
             <th class="py-3 px-5 text-[11px] font-semibold uppercase tracking-wider text-zinc-500 w-[35%]">Feature</th>
@@ -300,7 +300,7 @@ const healthChecks = [
       </div>
 
       <div data-reveal>
-        <div class="terminal">
+        <div class="terminal overflow-x-auto">
           <div class="terminal-header">
             <div class="terminal-dot" style="background:#ec6b5e;"></div>
             <div class="terminal-dot" style="background:#f3bf4f;"></div>
@@ -311,7 +311,7 @@ const healthChecks = [
               Copy
             </button>
           </div>
-          <div class="terminal-body">
+          <div class="terminal-body whitespace-pre-wrap sm:whitespace-normal">
             <div><span class="prompt">$</span> <span class="cmd">curl -fsSL https://raw.githubusercontent.com/</span></div>
             <div class="pl-[1.1rem]"><span class="cmd">catalystctl/catalyst/main/install.sh | bash</span></div>
             <div class="mt-1"><span class="prompt">$</span> <span class="cmd">cd catalyst-docker && nano .env</span></div>

@@ -3,73 +3,72 @@
 @config "../../tailwind.config.js";
 
 /* ═══════════════════════════════════════════════════════════
-   OBSIDIAN DESIGN SYSTEM
-   Matching the Catalyst panel exactly — dark-first industrial
-   control panel with warm zinc surfaces, vibrant teal accent,
-   and clean geometric typography.
+   CATALYST DESIGN SYSTEM
+   Matching the actual Catalyst panel — warm peach accent on
+   deep black, green success states, clean data presentation.
    ═══════════════════════════════════════════════════════════ */
 
 :root {
-  /* ── Accent Palette ── */
-  --accent-teal: 174 80% 46%;
-  --accent-teal-light: 174 72% 56%;
-  --accent-teal-muted: 174 80% 46% / 0.15;
+  /* ── Primary Accent (Warm Peach/Salmon) ── */
+  --accent-peach: 25 55% 58%;
+  --accent-peach-light: 25 60% 68%;
+  --accent-peach-muted: 25 55% 58% / 0.12;
 
-  /* ── Semantic Colors ── */
-  --success: 160 84% 39%;
-  --success-muted: 160 84% 39% / 0.15;
+  /* ── Success (Green) ── */
+  --success: 142 71% 55%;
+  --success-muted: 142 71% 55% / 0.12;
   --warning: 38 92% 50%;
-  --warning-muted: 38 92% 50% / 0.15;
+  --warning-muted: 38 92% 50% / 0.12;
   --danger: 0 84% 60%;
-  --danger-muted: 0 84% 60% / 0.15;
-  --info: 217 91% 60%;
-  --info-muted: 217 91% 60% / 0.15;
+  --danger-muted: 0 84% 60% / 0.12;
+  --info: 174 80% 46%;
+  --info-muted: 174 80% 46% / 0.12;
 
-  /* ── Dark Mode Tokens ── */
-  --background: 240 10% 3.9%;
-  --foreground: 0 0% 98%;
-  --muted: 240 3.7% 15.9%;
-  --muted-foreground: 240 5% 64.9%;
-  --popover: 240 10% 3.9%;
-  --popover-foreground: 0 0% 98%;
-  --card: 240 10% 3.9%;
-  --card-foreground: 0 0% 98%;
-  --border: 240 3.7% 15.9%;
-  --input: 240 3.7% 15.9%;
-  --primary: var(--accent-teal);
-  --primary-foreground: 240 10% 3.9%;
-  --secondary: 240 3.7% 15.9%;
-  --secondary-foreground: 0 0% 98%;
-  --accent: var(--accent-teal);
-  --accent-foreground: 240 10% 3.9%;
+  /* ── Dark Mode Tokens (Product Accurate) ── */
+  --background: 0 0% 4%;
+  --foreground: 0 0% 94%;
+  --muted: 0 0% 10%;
+  --muted-foreground: 0 0% 52%;
+  --popover: 0 0% 5%;
+  --popover-foreground: 0 0% 94%;
+  --card: 0 0% 6%;
+  --card-foreground: 0 0% 94%;
+  --border: 0 0% 13%;
+  --input: 0 0% 13%;
+  --primary: var(--accent-peach);
+  --primary-foreground: 0 0% 4%;
+  --secondary: 0 0% 10%;
+  --secondary-foreground: 0 0% 94%;
+  --accent: var(--accent-peach);
+  --accent-foreground: 0 0% 4%;
   --destructive: var(--danger);
   --destructive-foreground: 0 0% 100%;
-  --ring: var(--accent-teal);
-  --radius: 0.5rem;
+  --ring: var(--accent-peach);
+  --radius: 0.625rem;
 
-  /* ── Zinc Scale (Dark) ── */
+  /* ── Zinc Scale ── */
   --zinc-50: 0 0% 98%;
-  --zinc-100: 240 4.8% 95.9%;
-  --zinc-200: 240 5.9% 90%;
-  --zinc-300: 240 4.9% 83.9%;
-  --zinc-400: 240 5% 64.9%;
-  --zinc-500: 240 3.8% 46.1%;
-  --zinc-600: 240 5.2% 33.9%;
-  --zinc-700: 240 5.9% 24%;
-  --zinc-800: 240 3.7% 15.9%;
-  --zinc-900: 240 10% 3.9%;
-  --zinc-950: 240 10% 3.9%;
+  --zinc-100: 0 0% 96%;
+  --zinc-200: 0 0% 90%;
+  --zinc-300: 0 0% 83%;
+  --zinc-400: 0 0% 64%;
+  --zinc-500: 0 0% 46%;
+  --zinc-600: 0 0% 34%;
+  --zinc-700: 0 0% 24%;
+  --zinc-800: 0 0% 16%;
+  --zinc-900: 0 0% 10%;
+  --zinc-950: 0 0% 4%;
 
-  /* ── Surface Elevation (Dark) ── */
-  --surface-0: 240 10% 3.9%;
-  --surface-1: 240 10% 5.9%;
-  --surface-2: 240 3.7% 15.9%;
-  --surface-3: 240 5.9% 24%;
+  /* ── Surface Elevation ── */
+  --surface-0: 0 0% 4%;
+  --surface-1: 0 0% 6%;
+  --surface-2: 0 0% 9%;
+  --surface-3: 0 0% 13%;
 
   /* ── Scrollbar ── */
   --scrollbar-track: transparent;
-  --scrollbar-thumb: 240 5% 20%;
-  --scrollbar-thumb-hover: 174 40% 35%;
+  --scrollbar-thumb: 0 0% 15%;
+  --scrollbar-thumb-hover: 25 40% 35%;
 
   color-scheme: dark;
 }
@@ -116,8 +115,7 @@ body {
    SCROLLBAR STYLING
    ═══════════════════════════════════════════════════════════ */
 
-html,
-body {
+html, body {
   scrollbar-width: thin;
   scrollbar-color: hsl(var(--scrollbar-thumb)) hsl(var(--scrollbar-track));
 }
@@ -127,29 +125,22 @@ body {
   scrollbar-color: hsl(var(--scrollbar-thumb)) hsl(var(--scrollbar-track));
 }
 
-html::-webkit-scrollbar,
-body::-webkit-scrollbar {
+html::-webkit-scrollbar, body::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
-html::-webkit-scrollbar-track,
-body::-webkit-scrollbar-track,
-*::-webkit-scrollbar-track {
+html::-webkit-scrollbar-track, body::-webkit-scrollbar-track, *::-webkit-scrollbar-track {
   background: hsl(var(--scrollbar-track));
   border-radius: 3px;
 }
 
-html::-webkit-scrollbar-thumb,
-body::-webkit-scrollbar-thumb,
-*::-webkit-scrollbar-thumb {
+html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb, *::-webkit-scrollbar-thumb {
   background: hsl(var(--scrollbar-thumb));
   border-radius: 3px;
 }
 
-html::-webkit-scrollbar-thumb:hover,
-body::-webkit-scrollbar-thumb:hover,
-*::-webkit-scrollbar-thumb:hover {
+html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover, *::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--scrollbar-thumb-hover));
 }
 
@@ -158,24 +149,13 @@ body::-webkit-scrollbar-thumb:hover,
    ═══════════════════════════════════════════════════════════ */
 
 @keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
-}
-
-@keyframes pulse-soft {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
 }
 
 @keyframes blink {
@@ -191,10 +171,6 @@ body::-webkit-scrollbar-thumb:hover,
   animation: fadeIn 0.5s ease both;
 }
 
-.animate-pulse-soft {
-  animation: pulse-soft 2s ease-in-out infinite;
-}
-
 .delay-100 { animation-delay: 0.1s; }
 .delay-200 { animation-delay: 0.2s; }
 .delay-300 { animation-delay: 0.3s; }
@@ -203,25 +179,59 @@ body::-webkit-scrollbar-thumb:hover,
 .delay-600 { animation-delay: 0.6s; }
 .delay-700 { animation-delay: 0.7s; }
 
+/* Scroll-triggered reveal */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+[data-reveal].revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+[data-reveal-stagger] > * {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+[data-reveal-stagger].revealed > *:nth-child(1) { transition-delay: 0ms; }
+[data-reveal-stagger].revealed > *:nth-child(2) { transition-delay: 60ms; }
+[data-reveal-stagger].revealed > *:nth-child(3) { transition-delay: 120ms; }
+[data-reveal-stagger].revealed > *:nth-child(4) { transition-delay: 180ms; }
+[data-reveal-stagger].revealed > *:nth-child(5) { transition-delay: 240ms; }
+[data-reveal-stagger].revealed > *:nth-child(6) { transition-delay: 300ms; }
+[data-reveal-stagger].revealed > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal], [data-reveal-stagger] > * {
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
 /* ═══════════════════════════════════════════════════════════
    COMPONENT PATTERNS
    ═══════════════════════════════════════════════════════════ */
 
-/* Card — matches panel Card component */
+/* Card */
 .obsidian-card {
   border-radius: 0.75rem;
   border: 1px solid hsl(var(--border));
   background: hsl(var(--card));
   color: hsl(var(--card-foreground));
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.4);
   transition: all 0.2s ease;
 }
-
 .obsidian-card:hover {
   border-color: hsl(var(--surface-3));
 }
 
-/* Button — matches panel Button variants */
+/* Button */
 .obsidian-btn {
   display: inline-flex;
   align-items: center;
@@ -236,103 +246,120 @@ body::-webkit-scrollbar-thumb:hover,
   text-decoration: none;
 }
 
-.obsidian-btn-default {
-  background: hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.3);
-}
-.obsidian-btn-default:hover {
-  background: hsl(174 80% 40%);
-}
-
-.obsidian-btn-outline {
-  border: 1px solid hsl(var(--border));
-  background: transparent;
-  color: hsl(var(--foreground));
-}
-.obsidian-btn-outline:hover {
-  background: hsl(var(--surface-2));
-  color: hsl(var(--foreground));
-}
-
-.obsidian-btn-ghost {
-  background: transparent;
-  color: hsl(var(--foreground));
-}
-.obsidian-btn-ghost:hover {
-  background: hsl(var(--surface-2));
-}
-
-/* Badge — matches panel Badge component */
+/* Badge */
 .obsidian-badge {
   display: inline-flex;
   align-items: center;
-  border-radius: 0.375rem;
+  border-radius: 9999px;
   border: 1px solid transparent;
-  padding: 0.125rem 0.5rem;
+  padding: 0.125rem 0.625rem;
   font-size: 0.75rem;
   font-weight: 500;
   transition: colors 0.2s ease;
 }
 
-.obsidian-badge-default {
-  border-color: transparent;
-  background: hsl(var(--primary) / 0.15);
-  color: hsl(var(--primary));
-}
-
-.obsidian-badge-secondary {
-  border-color: transparent;
-  background: hsl(var(--surface-2));
-  color: hsl(var(--foreground));
-}
-
-/* Terminal cursor */
-.cursor-blink::after {
-  content: "▋";
-  animation: blink 1s step-end infinite;
-  color: hsl(var(--primary));
-  margin-left: 2px;
-}
-
-/* Screenshot card */
-.screenshot-card {
-  border-radius: 0.75rem;
-  border: 1px solid hsl(var(--border));
-  background: hsl(var(--card));
+/* Terminal */
+.terminal {
+  background: hsl(0 0% 5%);
+  border: 1px solid hsl(0 0% 13%);
+  border-radius: 0.625rem;
   overflow: hidden;
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.3);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.screenshot-card:hover {
-  border-color: hsl(var(--surface-3));
-  transform: translateY(-2px);
+.terminal-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  border-bottom: 1px solid hsl(0 0% 13%);
+  background: hsl(0 0% 7%);
 }
 
-.screenshot-card img {
-  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+.terminal-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
 }
 
-.screenshot-card:hover img {
-  transform: scale(1.02);
+.terminal-body {
+  padding: 1rem 1.25rem;
+  font-family: 'JetBrains Mono Variable', 'Fira Code', monospace;
+  font-size: 0.8125rem;
+  line-height: 1.75;
+  color: hsl(0 0% 55%);
 }
 
-/* Nav blur — matches panel surface-0 */
-.nav-blur {
-  backdrop-filter: blur(16px) saturate(1.8);
-  -webkit-backdrop-filter: blur(16px) saturate(1.8);
+.terminal-body .prompt { color: hsl(var(--primary)); }
+.terminal-body .cmd { color: hsl(0 0% 70%); }
+.terminal-body .comment { color: hsl(0 0% 30%); }
+.terminal-body .success { color: hsl(var(--success)); }
+.terminal-body .url { color: hsl(var(--primary)); }
+
+/* Copy button */
+.copy-btn {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: hsl(var(--zinc-500));
+  background: transparent;
+  border: 1px solid hsl(0 0% 16%);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.copy-btn:hover {
+  color: hsl(var(--zinc-300));
+  border-color: hsl(0 0% 22%);
+  background: hsl(0 0% 10%);
+}
+.copy-btn.copied {
+  color: hsl(var(--success));
+  border-color: hsl(var(--success) / 0.3);
 }
 
-/* Section divider — subtle zinc line */
+/* Progress bar — matches product resource bars */
+.progress-bar {
+  height: 4px;
+  border-radius: 9999px;
+  background: hsl(0 0% 14%);
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.5s ease;
+}
+
+/* Status dot */
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  display: inline-block;
+}
+.status-dot-success { background: hsl(var(--success)); box-shadow: 0 0 6px hsl(var(--success) / 0.4); }
+.status-dot-warning { background: hsl(var(--warning)); }
+.status-dot-danger { background: hsl(var(--danger)); }
+.status-dot-idle { background: hsl(0 0% 35%); }
+
+/* Hairline */
+.hairline {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, hsl(var(--border)) 20%, hsl(var(--border)) 80%, transparent);
+}
+
+/* Section divider */
 .section-divider {
   height: 1px;
   background: hsl(var(--border));
 }
 
 /* ═══════════════════════════════════════════════════════
-   DOC PROSE — Override Tailwind resets for markdown content
-   Must be in global.css (loaded after Tailwind) to win.
+   DOC PROSE
    ═══════════════════════════════════════════════════════ */
 
 .doc {
@@ -341,11 +368,8 @@ body::-webkit-scrollbar-thumb:hover,
   font-size: 1rem;
 }
 
-.doc > *:first-child {
-  margin-top: 0;
-}
+.doc > *:first-child { margin-top: 0; }
 
-/* ── Headings ── */
 .doc h1 {
   font-family: 'Outfit Variable', system-ui, sans-serif;
   font-size: 2rem;
@@ -364,7 +388,7 @@ body::-webkit-scrollbar-thumb:hover,
   margin-top: 3.5rem;
   margin-bottom: 1rem;
   padding-top: 1.5rem;
-  border-top: 1px solid hsl(240 3.7% 15.9%);
+  border-top: 1px solid hsl(0 0% 13%);
   line-height: 1.3;
   scroll-margin-top: 5rem;
 }
@@ -390,26 +414,17 @@ body::-webkit-scrollbar-thumb:hover,
   line-height: 1.4;
 }
 
-/* ── Body text ── */
-.doc p {
-  margin-top: 0;
-  margin-bottom: 1.25rem;
-}
+.doc p { margin-top: 0; margin-bottom: 1.25rem; }
 
-/* ── Links ── */
 .doc a {
-  color: hsl(174 80% 56%);
+  color: hsl(25 55% 65%);
   text-decoration: underline;
   text-underline-offset: 3px;
-  text-decoration-color: hsl(174 80% 46% / 0.3);
+  text-decoration-color: hsl(25 55% 58% / 0.3);
   transition: text-decoration-color 0.15s;
 }
+.doc a:hover { text-decoration-color: hsl(25 55% 58% / 0.8); }
 
-.doc a:hover {
-  text-decoration-color: hsl(174 80% 46% / 0.8);
-}
-
-/* ── Lists — undo Tailwind reset ── */
 .doc ul {
   list-style-type: disc;
   padding-left: 1.5rem;
@@ -430,39 +445,34 @@ body::-webkit-scrollbar-thumb:hover,
   padding-left: 0.25rem;
 }
 
-.doc li::marker {
-  color: hsl(174 80% 46% / 0.5);
-}
+.doc li::marker { color: hsl(25 55% 58% / 0.5); }
 
 .doc ol > li::marker {
-  color: hsl(174 80% 46%);
+  color: hsl(25 55% 58%);
   font-weight: 600;
 }
 
-.doc li > ul,
-.doc li > ol {
+.doc li > ul, .doc li > ol {
   margin-top: 0.25rem;
   margin-bottom: 0.25rem;
 }
 
-/* ── Inline code ── */
 .doc :not(pre) > code {
   font-family: 'JetBrains Mono Variable', monospace;
   font-size: 0.85em;
-  background: hsl(240 3.7% 15.9% / 0.7);
+  background: hsl(0 0% 12% / 0.7);
   border-radius: 4px;
   padding: 0.15em 0.4em;
-  color: hsl(174 72% 70%);
+  color: hsl(25 50% 72%);
   font-weight: 500;
 }
 
-/* ── Code blocks ── */
 .doc pre {
   font-family: 'JetBrains Mono Variable', monospace;
   font-size: 0.85rem;
   line-height: 1.7;
-  background: hsl(240 10% 2%) !important;
-  border: 1px solid hsl(240 3.7% 15.9% / 0.5);
+  background: hsl(0 0% 3%) !important;
+  border: 1px solid hsl(0 0% 13% / 0.5);
   border-radius: 10px;
   padding: 1.25rem 1.5rem;
   overflow-x: auto;
@@ -479,32 +489,25 @@ body::-webkit-scrollbar-thumb:hover,
   font-weight: 400;
 }
 
-/* ── Blockquotes ── */
 .doc blockquote {
   margin: 1.5rem 0;
   padding: 1rem 1.25rem;
-  border-left: 3px solid hsl(174 80% 46% / 0.4);
-  background: hsl(240 3.7% 15.9% / 0.25);
+  border-left: 3px solid hsl(25 55% 58% / 0.4);
+  background: hsl(0 0% 10% / 0.3);
   border-radius: 0 8px 8px 0;
   color: hsl(0 0% 68%);
   font-style: normal;
 }
 
-.doc blockquote p:last-child {
-  margin-bottom: 0;
-}
+.doc blockquote p:last-child { margin-bottom: 0; }
+.doc blockquote strong { color: hsl(0 0% 85%); }
 
-.doc blockquote strong {
-  color: hsl(0 0% 85%);
-}
-
-/* ── Tables — undo Tailwind collapse reset ── */
 .doc table {
   width: 100%;
   margin: 1.25rem 0 2rem;
   font-size: 0.875rem;
   line-height: 1.5;
-  border: 1px solid hsl(240 3.7% 15.9% / 0.5);
+  border: 1px solid hsl(0 0% 13% / 0.5);
   border-radius: 8px;
   border-collapse: separate;
   border-spacing: 0;
@@ -518,56 +521,43 @@ body::-webkit-scrollbar-thumb:hover,
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: hsl(0 0% 65%);
+  color: hsl(0 0% 60%);
   padding: 0.65rem 1rem;
-  background: hsl(240 3.7% 15.9% / 0.4);
-  border-bottom: 1px solid hsl(240 3.7% 15.9% / 0.5);
+  background: hsl(0 0% 10% / 0.4);
+  border-bottom: 1px solid hsl(0 0% 13% / 0.5);
 }
 
 .doc td {
   padding: 0.55rem 1rem;
-  border-bottom: 1px solid hsl(240 3.7% 15.9% / 0.2);
+  border-bottom: 1px solid hsl(0 0% 13% / 0.2);
   color: hsl(0 0% 78%);
   vertical-align: top;
 }
 
-.doc tr:last-child td {
-  border-bottom: none;
-}
+.doc tr:last-child td { border-bottom: none; }
 
-.doc tbody tr:hover td {
-  background: hsl(240 3.7% 15.9% / 0.15);
-}
+.doc tbody tr:hover td { background: hsl(0 0% 10% / 0.15); }
 
-.doc td code {
-  font-size: 0.85em;
-}
+.doc td code { font-size: 0.85em; }
 
-/* ── Horizontal rule ── */
 .doc hr {
   border: none;
   height: 1px;
-  background: hsl(240 3.7% 15.9% / 0.5);
+  background: hsl(0 0% 13% / 0.5);
   margin: 2.5rem 0;
 }
 
-/* ── Images ── */
 .doc img {
   border-radius: 10px;
-  border: 1px solid hsl(240 3.7% 15.9% / 0.4);
+  border: 1px solid hsl(0 0% 13% / 0.4);
   margin: 2rem 0;
 }
 
-/* ── Strong ── */
-.doc strong {
-  color: hsl(0 0% 92%);
-  font-weight: 600;
-}
+.doc strong { color: hsl(0 0% 92%); font-weight: 600; }
 
-/* ── Callouts ── */
 .doc :global(.callout) {
   border-radius: 8px;
-  border: 1px solid hsl(240 3.7% 15.9% / 0.4);
+  border: 1px solid hsl(0 0% 13% / 0.4);
   padding: 1rem 1.25rem;
   margin-bottom: 1.5rem;
 }

@@ -1,12 +1,12 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { readdirSync, statSync } from "node:fs";
+import { readdirSync } from "node:fs";
 import { join } from "node:path";
 
 const B = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "") + "/";
 const GITHUB_URL = "https://github.com/catalystctl/catalyst";
 
-/* ── Dynamic screenshot preview (pulls from submodule) ── */
+/* ── Dynamic screenshot preview ── */
 const SHOT_DIR = "catalyst/docs/screenshots";
 const PREVIEW_ORDER = ["user", "admin", "auth"];
 
@@ -17,328 +17,390 @@ function discoverPreviewShots(): { src: string; alt: string }[] {
     let files: string[] = [];
     try {
       files = readdirSync(dirPath)
-        .filter((f) => f.toLowerCase().endsWith(".png"))
+        .filter((f) => !f.startsWith(".") && f.toLowerCase().endsWith(".png"))
         .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
     } catch { /* directory missing */ }
     for (const file of files) {
       const name = file.replace(/\.png$/i, "").replace(/-/g, " ");
-      shots.push({
-        src: B + `img/screenshots/${key}/${file}`,
-        alt: `Catalyst ${name}`,
-      });
+      shots.push({ src: B + `img/screenshots/${key}/${file}`, alt: `Catalyst ${name}` });
     }
   }
   return shots.slice(0, 4);
 }
 
 const previewShots = discoverPreviewShots();
-
-const stats = [
-  { label: "Servers", value: "60+", sub: "REST endpoints" },
-  { label: "Pages", value: "25+", sub: "Full admin panel" },
-  { label: "Tests", value: "23", sub: "E2E suites" },
-  { label: "Latency", value: "<10ms", sub: "WebSocket" },
-];
+const heroShot = previewShots[0]?.src || B + "og-default.png";
 
 const features = [
   {
     title: "Create Server",
-    description: "Deploy a new game server from a template.",
-    icon: `<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>`,
-    color: "bg-primary",
+    description: "Deploy from a template in seconds with automatic environment provisioning.",
+    icon: `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>`,
   },
   {
     title: "Real-Time Console",
-    description: "Live streaming via WebSocket gateway.",
-    icon: `<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 011.06 0z" /></svg>`,
-    color: "bg-primary",
+    description: "Live log streaming via WebSocket with zero-latency bidirectional I/O.",
+    icon: `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 011.06 0z" /></svg>`,
   },
   {
     title: "Enterprise Security",
-    description: "RBAC, API keys, audit logging, TLS.",
-    icon: `<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg>`,
-    color: "bg-primary",
+    description: "RBAC with 20+ permissions, API keys, audit logging, and TLS by default.",
+    icon: `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg>`,
   },
   {
     title: "Register Node",
-    description: "Add infrastructure with a Rust agent.",
-    icon: `<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 01-3-3m3 3a3 3 0 100 6h13.5a3 3 0 100-6m-16.5-3a3 3 0 013-3h13.5a3 3 0 013 3m-19.5 0a4.5 4.5 0 01.9-2.7L5.737 5.1a3.375 3.375 0 012.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 01.9 2.7m0 0a3 3 0 01-3 3m0 3h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008zm-3 6h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008z" /></svg>`,
-    color: "bg-primary",
+    description: "Add bare-metal or VM infrastructure with a lightweight Rust agent.",
+    icon: `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 01-3-3m3 3a3 3 0 100 6h13.5a3 3 0 100-6m-16.5-3a3 3 0 013-3h13.5a3 3 0 013 3m-19.5 0a4.5 4.5 0 01.9-2.7L5.737 5.1a3.375 3.375 0 012.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 01.9 2.7m0 0a3 3 0 01-3 3m0 3h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008zm-3 6h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008z" /></svg>`,
   },
   {
     title: "Plugin System",
-    description: "Extend with custom API routes and tasks.",
-    icon: `<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.25 9.75L16.5 12l-2.25 2.25m-4.5 0L7.5 12l2.25-2.25M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" /></svg>`,
-    color: "bg-primary",
+    description: "Extend the API with custom routes, hooks, and scheduled background tasks.",
+    icon: `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.25 9.75L16.5 12l-2.25 2.25m-4.5 0L7.5 12l2.25-2.25M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" /></svg>`,
   },
   {
     title: "View Alerts",
-    description: "Customizable alerts across all nodes.",
-    icon: `<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>`,
-    color: "bg-zinc-600",
+    description: "Customizable alerts and monitoring dashboards across every node in your fleet.",
+    icon: `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>`,
   },
+];
+
+const comparison = [
+  { feature: "Runtime", catalyst: "containerd (native)", pterodactyl: "Docker (layered)" },
+  { feature: "Backend", catalyst: "Rust + TypeScript", pterodactyl: "PHP" },
+  { feature: "WebSocket latency", catalyst: "<10ms", pterodactyl: "~100ms" },
+  { feature: "API endpoints", catalyst: "60+ REST", pterodactyl: "~40" },
+  { feature: "Plugin system", catalyst: "Native hooks", pterodactyl: "None" },
+  { feature: "RBAC permissions", catalyst: "20+ granular", pterodactyl: "Basic" },
+  { feature: "Install", catalyst: "Single script", pterodactyl: "Manual + Wings" },
+];
+
+const healthChecks = [
+  { name: "Database", status: "healthy", latency: null },
+  { name: "Cluster Nodes", status: "degraded", latency: "1/2" },
+  { name: "API Gateway", status: "healthy", latency: "32ms" },
+  { name: "WebSocket", status: "healthy", latency: "Active" },
 ];
 ---
 
 <Layout title="Home" description="Catalyst is a fast, secure, and modern game server management platform built with Rust, TypeScript, and containerd. Deploy game servers with Docker Compose in 60 seconds." keywords={["catalyst", "game server management", "pterodactyl alternative", "game server panel", "containerd", "rust", "typescript", "minecraft server"]}>
-  <!-- Ambient glow — matches panel AppLayout -->
-  <div class="pointer-events-none fixed inset-0 -z-10">
-    <div class="absolute -left-24 top-12 h-64 w-64 rounded-full bg-primary/5 blur-3xl"></div>
-    <div class="absolute right-10 top-1/3 h-72 w-72 rounded-full bg-primary/3 blur-3xl"></div>
-  </div>
 
-  <div class="max-w-6xl mx-auto px-4 py-6 space-y-6">
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('[data-reveal], [data-reveal-stagger]').forEach((el) => observer.observe(el));
 
-    <!-- HERO -->
-    <section aria-label="Catalyst overview">
-    <div class="relative overflow-hidden rounded-xl border border-primary/20 bg-gradient-to-br from-primary/20 via-primary/10 to-transparent p-8">
-      <div class="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-primary/10 blur-3xl"></div>
-      <div class="absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-primary/5 blur-3xl"></div>
+    document.querySelectorAll('.copy-btn').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const text = btn.getAttribute('data-copy') || '';
+        await navigator.clipboard.writeText(text);
+        const original = btn.innerHTML;
+        btn.innerHTML = '<svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg> Copied';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.innerHTML = original; btn.classList.remove('copied'); }, 2000);
+      });
+    });
+  </script>
 
-      <div class="relative z-10">
-        <div class="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <div class="flex items-center gap-2 text-primary">
-              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+  <!-- ═══════════════════════════════════════════════
+       HERO
+       ═══════════════════════════════════════════════ -->
+  <section class="relative" aria-label="Catalyst overview">
+    <div class="max-w-6xl mx-auto px-4 pt-12 pb-6 sm:pt-16 sm:pb-10">
+      <!-- Welcome card — matches product dashboard hero -->
+      <div class="relative rounded-2xl border border-zinc-800/60 overflow-hidden" data-reveal>
+        <!-- Warm gradient bg like the product dashboard -->
+        <div class="absolute inset-0 bg-gradient-to-br from-[#1a1510] via-[#0f0f11] to-[#0a0a0c]"></div>
+        <div class="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="relative p-8 sm:p-10">
+          <div class="flex flex-wrap items-start justify-between gap-4 mb-6">
+            <div class="flex items-center gap-2">
+              <svg class="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
               </svg>
-              <span class="text-sm font-medium">Game Server Management</span>
+              <span class="text-xs font-semibold tracking-wider uppercase text-primary">Game Server Management</span>
             </div>
-            <h1 class="mt-2 font-display text-3xl sm:text-4xl font-bold text-foreground">
-              Game servers,<br />reimagined.
-            </h1>
-            <p class="mt-2 max-w-lg text-sm text-muted-foreground">
-              Fast, secure, and modern game server management. Built with Rust, TypeScript, and containerd — designed to replace Pterodactyl with a fraction of the overhead.
-            </p>
-          </div>
-
-          <div class="flex items-center gap-2 rounded-full border border-success/30 bg-success/10 px-4 py-2 text-sm text-success">
-            <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-success"></span>
-            Early Testing
-          </div>
-        </div>
-
-        <!-- CTAs -->
-        <div class="mt-6 flex flex-wrap items-center gap-3">
-          <a
-            href={GITHUB_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-all duration-200 hover:bg-primary-600"
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
-            </svg>
-            View on GitHub
-            <svg class="w-3.5 h-3.5 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </a>
-          <a
-            href={B + "screenshots"}
-            class="inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-transparent px-4 py-2 text-sm font-medium text-zinc-200 transition-all duration-200 hover:bg-surface-2 hover:text-zinc-100"
-          >
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.91m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-            </svg>
-            See Screenshots
-          </a>
-          <a
-            href="https://github.com/catalystctl/catalyst#quick-start"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-transparent px-4 py-2 text-sm font-medium text-zinc-200 transition-all duration-200 hover:bg-surface-2 hover:text-zinc-100"
-          >
-            Read the Docs
-          </a>
-        </div>
-
-        <!-- Stats row — matches panel stat cards inside hero -->
-        <div class="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {stats.map((stat) => (
-            <div class="flex items-center gap-4 rounded-xl border border-border bg-card/50 p-4 backdrop-blur-sm transition-all hover:border-primary/30 hover:bg-card">
-              <div class="flex-1">
-                <div class="font-display text-2xl font-bold text-foreground">{stat.value}</div>
-                <div class="text-sm text-muted-foreground">{stat.sub}</div>
-              </div>
+            <div class="flex items-center gap-2 rounded-full border border-success/20 bg-success/[0.08] px-3 py-1 text-xs font-medium text-success">
+              <span class="status-dot status-dot-success"></span>
+              Early Testing
             </div>
-          ))}
-        </div>
-      </div>
-    </div>
-    </section>
-    <section aria-label="Features">
-      <div class="flex items-center justify-between mb-4">
-        <div>
-          <h2 class="font-display text-lg font-semibold text-foreground">Features</h2>
-          <p class="text-sm text-muted-foreground">What Catalyst can do for you.</p>
-        </div>
-      </div>
-      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {features.map((action) => (
-          <a
-            href={GITHUB_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="group flex items-center gap-4 rounded-xl border border-border bg-card p-5 shadow-surface-dark transition-all duration-200 hover:border-zinc-700 hover:shadow-elevated-dark"
-          >
-            <div class={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg ${action.color} text-white`}>
-              <Fragment set:html={action.icon} />
-            </div>
-            <div class="flex-1 min-w-0">
-              <div class="font-semibold text-foreground">{action.title}</div>
-              <div class="text-sm text-muted-foreground">{action.description}</div>
-            </div>
-            <svg class="w-5 h-5 text-muted-foreground transition-all group-hover:text-primary group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </a>
-        ))}
-      </div>
-    </section>
-
-    <!-- INSTALL + ARCHITECTURE -->
-    <section aria-label="Quick start and architecture">
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-5">
-
-      <!-- Install (3 cols) — matches panel resource card -->
-      <div class="lg:col-span-3 rounded-xl border border-border bg-card p-6 shadow-surface-dark">
-        <div class="flex items-center justify-between mb-4">
-          <div>
-            <h2 class="font-display text-lg font-semibold text-foreground">Quick Start</h2>
-            <p class="text-sm text-muted-foreground">Deploy in 60 seconds with the install script.</p>
           </div>
-          <div class="flex items-center gap-1.5 rounded-full bg-primary/15 px-3 py-1 text-xs font-medium text-primary">
-            <span class="h-1.5 w-1.5 rounded-full bg-primary"></span>
-            3 commands
-          </div>
-        </div>
 
-        <div class="rounded-xl border border-zinc-800 bg-zinc-950 overflow-hidden">
-          <div class="flex items-center gap-2 px-4 py-2.5 border-b border-zinc-800 bg-surface-1">
-            <div class="w-2.5 h-2.5 rounded-full bg-danger/70"></div>
-            <div class="w-2.5 h-2.5 rounded-full bg-warning/70"></div>
-            <div class="w-2.5 h-2.5 rounded-full bg-success/70"></div>
-            <span class="text-xs text-zinc-500 ml-2 font-mono">terminal</span>
-          </div>
-          <div class="p-4 font-mono text-sm leading-7 console-output bg-zinc-950">
-            <div class="console-line"><span class="text-primary">$</span> <span class="text-zinc-400">curl -fsSL https://raw.githubusercontent.com/</span></div>
-            <div class="console-line pl-5"><span class="text-zinc-400">catalystctl/catalyst/main/install.sh | bash</span></div>
-            <div class="console-line"><span class="text-primary">$</span> <span class="text-zinc-400">cd catalyst-docker && nano .env</span></div>
-            <div class="console-line text-zinc-600"># Set PUBLIC_URL at minimum</div>
-            <div class="console-line"><span class="text-primary">$</span> <span class="text-zinc-400">docker compose up -d</span></div>
-            <div class="console-line mt-1"><span class="text-success font-semibold">✓</span> <span class="text-zinc-300">Panel live at</span> <span class="text-primary">http://localhost</span></div>
-          </div>
-        </div>
+          <h1 class="font-display font-bold text-foreground tracking-tight leading-[1.05]" style="font-size: clamp(2.5rem, 6.5vw, 4.5rem);">
+            The game server<br />
+            panel that doesn't<br />
+            <span class="text-zinc-500">suck.</span>
+          </h1>
 
-        <div class="mt-4 flex flex-wrap gap-2">
-          {["Docker Compose", "install.sh", "Auto-generated secrets"].map((t) => (
-            <span class="inline-flex items-center rounded-md border border-transparent bg-surface-2 text-xs font-medium text-foreground px-2 py-0.5">{t}</span>
-          ))}
-        </div>
-      </div>
+          <p class="mt-5 max-w-lg text-base text-zinc-400 leading-relaxed">
+            Built with Rust and containerd. Replaces Pterodactyl with a fraction of the overhead, better security, and an API you'll actually want to use.
+          </p>
 
-      <!-- Architecture (2 cols) — matches panel activity card -->
-      <div class="lg:col-span-2 rounded-xl border border-border bg-card p-6 shadow-surface-dark">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="font-display text-lg font-semibold text-foreground">Architecture</h2>
-        </div>
-
-        <div class="space-y-1">
-          {[
-            { group: "Panel", items: ["React 18 + Vite :80", "Fastify API :3000", "PostgreSQL + Redis"] },
-            { group: "Agent", items: ["Rust + Tokio", "containerd gRPC"] },
-            { group: "Games", items: ["Minecraft", "Rust", "ARK", "Hytale"] },
-          ].map((section) => (
-            <div class="mb-3">
-              <div class="text-[11px] font-semibold uppercase tracking-widest text-zinc-500 px-3 py-1.5">{section.group}</div>
-              {section.items.map((item) => (
-                <div class="flex items-center gap-3 rounded-lg p-3 transition-colors hover:bg-surface-2">
-                  <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-surface-2">
-                    <svg class="w-4 h-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 01-3-3m3 3a3 3 0 100 6h13.5a3 3 0 100-6m-16.5-3a3 3 0 013-3h13.5a3 3 0 013 3m-19.5 0a4.5 4.5 0 01.9-2.7L5.737 5.1a3.375 3.375 0 012.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 01.9 2.7m0 0a3 3 0 01-3 3m0 3h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008zm-3 6h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008z" />
-                    </svg>
-                  </div>
-                  <div class="min-w-0 flex-1">
-                    <div class="truncate text-sm font-medium text-foreground">{item}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-    </section>
-
-    <!-- SCREENSHOTS -->
-    <section aria-label="Screenshots preview">
-    <div>
-      <div class="rounded-xl border border-border bg-card px-6 py-4 shadow-surface-dark mb-4">
-        <div class="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h2 class="font-display text-2xl font-bold text-foreground">Screenshots</h2>
-            <p class="text-sm text-muted-foreground">Captured at 1080p via Playwright.</p>
-          </div>
-          <div class="flex items-center gap-2">
-            <a href={B + "screenshots"} class="inline-flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80 transition-colors">
-              View all
-              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
+          <div class="mt-7 flex flex-wrap items-center gap-3">
+            <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary-600">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+              View on GitHub
+            </a>
+            <a href={B + "screenshots"} class="inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-transparent px-5 py-2.5 text-sm font-medium text-zinc-300 transition-all duration-200 hover:bg-surface-2 hover:text-zinc-100">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.91m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
+              Screenshots
+            </a>
+            <a href="https://github.com/catalystctl/catalyst#quick-start" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-500 transition-all duration-200 hover:text-zinc-300">
+              Read Docs
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
             </a>
           </div>
         </div>
       </div>
-      <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {previewShots.map((shot) => (
-          <div class="group rounded-xl border border-border bg-card overflow-hidden shadow-surface-dark transition-all duration-200 hover:border-zinc-700 hover:shadow-elevated-dark">
-            <div class="aspect-video bg-zinc-950 overflow-hidden">
-              <!-- Browser chrome -->
-              <div class="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 border-b border-zinc-800">
-                <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
-                <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
-                <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
-              </div>
-              <img src={shot.src} alt={shot.alt} class="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105" loading="lazy" width="384" height="216" />
+    </div>
+
+    <!-- Product screenshot with window chrome -->
+    <div class="relative max-w-6xl mx-auto px-4" data-reveal>
+      <div class="rounded-xl border border-zinc-800/80 bg-[#0c0c0e] overflow-hidden shadow-2xl shadow-black/60">
+        <div class="flex items-center gap-2 px-4 py-2.5 border-b border-zinc-800/60 bg-[#111113]">
+          <div class="w-2.5 h-2.5 rounded-full bg-[#ec6b5e]"></div>
+          <div class="w-2.5 h-2.5 rounded-full bg-[#f3bf4f]"></div>
+          <div class="w-2.5 h-2.5 rounded-full bg-[#61c253]"></div>
+          <div class="ml-4 flex-1 max-w-sm">
+            <div class="h-5 rounded bg-zinc-800/80 flex items-center px-2.5">
+              <svg class="w-3 h-3 text-zinc-600 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" /></svg>
+              <span class="text-[10px] text-zinc-600 font-mono">localhost/dashboard</span>
             </div>
           </div>
-        ))}
+        </div>
+        <img src={heroShot} alt="Catalyst dashboard" class="w-full object-cover object-top" loading="eager" style="max-height: 520px;" />
+      </div>
+      <!-- Ambient glow -->
+      <div class="absolute -bottom-10 left-1/4 right-1/4 h-24 bg-primary/[0.03] blur-3xl rounded-full pointer-events-none"></div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       STATS + SYSTEM HEALTH
+       ═══════════════════════════════════════════════ -->
+  <section class="max-w-6xl mx-auto px-4 pt-16 pb-4" data-reveal>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <!-- Stat cards — matches product stat row -->
+      <div class="lg:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="rounded-xl border border-zinc-800/60 bg-surface-1 p-4">
+          <div class="flex items-center gap-2 text-zinc-500 mb-2">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" /></svg>
+            <span class="text-[10px] font-semibold uppercase tracking-wider">Endpoints</span>
+          </div>
+          <div class="font-display text-2xl font-bold text-foreground">60+</div>
+          <div class="text-xs text-zinc-600 mt-0.5">REST API</div>
+        </div>
+        <div class="rounded-xl border border-zinc-800/60 bg-surface-1 p-4">
+          <div class="flex items-center gap-2 text-zinc-500 mb-2">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" /></svg>
+            <span class="text-[10px] font-semibold uppercase tracking-wider">Pages</span>
+          </div>
+          <div class="font-display text-2xl font-bold text-foreground">25+</div>
+          <div class="text-xs text-zinc-600 mt-0.5">Admin panel</div>
+        </div>
+        <div class="rounded-xl border border-zinc-800/60 bg-surface-1 p-4">
+          <div class="flex items-center gap-2 text-zinc-500 mb-2">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" /></svg>
+            <span class="text-[10px] font-semibold uppercase tracking-wider">Tests</span>
+          </div>
+          <div class="font-display text-2xl font-bold text-foreground">23</div>
+          <div class="text-xs text-zinc-600 mt-0.5">E2E suites</div>
+        </div>
+        <div class="rounded-xl border border-zinc-800/60 bg-surface-1 p-4">
+          <div class="flex items-center gap-2 text-zinc-500 mb-2">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" /></svg>
+            <span class="text-[10px] font-semibold uppercase tracking-wider">Latency</span>
+          </div>
+          <div class="font-display text-2xl font-bold text-foreground">&lt;10ms</div>
+          <div class="text-xs text-zinc-600 mt-0.5">WebSocket</div>
+        </div>
+      </div>
+
+      <!-- System Health — matches product System Health card -->
+      <div class="rounded-xl border border-zinc-800/60 bg-surface-1 p-5">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" /></svg>
+            <span class="text-sm font-semibold text-foreground">System Health</span>
+          </div>
+          <span class="text-[10px] font-medium text-zinc-600">Live</span>
+        </div>
+        <div class="space-y-3">
+          {healthChecks.map((check) => (
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <span class={`status-dot ${check.status === 'healthy' ? 'status-dot-success' : check.status === 'degraded' ? 'status-dot-warning' : 'status-dot-danger'}`}></span>
+                <span class="text-sm text-zinc-400">{check.name}</span>
+              </div>
+              <span class="text-xs font-mono text-zinc-500">{check.latency || 'OK'}</span>
+            </div>
+          ))}
+        </div>
+        <div class="mt-4 pt-3 border-t border-zinc-800/60 flex items-center justify-between">
+          <span class="text-[11px] text-zinc-600">Last updated</span>
+          <span class="text-[11px] text-zinc-600 font-mono">Just now</span>
+        </div>
       </div>
     </div>
-    </section>
+  </section>
 
-    <!-- CTA -->
-    <section aria-label="Call to action">
-    <div class="relative overflow-hidden rounded-xl border border-primary/20 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-8 text-center">
-      <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-primary/[0.06] rounded-full blur-3xl pointer-events-none"></div>
-      <div class="relative z-10">
-        <h2 class="font-display text-2xl font-bold text-foreground">Ready to make the switch?</h2>
-        <p class="mt-2 text-sm text-muted-foreground">Free, open-source, GPLv3. Join the early testing phase.</p>
-        <div class="mt-6 flex items-center justify-center gap-3">
-          <a
-            href={GITHUB_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-all duration-200 hover:bg-primary-600"
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
-            </svg>
+  <!-- ═══════════════════════════════════════════════
+       COMPARISON
+       ═══════════════════════════════════════════════ -->
+  <section class="max-w-6xl mx-auto px-4 py-20" aria-label="Comparison with Pterodactyl">
+    <div class="mb-10" data-reveal>
+      <h2 class="font-display text-sm font-semibold tracking-[0.12em] uppercase text-zinc-500">Comparison</h2>
+      <p class="mt-2 text-2xl sm:text-3xl font-display font-semibold text-foreground tracking-tight">How we stack up.</p>
+    </div>
+
+    <div class="rounded-xl border border-zinc-800/60 overflow-hidden" data-reveal>
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="border-b border-zinc-800/60 bg-surface-1">
+            <th class="py-3 px-5 text-[11px] font-semibold uppercase tracking-wider text-zinc-500 w-[35%]">Feature</th>
+            <th class="py-3 px-5 text-[11px] font-semibold uppercase tracking-wider text-primary w-[32%]">Catalyst</th>
+            <th class="py-3 px-5 text-[11px] font-semibold uppercase tracking-wider text-zinc-500 w-[33%]">Pterodactyl</th>
+          </tr>
+        </thead>
+        <tbody>
+          {comparison.map((row, i) => (
+            <tr class="border-b border-zinc-800/40 last:border-0 hover:bg-surface-1/50 transition-colors">
+              <td class="py-3.5 px-5 text-sm text-zinc-400">{row.feature}</td>
+              <td class="py-3.5 px-5 text-sm font-medium text-foreground">{row.catalyst}</td>
+              <td class="py-3.5 px-5 text-sm text-zinc-600">{row.pterodactyl}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       QUICK START
+       ═══════════════════════════════════════════════ -->
+  <section class="max-w-6xl mx-auto px-4 py-20" aria-label="Quick start">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
+      <div data-reveal>
+        <h2 class="font-display text-sm font-semibold tracking-[0.12em] uppercase text-zinc-500">Quick Start</h2>
+        <p class="mt-2 text-2xl sm:text-3xl font-display font-semibold text-foreground tracking-tight">One command. Sixty seconds.</p>
+        <p class="mt-4 text-base text-zinc-400 leading-relaxed max-w-md">
+          No manual dependency hell. No Wings daemon to wrestle with. Clone, configure, deploy. Catalyst handles the rest.
+        </p>
+        <div class="mt-6 flex flex-wrap gap-2">
+          {["Docker Compose", "install.sh", "Auto-generated secrets", "TLS ready"].map((t) => (
+            <span class="inline-flex items-center rounded-md border border-zinc-800 bg-surface-1 text-[11px] font-medium text-zinc-500 px-2 py-1">{t}</span>
+          ))}
+        </div>
+      </div>
+
+      <div data-reveal>
+        <div class="terminal">
+          <div class="terminal-header">
+            <div class="terminal-dot" style="background:#ec6b5e;"></div>
+            <div class="terminal-dot" style="background:#f3bf4f;"></div>
+            <div class="terminal-dot" style="background:#61c253;"></div>
+            <span class="text-[11px] text-zinc-600 font-mono ml-2">bash</span>
+            <button class="copy-btn" data-copy="curl -fsSL https://raw.githubusercontent.com/catalystctl/catalyst/main/install.sh | bash" aria-label="Copy install command">
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5"/></svg>
+              Copy
+            </button>
+          </div>
+          <div class="terminal-body">
+            <div><span class="prompt">$</span> <span class="cmd">curl -fsSL https://raw.githubusercontent.com/</span></div>
+            <div class="pl-[1.1rem]"><span class="cmd">catalystctl/catalyst/main/install.sh | bash</span></div>
+            <div class="mt-1"><span class="prompt">$</span> <span class="cmd">cd catalyst-docker && nano .env</span></div>
+            <div class="comment"># Set PUBLIC_URL at minimum</div>
+            <div class="mt-1"><span class="prompt">$</span> <span class="cmd">docker compose up -d</span></div>
+            <div class="mt-2"><span class="success">✓</span> <span class="cmd">Panel live at</span> <span class="url">http://localhost</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       FEATURES
+       ═══════════════════════════════════════════════ -->
+  <section class="max-w-6xl mx-auto px-4 py-20" aria-label="Features">
+    <div class="mb-12" data-reveal>
+      <h2 class="font-display text-sm font-semibold tracking-[0.12em] uppercase text-zinc-500">Features</h2>
+      <p class="mt-2 text-2xl sm:text-3xl font-display font-semibold text-foreground tracking-tight">Everything you need to run a fleet.</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3" data-reveal-stagger>
+      {features.map((f) => (
+        <div class="group rounded-xl border border-zinc-800/60 bg-surface-1 p-6 transition-all duration-200 hover:border-zinc-700 hover:bg-surface-2">
+          <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-800 text-zinc-400 transition-colors group-hover:text-zinc-200">
+            <Fragment set:html={f.icon} />
+          </div>
+          <h3 class="mt-4 font-semibold text-foreground text-[15px]">{f.title}</h3>
+          <p class="mt-1.5 text-sm text-zinc-500 leading-relaxed">{f.description}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       SCREENSHOTS
+       ═══════════════════════════════════════════════ -->
+  <section class="max-w-6xl mx-auto px-4 py-20" aria-label="Screenshots preview">
+    <div class="flex flex-wrap items-end justify-between gap-4 mb-10" data-reveal>
+      <div>
+        <h2 class="font-display text-sm font-semibold tracking-[0.12em] uppercase text-zinc-500">Screenshots</h2>
+        <p class="mt-2 text-2xl sm:text-3xl font-display font-semibold text-foreground tracking-tight">See it in action.</p>
+      </div>
+      <a href={B + "screenshots"} class="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary-400 transition-colors pb-1">
+        View all
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+      </a>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" data-reveal-stagger>
+      {previewShots.map((shot) => (
+        <a href={B + "screenshots"} class="group block rounded-xl border border-zinc-800/60 overflow-hidden bg-[#0c0c0e] transition-all duration-300 hover:border-zinc-700">
+          <div class="aspect-video overflow-hidden">
+            <div class="flex items-center gap-1.5 px-3 py-2 bg-[#111113] border-b border-zinc-800/60">
+              <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
+              <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
+              <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
+            </div>
+            <img src={shot.src} alt={shot.alt} class="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]" loading="lazy" width="600" height="338" />
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       CTA
+       ═══════════════════════════════════════════════ -->
+  <section class="max-w-6xl mx-auto px-4 py-20" aria-label="Call to action">
+    <div class="relative rounded-2xl border border-zinc-800/60 bg-surface-1 p-10 sm:p-14 text-center overflow-hidden" data-reveal>
+      <!-- Warm gradient like product dashboard -->
+      <div class="absolute inset-0 bg-gradient-to-br from-[#1a1510]/50 via-transparent to-transparent pointer-events-none"></div>
+      <div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="relative">
+        <h2 class="font-display text-3xl sm:text-4xl font-bold text-foreground tracking-tight">Ready to switch?</h2>
+        <p class="mt-3 text-base text-zinc-500 max-w-md mx-auto">Free, open-source, GPLv3. Join the early testing phase and help shape the future of game server management.</p>
+        <div class="mt-8 flex items-center justify-center gap-3">
+          <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary-600">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
             Star on GitHub
           </a>
-          <a
-            href="https://github.com/catalystctl/catalyst#quick-start"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="inline-flex items-center gap-2 rounded-lg border border-zinc-800 px-4 py-2 text-sm font-medium text-zinc-200 transition-all duration-200 hover:bg-surface-2 hover:text-zinc-100"
-          >
+          <a href="https://github.com/catalystctl/catalyst#quick-start" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-lg border border-zinc-800 px-5 py-2.5 text-sm font-medium text-zinc-400 transition-all duration-200 hover:bg-surface-2 hover:text-zinc-200">
             Read the Docs
           </a>
         </div>
       </div>
     </div>
-    </section>
+  </section>
 
-  </div>
+  <div class="h-8"></div>
 </Layout>

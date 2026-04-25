@@ -34,23 +34,42 @@ const sidebar = Array.from(groups.values())
 ---
 
 <Layout title="Documentation" description="Catalyst documentation — installation, configuration, nodes, plugins.">
-  <div class="max-w-3xl mx-auto px-6 sm:px-10 py-16">
 
-    <h1 class="font-display text-4xl font-bold text-zinc-50 mb-3">Documentation</h1>
-    <p class="text-lg text-zinc-500 mb-12">Everything you need to set up and run Catalyst.</p>
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('[data-reveal], [data-reveal-stagger]').forEach((el) => observer.observe(el));
+  </script>
 
-    <div class="space-y-12">
+  <div class="max-w-3xl mx-auto px-4 sm:px-10 py-16 sm:py-20">
+
+    <div data-reveal>
+      <h1 class="font-display font-bold text-foreground tracking-tight" style="font-size: clamp(2rem, 5vw, 3.5rem);">
+        Documentation
+      </h1>
+      <p class="mt-3 text-base sm:text-lg text-zinc-400 leading-relaxed">
+        Everything you need to set up and run Catalyst.
+      </p>
+    </div>
+
+    <div class="mt-12 space-y-14" data-reveal-stagger>
       {sidebar.map(group => (
         <section>
-          <h2 class="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-600 mb-4">{group.label}</h2>
+          <h2 class="text-xs font-semibold uppercase tracking-[0.15em] text-zinc-500 mb-4">{group.label}</h2>
           <div class="space-y-1">
             {group.items.map(item => (
               <a
                 href={`/docs/${item.slug}/`}
-                class="group flex items-center justify-between rounded-lg px-4 py-3 -mx-1 transition-colors hover:bg-zinc-800/30"
+                class="group flex items-center justify-between rounded-lg px-4 py-3 -mx-1 transition-all hover:bg-surface-1 border border-transparent hover:border-zinc-800/60"
               >
                 <div>
-                  <span class="text-[15px] text-zinc-300 group-hover:text-primary transition-colors">{item.title}</span>
+                  <span class="text-[15px] text-zinc-300 group-hover:text-foreground transition-colors font-medium">{item.title}</span>
                   {item.description && (
                     <span class="block text-sm text-zinc-600 mt-0.5">{item.description}</span>
                   )}
@@ -65,13 +84,13 @@ const sidebar = Array.from(groups.values())
       ))}
     </div>
 
-    <div class="mt-20 pt-8 border-t border-zinc-800/50 text-center">
-      <p class="text-sm text-zinc-600 mb-4">Contributions welcome</p>
+    <div class="mt-20 pt-8 border-t border-zinc-800/60 text-center" data-reveal>
+      <p class="text-sm text-zinc-500 mb-4">Contributions welcome</p>
       <a
         href="https://github.com/catalystctl/catalyst-website"
         target="_blank"
         rel="noopener noreferrer"
-        class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary-600 transition-colors"
+        class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary-600 transition-colors"
       >
         <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
         Edit on GitHub

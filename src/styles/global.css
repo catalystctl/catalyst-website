@@ -321,6 +321,15 @@ html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover, *::-we
   border-color: hsl(var(--success) / 0.3);
 }
 
+/* Hide scrollbar but keep scroll functionality */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* Progress bar — matches product resource bars */
 .progress-bar {
   height: 4px;

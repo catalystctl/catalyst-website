@@ -6,14 +6,6 @@ import { join, relative } from "node:path";
 const B = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "") + "/";
 const GITHUB_URL = "https://github.com/catalystctl/catalyst";
 
-/* ═══════════════════════════════════════════════════════════
-   DYNAMIC SCREENSHOT DISCOVERY — source of truth is the
-   catalyst submodule: catalyst/docs/screenshots/<group>/
-
-   Drop new .png files into the submodule and they appear
-   automatically on the next build. No manual list edits.
-   ═══════════════════════════════════════════════════════════ */
-
 const SHOT_DIR = "catalyst/docs/screenshots";
 
 const GROUP_MAP: Record<string, string> = {
@@ -51,7 +43,7 @@ function walkPngs(dir: string, root?: string): string[] {
     const full = join(dir, entry.name);
     if (entry.isDirectory()) {
       results.push(...walkPngs(full, base));
-    } else if (entry.isFile() && entry.name.toLowerCase().endsWith(".png") && entry.name !== ".png") {
+    } else if (entry.isFile() && !entry.name.startsWith(".") && entry.name.toLowerCase().endsWith(".png")) {
       results.push(relative(base, full));
     }
   }
@@ -80,7 +72,6 @@ try {
   groupKeys = [];
 }
 
-// Preserve consistent ordering
 const ORDER = ["auth", "user", "admin"];
 for (const key of ORDER) {
   if (!groupKeys.includes(key)) continue;
@@ -102,47 +93,75 @@ for (const key of ORDER) {
 
 const allShots = screenshotGroups.flatMap((g) => g.screenshots.map((s) => ({ ...s, group: g.title })));
 const total = allShots.length;
+
+const groupMeta = [
+  { key: "auth", label: "Authentication", icon: `<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" /></svg>` },
+  { key: "user", label: "User Panel", icon: `<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>` },
+  { key: "admin", label: "Admin Panel", icon: `<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>` },
+];
 ---
 
 <Layout title="Screenshots" description="Browse all Catalyst screenshots at 1080p — authentication, user panel, server console, admin dashboard, nodes, plugins, and more." keywords={["catalyst screenshots", "game server panel", "admin dashboard", "server console", "file manager"]}>
-  <!-- Ambient glow -->
-  <div class="pointer-events-none fixed inset-0 -z-10">
-    <div class="absolute -left-24 top-12 h-64 w-64 rounded-full bg-primary/5 blur-3xl"></div>
-    <div class="absolute right-10 top-1/3 h-72 w-72 rounded-full bg-primary/3 blur-3xl"></div>
-  </div>
 
-  <div class="max-w-6xl mx-auto px-4 py-6 space-y-6">
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('[data-reveal], [data-reveal-stagger]').forEach((el) => observer.observe(el));
+  </script>
 
-    <!-- Page header -->
-    <div class="rounded-xl border border-border bg-card px-6 py-4 shadow-surface-dark">
-      <div class="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 class="font-display text-2xl font-bold text-foreground">Screenshots</h1>
-          <p class="text-sm text-muted-foreground">{total} pages captured at 1080p via Playwright.</p>
-        </div>
-        <div class="flex items-center gap-2 flex-wrap">
-          {screenshotGroups.map((group, i) => (
-            <a
-              href={`#group-${i}`}
-              class="inline-flex items-center rounded-md border border-transparent bg-surface-2 text-xs font-medium text-foreground px-2 py-0.5 transition-colors hover:bg-surface-3"
-            >
-              {group.title}
-            </a>
-          ))}
-        </div>
+  <!-- ═══════════════════════════════════════════════
+       HERO
+       ═══════════════════════════════════════════════ -->
+  <section class="max-w-6xl mx-auto px-4 pt-12 pb-8 sm:pt-16 sm:pb-10" aria-label="Screenshots overview">
+    <div class="flex flex-wrap items-start justify-between gap-4" data-reveal>
+      <div>
+        <h1 class="font-display font-bold text-foreground tracking-tight" style="font-size: clamp(2rem, 5vw, 3.5rem);">
+          Screenshots
+        </h1>
+        <p class="mt-2 text-base text-zinc-400 max-w-md">
+          {total} pages captured at 1080p via Playwright. Every screen in the app, from auth to admin.
+        </p>
+      </div>
+      <div class="flex items-center gap-2">
+        {screenshotGroups.map((group, i) => (
+          <a
+            href={`#group-${i}`}
+            class="inline-flex items-center gap-1.5 rounded-lg border border-zinc-800 bg-surface-1 text-xs font-medium text-zinc-400 px-3 py-1.5 transition-all hover:border-zinc-700 hover:text-zinc-200"
+          >
+            {group.title}
+            <span class="text-[10px] text-zinc-600 font-mono">{group.screenshots.length}</span>
+          </a>
+        ))}
       </div>
     </div>
+  </section>
 
-    <!-- Screenshot groups -->
+  <!-- ═══════════════════════════════════════════════
+       SCREENSHOT GROUPS
+       ═══════════════════════════════════════════════ -->
+  <div class="max-w-6xl mx-auto px-4 pb-20 space-y-16">
     {screenshotGroups.map((group, i) => (
-      <section id={`group-${i}`} class="scroll-mt-20 space-y-3">
-        <div class="flex items-center gap-3">
-          <span class="text-[11px] font-semibold uppercase tracking-widest text-zinc-500 px-3 py-2">{group.title}</span>
-          <div class="h-px flex-1 bg-zinc-800"></div>
-          <span class="text-xs text-zinc-500 font-mono">{group.screenshots.length}</span>
+      <section id={`group-${i}`} class="scroll-mt-24" aria-label={group.title}>
+        <div class="flex items-center gap-4 mb-6" data-reveal>
+          <div class="flex items-center gap-2">
+            {groupMeta.find(m => m.label === group.title)?.icon && (
+              <div class="flex h-7 w-7 items-center justify-center rounded-md bg-zinc-800 text-zinc-400">
+                <Fragment set:html={groupMeta.find(m => m.label === group.title)?.icon || ''} />
+              </div>
+            )}
+            <h2 class="font-display text-lg font-semibold text-foreground">{group.title}</h2>
+          </div>
+          <div class="h-px flex-1 bg-zinc-800/60"></div>
+          <span class="text-xs text-zinc-600 font-mono">{group.screenshots.length}</span>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" data-reveal-stagger>
           {group.screenshots.map((shot) => (
             <button
               type="button"
@@ -150,11 +169,10 @@ const total = allShots.length;
               data-src={shot.path}
               data-name={shot.name}
               data-group={group.title}
-              class="group rounded-xl border border-border bg-card overflow-hidden shadow-surface-dark transition-all duration-200 hover:border-zinc-700 hover:shadow-elevated-dark text-left"
+              class="group rounded-xl border border-zinc-800/60 bg-[#0c0c0e] overflow-hidden transition-all duration-200 hover:border-zinc-700 hover:shadow-elevated-dark text-left"
             >
-              <div class="aspect-video bg-zinc-950 overflow-hidden">
-                <!-- Browser chrome — gives screenshots visual separation from dark bg -->
-                <div class="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 border-b border-zinc-800">
+              <div class="aspect-video overflow-hidden">
+                <div class="flex items-center gap-1.5 px-3 py-2 bg-[#111113] border-b border-zinc-800/60">
                   <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
                   <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
                   <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
@@ -164,13 +182,15 @@ const total = allShots.length;
                 <img
                   src={shot.path}
                   alt={`Catalyst ${shot.name} — ${group.title}`}
-                  class="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                  class="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
                   loading="lazy"
+                  width="600"
+                  height="338"
                 />
               </div>
-              <div class="px-4 py-3 border-t border-zinc-800 flex items-center justify-between">
-                <span class="text-sm font-medium text-foreground">{shot.name}</span>
-                <svg class="w-4 h-4 text-muted-foreground opacity-0 transition-all group-hover:opacity-100 group-hover:text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <div class="px-4 py-3 flex items-center justify-between">
+                <span class="text-sm font-medium text-zinc-300">{shot.name}</span>
+                <svg class="w-4 h-4 text-zinc-600 opacity-0 transition-all group-hover:opacity-100 group-hover:text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
                 </svg>
               </div>
@@ -180,28 +200,28 @@ const total = allShots.length;
       </section>
     ))}
 
-    <!-- CTA -->
-    <div class="flex flex-col items-center justify-center rounded-xl border border-dashed border-border px-4 py-10 text-center">
-      <svg class="w-8 h-8 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
-      </svg>
-      <p class="mt-2 text-sm text-muted-foreground">Want to see the code behind these screenshots?</p>
-      <a
-        href={GITHUB_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="mt-4 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-all duration-200 hover:bg-primary-600"
-      >
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
-        </svg>
-        Get Started on GitHub
-      </a>
+    <!-- ═══════════════════════════════════════════════
+         CTA
+         ═══════════════════════════════════════════════ -->
+    <div class="relative rounded-2xl border border-zinc-800/60 bg-surface-1 p-10 sm:p-14 text-center overflow-hidden" data-reveal>
+      <div class="absolute inset-0 bg-gradient-to-br from-[#1a1510]/50 via-transparent to-transparent pointer-events-none"></div>
+      <div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="relative">
+        <h2 class="font-display text-2xl sm:text-3xl font-bold text-foreground tracking-tight">Want to see the code?</h2>
+        <p class="mt-2 text-base text-zinc-500 max-w-md mx-auto">These screenshots are generated automatically on every commit. The source is open.</p>
+        <div class="mt-6 flex items-center justify-center gap-3">
+          <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary-600">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            Get Started on GitHub
+          </a>
+        </div>
+      </div>
     </div>
-
   </div>
 
-  <!-- Lightbox -->
+  <!-- ═══════════════════════════════════════════════
+       LIGHTBOX
+       ═══════════════════════════════════════════════ -->
   <div id="lightbox" class="fixed inset-0 z-[100] hidden" role="dialog" aria-modal="true" aria-label="Screenshot viewer">
     <div id="lightbox-backdrop" class="absolute inset-0 bg-black/90 backdrop-blur-sm transition-opacity opacity-0"></div>
 
@@ -219,7 +239,7 @@ const total = allShots.length;
     </div>
 
     <div class="relative z-10 flex items-center justify-center h-full px-4 sm:px-16 py-16">
-      <img id="lightbox-img" class="max-w-full max-h-[80vh] rounded-lg shadow-2xl border border-zinc-800 object-contain transition-transform duration-200" alt="" />
+      <img id="lightbox-img" class="max-w-full max-h-[80vh] rounded-xl shadow-2xl border border-zinc-800 object-contain transition-transform duration-200" alt="" />
     </div>
 
     <button id="lightbox-prev" type="button" class="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 p-2 sm:p-3 rounded-xl bg-zinc-900/80 border border-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-800 hover:border-zinc-700 transition-all" aria-label="Previous screenshot">

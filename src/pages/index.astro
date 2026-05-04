@@ -1,35 +1,14 @@
 ---
+export const prerender = true;
+
 import Layout from "../layouts/Layout.astro";
-import { readdirSync } from "node:fs";
-import { join } from "node:path";
+import previewData from "../data/preview-shots.json";
 
 const B = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "") + "/";
 const GITHUB_URL = "https://github.com/catalystctl/catalyst";
 
-/* ── Dynamic screenshot preview ── */
-const SHOT_DIR = "catalyst/docs/screenshots";
-const PREVIEW_ORDER = ["user", "admin", "auth"];
-
-function discoverPreviewShots(): { src: string; alt: string }[] {
-  const shots: { src: string; alt: string }[] = [];
-  for (const key of PREVIEW_ORDER) {
-    const dirPath = join(SHOT_DIR, key);
-    let files: string[] = [];
-    try {
-      files = readdirSync(dirPath)
-        .filter((f) => !f.startsWith(".") && f.toLowerCase().endsWith(".png"))
-        .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
-    } catch { /* directory missing */ }
-    for (const file of files) {
-      const name = file.replace(/\.png$/i, "").replace(/-/g, " ");
-      shots.push({ src: B + `img/screenshots/${key}/${file}`, alt: `Catalyst ${name}` });
-    }
-  }
-  return shots.slice(0, 4);
-}
-
-const previewShots = discoverPreviewShots();
-const heroShot = previewShots[0]?.src || B + "og-default.png";
+const previewShots = previewData.shots;
+const heroShot = previewData.heroShot.startsWith("/") ? previewData.heroShot : B + previewData.heroShot;
 
 const features = [
   {

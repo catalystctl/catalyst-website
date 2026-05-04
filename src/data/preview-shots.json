@@ -1,0 +1,21 @@
+{
+  "shots": [
+    {
+      "src": "/img/screenshots/user/dashboard.png",
+      "alt": "Catalyst dashboard"
+    },
+    {
+      "src": "/img/screenshots/user/profile.png",
+      "alt": "Catalyst profile"
+    },
+    {
+      "src": "/img/screenshots/user/server-test.png",
+      "alt": "Catalyst server test"
+    },
+    {
+      "src": "/img/screenshots/user/servers.png",
+      "alt": "Catalyst servers"
+    }
+  ],
+  "heroShot": "/img/screenshots/user/dashboard.png"
+}

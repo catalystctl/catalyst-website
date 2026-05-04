@@ -1,0 +1,301 @@
+{
+  "groups": [
+    {
+      "title": "Authentication",
+      "screenshots": [
+        {
+          "name": "Forgot Password",
+          "path": "/img/screenshots/auth/forgot-password.png"
+        },
+        {
+          "name": "Login",
+          "path": "/img/screenshots/auth/login.png"
+        },
+        {
+          "name": "Register",
+          "path": "/img/screenshots/auth/register.png"
+        },
+        {
+          "name": "Reset Password",
+          "path": "/img/screenshots/auth/reset-password.png"
+        },
+        {
+          "name": "Setup",
+          "path": "/img/screenshots/auth/setup.png"
+        },
+        {
+          "name": "Two Factor",
+          "path": "/img/screenshots/auth/two-factor.png"
+        }
+      ]
+    },
+    {
+      "title": "User Panel",
+      "screenshots": [
+        {
+          "name": "Dashboard",
+          "path": "/img/screenshots/user/dashboard.png"
+        },
+        {
+          "name": "Modals — Server Test Modal Kill",
+          "path": "/img/screenshots/user/modals/server-test-modal-kill.png"
+        },
+        {
+          "name": "Profile",
+          "path": "/img/screenshots/user/profile.png"
+        },
+        {
+          "name": "Server Test",
+          "path": "/img/screenshots/user/server-test.png"
+        },
+        {
+          "name": "Servers",
+          "path": "/img/screenshots/user/servers.png"
+        },
+        {
+          "name": "Tickets",
+          "path": "/img/screenshots/user/tickets.png"
+        }
+      ]
+    },
+    {
+      "title": "Admin Panel",
+      "screenshots": [
+        {
+          "name": "Alerts",
+          "path": "/img/screenshots/admin/admin-alerts.png"
+        },
+        {
+          "name": "API Keys",
+          "path": "/img/screenshots/admin/admin-api-keys.png"
+        },
+        {
+          "name": "Audit Logs",
+          "path": "/img/screenshots/admin/admin-audit-logs.png"
+        },
+        {
+          "name": "Database",
+          "path": "/img/screenshots/admin/admin-database.png"
+        },
+        {
+          "name": "Migration",
+          "path": "/img/screenshots/admin/admin-migration.png"
+        },
+        {
+          "name": "Network",
+          "path": "/img/screenshots/admin/admin-network.png"
+        },
+        {
+          "name": "Nodes",
+          "path": "/img/screenshots/admin/admin-nodes.png"
+        },
+        {
+          "name": "Plugins",
+          "path": "/img/screenshots/admin/admin-plugins.png"
+        },
+        {
+          "name": "Roles",
+          "path": "/img/screenshots/admin/admin-roles.png"
+        },
+        {
+          "name": "Security",
+          "path": "/img/screenshots/admin/admin-security.png"
+        },
+        {
+          "name": "Servers",
+          "path": "/img/screenshots/admin/admin-servers.png"
+        },
+        {
+          "name": "System Errors",
+          "path": "/img/screenshots/admin/admin-system-errors.png"
+        },
+        {
+          "name": "System",
+          "path": "/img/screenshots/admin/admin-system.png"
+        },
+        {
+          "name": "Templates",
+          "path": "/img/screenshots/admin/admin-templates.png"
+        },
+        {
+          "name": "Theme Settings",
+          "path": "/img/screenshots/admin/admin-theme-settings.png"
+        },
+        {
+          "name": "Users",
+          "path": "/img/screenshots/admin/admin-users.png"
+        },
+        {
+          "name": "Admin",
+          "path": "/img/screenshots/admin/admin.png"
+        },
+        {
+          "name": "Node Home",
+          "path": "/img/screenshots/admin/node-home.png"
+        },
+        {
+          "name": "Template Magma",
+          "path": "/img/screenshots/admin/template-magma.png"
+        }
+      ]
+    }
+  ],
+  "total": 31,
+  "allShots": [
+    {
+      "name": "Forgot Password",
+      "path": "/img/screenshots/auth/forgot-password.png",
+      "group": "Authentication"
+    },
+    {
+      "name": "Login",
+      "path": "/img/screenshots/auth/login.png",
+      "group": "Authentication"
+    },
+    {
+      "name": "Register",
+      "path": "/img/screenshots/auth/register.png",
+      "group": "Authentication"
+    },
+    {
+      "name": "Reset Password",
+      "path": "/img/screenshots/auth/reset-password.png",
+      "group": "Authentication"
+    },
+    {
+      "name": "Setup",
+      "path": "/img/screenshots/auth/setup.png",
+      "group": "Authentication"
+    },
+    {
+      "name": "Two Factor",
+      "path": "/img/screenshots/auth/two-factor.png",
+      "group": "Authentication"
+    },
+    {
+      "name": "Dashboard",
+      "path": "/img/screenshots/user/dashboard.png",
+      "group": "User Panel"
+    },
+    {
+      "name": "Modals — Server Test Modal Kill",
+      "path": "/img/screenshots/user/modals/server-test-modal-kill.png",
+      "group": "User Panel"
+    },
+    {
+      "name": "Profile",
+      "path": "/img/screenshots/user/profile.png",
+      "group": "User Panel"
+    },
+    {
+      "name": "Server Test",
+      "path": "/img/screenshots/user/server-test.png",
+      "group": "User Panel"
+    },
+    {
+      "name": "Servers",
+      "path": "/img/screenshots/user/servers.png",
+      "group": "User Panel"
+    },
+    {
+      "name": "Tickets",
+      "path": "/img/screenshots/user/tickets.png",
+      "group": "User Panel"
+    },
+    {
+      "name": "Alerts",
+      "path": "/img/screenshots/admin/admin-alerts.png",
+      "group": "Admin Panel"
+    },
+    {
+      "name": "API Keys",
+      "path": "/img/screenshots/admin/admin-api-keys.png",
+      "group": "Admin Panel"
+    },
+    {
+      "name": "Audit Logs",
+      "path": "/img/screenshots/admin/admin-audit-logs.png",
+      "group": "Admin Panel"
+    },
+    {
+      "name": "Database",
+      "path": "/img/screenshots/admin/admin-database.png",
+      "group": "Admin Panel"
+    },
+    {
+      "name": "Migration",
+      "path": "/img/screenshots/admin/admin-migration.png",
+      "group": "Admin Panel"
+    },
+    {
+      "name": "Network",
+      "path": "/img/screenshots/admin/admin-network.png",
+      "group": "Admin Panel"
+    },
+    {
+      "name": "Nodes",
+      "path": "/img/screenshots/admin/admin-nodes.png",
+      "group": "Admin Panel"
+    },
+    {
+      "name": "Plugins",
+      "path": "/img/screenshots/admin/admin-plugins.png",
+      "group": "Admin Panel"
+    },
+    {
+      "name": "Roles",
+      "path": "/img/screenshots/admin/admin-roles.png",
+      "group": "Admin Panel"
+    },
+    {
+      "name": "Security",
+      "path": "/img/screenshots/admin/admin-security.png",
+      "group": "Admin Panel"
+    },
+    {
+      "name": "Servers",
+      "path": "/img/screenshots/admin/admin-servers.png",
+      "group": "Admin Panel"
+    },
+    {
+      "name": "System Errors",
+      "path": "/img/screenshots/admin/admin-system-errors.png",
+      "group": "Admin Panel"
+    },
+    {
+      "name": "System",
+      "path": "/img/screenshots/admin/admin-system.png",
+      "group": "Admin Panel"
+    },
+    {
+      "name": "Templates",
+      "path": "/img/screenshots/admin/admin-templates.png",
+      "group": "Admin Panel"
+    },
+    {
+      "name": "Theme Settings",
+      "path": "/img/screenshots/admin/admin-theme-settings.png",
+      "group": "Admin Panel"
+    },
+    {
+      "name": "Users",
+      "path": "/img/screenshots/admin/admin-users.png",
+      "group": "Admin Panel"
+    },
+    {
+      "name": "Admin",
+      "path": "/img/screenshots/admin/admin.png",
+      "group": "Admin Panel"
+    },
+    {
+      "name": "Node Home",
+      "path": "/img/screenshots/admin/node-home.png",
+      "group": "Admin Panel"
+    },
+    {
+      "name": "Template Magma",
+      "path": "/img/screenshots/admin/template-magma.png",
+      "group": "Admin Panel"
+    }
+  ]
+}

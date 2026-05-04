@@ -6,7 +6,7 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "prebuild": "scripts/sync-docs.sh && scripts/copy-screenshots.sh",
+    "prebuild": "scripts/sync-docs.sh && scripts/copy-screenshots.sh && node scripts/generate-screenshot-data.js",
     "predev": "scripts/sync-docs.sh && scripts/copy-screenshots.sh",
     "dev": "astro dev",
     "build": "astro build",

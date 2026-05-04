@@ -9,7 +9,7 @@ import cloudflare from '@astrojs/cloudflare';
 export default defineConfig({
   site: "https://catalystctl.com",
   trailingSlash: "always",
-  output: "static",
+  output: "server",
   compressHTML: true,
 
   build: {

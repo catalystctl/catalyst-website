@@ -3,18 +3,23 @@ import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 import sitemap from '@astrojs/sitemap';
 
+import cloudflare from '@astrojs/cloudflare';
+
 // https://astro.build/config
 export default defineConfig({
   site: "https://catalystctl.com",
   trailingSlash: "always",
   output: "static",
   compressHTML: true,
+
   build: {
     inlineStylesheets: "auto",
   },
+
   vite: {
     plugins: [tailwindcss()],
   },
+
   integrations: [
     sitemap({
       changefreq: 'weekly',
@@ -34,4 +39,6 @@ export default defineConfig({
       },
     }),
   ],
+
+  adapter: cloudflare(),
 });

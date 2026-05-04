@@ -34,3 +34,9 @@ src/content/docs/api-reference/
 src/content/docs/automation/
 .pi-lens/
 .pi/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example

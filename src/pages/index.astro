@@ -82,7 +82,7 @@ const healthChecks = [
 ];
 ---
 
-<Layout title="Home" description="Catalyst is a fast, secure, and modern game server management platform built with Rust, TypeScript, and containerd. Deploy game servers with Docker Compose in 60 seconds." keywords={["catalyst", "game server management", "pterodactyl alternative", "game server panel", "containerd", "rust", "typescript", "minecraft server"]}>
+<Layout title="Home" description="Catalyst is the modern Pterodactyl replacement — a fast, secure game server management platform built with Rust, TypeScript, and containerd. Deploy game servers in 60 seconds." keywords={["catalyst", "game server management", "pterodactyl alternative", "pterodactyl replacement", "modern game server panel", "containerd", "rust", "typescript", "minecraft server", "game server control panel", "pterodactyl vs catalyst"]}>
 
   <script>
     const observer = new IntersectionObserver((entries) => {
@@ -133,11 +133,11 @@ const healthChecks = [
           </div>
 
           <h1 class="font-display font-bold text-foreground tracking-tight leading-[1.05]" style="font-size: clamp(2rem, 6.5vw, 4.5rem);">
-            The game server panel that doesn't <span class="text-zinc-500">suck.</span>
+            The modern <span class="text-primary">Pterodactyl alternative</span> built with Rust.
           </h1>
 
           <p class="mt-5 max-w-lg text-base text-zinc-400 leading-relaxed">
-            Built with Rust and containerd. Replaces Pterodactyl with a fraction of the overhead, better security, and an API you'll actually want to use.
+            Catalyst replaces Pterodactyl with a fraction of the overhead, better security, sub-10ms WebSocket console streaming, and an API you'll actually want to use. Deploy game servers in 60 seconds with Docker Compose.
           </p>
 
           <div class="mt-7 flex flex-wrap items-center gap-3">
@@ -394,6 +394,138 @@ const healthChecks = [
   </section>
 
   <!-- ═══════════════════════════════════════════════
+       RELATED PAGES
+       ═══════════════════════════════════════════════ -->
+  <section class="max-w-6xl mx-auto px-4 py-12" aria-label="Related pages">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" data-reveal>
+      <a href={B + "vs-pterodactyl/"} class="group rounded-xl border border-zinc-800/60 bg-surface-1 p-5 transition-all duration-200 hover:border-zinc-700 hover:bg-surface-2">
+        <div class="flex items-center gap-2 text-primary mb-2">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>
+          <span class="text-xs font-semibold uppercase tracking-wider">Compare</span>
+        </div>
+        <h3 class="font-semibold text-foreground text-[15px] group-hover:text-primary transition-colors">Catalyst vs Pterodactyl</h3>
+        <p class="mt-1 text-sm text-zinc-500">Side-by-side feature comparison, performance benchmarks, and architecture differences.</p>
+      </a>
+      <a href={B + "migrate-from-pterodactyl/"} class="group rounded-xl border border-zinc-800/60 bg-surface-1 p-5 transition-all duration-200 hover:border-zinc-700 hover:bg-surface-2">
+        <div class="flex items-center gap-2 text-primary mb-2">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" /></svg>
+          <span class="text-xs font-semibold uppercase tracking-wider">Migrate</span>
+        </div>
+        <h3 class="font-semibold text-foreground text-[15px] group-hover:text-primary transition-colors">Migrate from Pterodactyl</h3>
+        <p class="mt-1 text-sm text-zinc-500">Step-by-step guide to move your servers, eggs, and users from Pterodactyl to Catalyst.</p>
+      </a>
+      <a href={B + "pterodactyl-alternative/"} class="group rounded-xl border border-zinc-800/60 bg-surface-1 p-5 transition-all duration-200 hover:border-zinc-700 hover:bg-surface-2">
+        <div class="flex items-center gap-2 text-primary mb-2">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" /></svg>
+          <span class="text-xs font-semibold uppercase tracking-wider">Learn</span>
+        </div>
+        <h3 class="font-semibold text-foreground text-[15px] group-hover:text-primary transition-colors">Why switch?</h3>
+        <p class="mt-1 text-sm text-zinc-500">Deep dive into why Catalyst is the best Pterodactyl alternative for modern game hosting.</p>
+      </a>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       FAQ
+       ═══════════════════════════════════════════════ -->
+  <section class="max-w-6xl mx-auto px-4 py-20" aria-label="Frequently asked questions">
+    <div class="mb-10" data-reveal>
+      <h2 class="font-display text-sm font-semibold tracking-[0.12em] uppercase text-zinc-500">FAQ</h2>
+      <p class="mt-2 text-2xl sm:text-3xl font-display font-semibold text-foreground tracking-tight">Questions? Answered.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4" data-reveal-stagger>
+      {[
+        {
+          q: "Is Catalyst a Pterodactyl replacement?",
+          a: "Yes. Catalyst is designed from the ground up as a modern replacement for Pterodactyl. It covers the same core use cases — game server management, node orchestration, user panels, and admin dashboards — with a faster Rust backend, containerd runtime, and a plugin system Pterodactyl lacks.",
+        },
+        {
+          q: "How is Catalyst different from Pterodactyl?",
+          a: "Catalyst uses Rust instead of PHP for the backend, containerd instead of Docker for the runtime, and provides 60+ REST API endpoints compared to Pterodactyl's ~40. Catalyst also has a native plugin system, sub-10ms WebSocket console latency, and RBAC with 20+ granular permissions.",
+        },
+        {
+          q: "Can I migrate from Pterodactyl to Catalyst?",
+          a: "Yes. Catalyst supports importing servers, eggs, and user data from Pterodactyl. Our migration guide walks you through the process step by step. The containerd runtime is compatible with most Pterodactyl Docker images.",
+        },
+        {
+          q: "Is Catalyst free and open source?",
+          a: "Yes. Catalyst is released under GPLv3. The entire codebase — backend, frontend, node agent, and documentation — is available on GitHub. There are no paid tiers or feature gates.",
+        },
+        {
+          q: "What games does Catalyst support?",
+          a: "Catalyst supports any game that runs in a Linux container. This includes Minecraft (Java and Bedrock), Counter-Strike 2, Rust, ARK, Terraria, Team Fortress 2, and hundreds more through custom egg definitions.",
+        },
+        {
+          q: "What are the system requirements?",
+          a: "Catalyst runs on any Linux server with Docker and Docker Compose. The panel and API require minimal resources — a single CPU core and 512MB RAM is sufficient for small deployments. Nodes need containerd and the Catalyst agent installed.",
+        },
+      ].map((faq) => (
+        <div class="rounded-xl border border-zinc-800/60 bg-surface-1 p-6">
+          <h3 class="font-semibold text-foreground text-[15px]">{faq.q}</h3>
+          <p class="mt-2 text-sm text-zinc-500 leading-relaxed">{faq.a}</p>
+        </div>
+      ))}
+    </div>
+
+    <!-- FAQPage JSON-LD -->
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Is Catalyst a Pterodactyl replacement?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Catalyst is designed from the ground up as a modern replacement for Pterodactyl. It covers the same core use cases — game server management, node orchestration, user panels, and admin dashboards — with a faster Rust backend, containerd runtime, and a plugin system Pterodactyl lacks."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How is Catalyst different from Pterodactyl?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Catalyst uses Rust instead of PHP for the backend, containerd instead of Docker for the runtime, and provides 60+ REST API endpoints compared to Pterodactyl's ~40. Catalyst also has a native plugin system, sub-10ms WebSocket console latency, and RBAC with 20+ granular permissions."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I migrate from Pterodactyl to Catalyst?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Catalyst supports importing servers, eggs, and user data from Pterodactyl. Our migration guide walks you through the process step by step. The containerd runtime is compatible with most Pterodactyl Docker images."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is Catalyst free and open source?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Catalyst is released under GPLv3. The entire codebase — backend, frontend, node agent, and documentation — is available on GitHub. There are no paid tiers or feature gates."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What games does Catalyst support?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Catalyst supports any game that runs in a Linux container. This includes Minecraft (Java and Bedrock), Counter-Strike 2, Rust, ARK, Terraria, Team Fortress 2, and hundreds more through custom egg definitions."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What are the system requirements?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Catalyst runs on any Linux server with Docker and Docker Compose. The panel and API require minimal resources — a single CPU core and 512MB RAM is sufficient for small deployments. Nodes need containerd and the Catalyst agent installed."
+          }
+        },
+      ]
+    })} />
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
        CTA
        ═══════════════════════════════════════════════ -->
   <section class="max-w-6xl mx-auto px-4 py-20" aria-label="Call to action">
@@ -410,8 +542,8 @@ const healthChecks = [
             <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
             Star on GitHub
           </a>
-          <a href="https://github.com/catalystctl/catalyst#quick-start" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-lg border border-zinc-800 px-5 py-3 text-sm font-medium text-zinc-400 transition-all duration-200 hover:bg-surface-2 hover:text-zinc-200 min-h-11">
-            Read the Docs
+          <a href={B + "migrate-from-pterodactyl/"} class="inline-flex items-center gap-2 rounded-lg border border-zinc-800 px-5 py-3 text-sm font-medium text-zinc-400 transition-all duration-200 hover:bg-surface-2 hover:text-zinc-200 min-h-11">
+            Migration Guide
           </a>
         </div>
       </div>

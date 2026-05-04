@@ -24,9 +24,12 @@ export default defineConfig({
       serialize(item) {
         const url = item.url;
         if (url === 'https://catalystctl.com/') item.priority = 1.0;
+        else if (url === 'https://catalystctl.com/pterodactyl-alternative/') item.priority = 0.9;
+        else if (url === 'https://catalystctl.com/vs-pterodactyl/') item.priority = 0.9;
+        else if (url === 'https://catalystctl.com/migrate-from-pterodactyl/') item.priority = 0.85;
         else if (url === 'https://catalystctl.com/docs/') item.priority = 0.8;
-        else if (url === 'https://catalystctl.com/screenshots/') item.priority = 0.6;
         else if (url.includes('/docs/')) item.priority = 0.7;
+        else if (url === 'https://catalystctl.com/screenshots/') item.priority = 0.6;
         return item;
       },
     }),

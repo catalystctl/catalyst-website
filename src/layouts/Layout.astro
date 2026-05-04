@@ -106,10 +106,9 @@ const jsonLd = isArticle
     <title>{fullTitle}</title>
     <meta name="title" content={fullTitle} />
     <meta name="description" content={description} />
-    <meta name="keywords" content="game server management, pterodactyl alternative, catalyst, game server panel, server hosting, containerd, rust, typescript, minecraft server, game server control panel" />
     <meta name="robots" content="index, follow" />
     <meta name="generator" content={Astro.generator} />
-    <meta name="keywords" content={(keywords || []).join(', ')} />
+    <meta name="keywords" content={["game server management", "pterodactyl alternative", "pterodactyl replacement", "modern game server panel", "server hosting", "containerd", "rust", "typescript", "minecraft server", "game server control panel", ...(keywords || [])].join(', ')} />
     <link rel="canonical" href={fullUrl} />
 
     <!-- Favicon -->

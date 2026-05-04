@@ -1,0 +1,275 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+const B = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "") + "/";
+const GITHUB_URL = "https://github.com/catalystctl/catalyst";
+
+const steps = [
+  {
+    number: "01",
+    title: "Backup your Pterodactyl data",
+    description: "Export your Pterodactyl database, server configurations, and egg definitions. Preserve your Wings daemon configs and any custom Docker images you've built.",
+    details: [
+      "Dump the Pterodactyl MySQL/MariaDB database: mysqldump -u root -p panel > pterodactyl-backup.sql",
+      "Copy /var/lib/pterodactyl and /etc/pterodactyl to a safe location",
+      "Export custom egg JSON files from the Pterodactyl admin panel",
+      "Document your node configurations and allocation ports",
+    ],
+  },
+  {
+    number: "02",
+    title: "Deploy Catalyst",
+    description: "Install Catalyst on your target server using the one-line installer. The script sets up Docker Compose, generates secrets, and configures the panel automatically.",
+    details: [
+      "Run: curl -fsSL https://raw.githubusercontent.com/catalystctl/catalyst/main/install.sh | bash",
+      "Edit the generated .env file and set PUBLIC_URL to your domain",
+      "Run docker compose up -d to start the panel, API, and database",
+      "Verify the panel is accessible at your configured URL",
+    ],
+  },
+  {
+    number: "03",
+    title: "Import eggs and templates",
+    description: "Catalyst uses the same container-based approach as Pterodactyl, so most eggs are compatible. Import your custom egg definitions and verify they work with containerd.",
+    details: [
+      "Navigate to Admin → Templates in the Catalyst panel",
+      "Upload your Pterodactyl egg JSON files",
+      "Review and adjust any Docker-specific commands for containerd compatibility",
+      "Test each egg by creating a temporary server and verifying startup",
+    ],
+  },
+  {
+    number: "04",
+    title: "Configure nodes and allocations",
+    description: "Install the Catalyst agent on each node and register them with the panel. Map your existing IP allocations and port ranges.",
+    details: [
+      "Install containerd and the Catalyst agent on each game server node",
+      "Register the node in the Catalyst admin panel",
+      "Create allocations matching your existing Pterodactyl port assignments",
+      "Verify node health and connectivity from the panel dashboard",
+    ],
+  },
+  {
+    number: "05",
+    title: "Migrate servers and users",
+    description: "Recreate your servers in Catalyst using the imported eggs and node allocations. Migrate user accounts and assign appropriate RBAC roles.",
+    details: [
+      "Create servers in Catalyst with the same specifications as Pterodactyl",
+      "Transfer server files from /var/lib/pterodactyl/volumes to Catalyst's containerd storage",
+      "Invite users and assign granular permissions (20+ options vs Pterodactyl's basic roles)",
+      "Generate scoped API keys for any integrations or bots",
+    ],
+  },
+  {
+    number: "06",
+    title: "Cut over and decommission",
+    description: "Once everything is verified, update your DNS, notify users, and shut down Pterodactyl. Keep your backup until you're confident Catalyst is stable.",
+    details: [
+      "Update DNS A records to point to the Catalyst panel",
+      "Send a brief migration notice to your users with new login URLs",
+      "Stop Pterodactyl services: systemctl stop pteroq wings",
+      "Monitor Catalyst logs for 24-48 hours before removing Pterodactyl entirely",
+    ],
+  },
+];
+
+const faqs = [
+  {
+    q: "Will my Pterodactyl eggs work in Catalyst?",
+    a: "Most eggs are compatible because both platforms use Linux containers. Catalyst uses containerd instead of Docker, so some Docker-specific commands may need minor adjustments. The core concepts — startup commands, environment variables, and install scripts — are the same.",
+  },
+  {
+    q: "Can I run Catalyst and Pterodactyl side by side?",
+    a: "Yes, during migration. Install Catalyst on a separate server or use different ports. Both can access the same nodes if configured with non-overlapping port allocations. This lets you validate Catalyst before cutting over.",
+  },
+  {
+    q: "What happens to my existing server files?",
+    a: "Server files stored in Pterodactyl's Docker volumes can be transferred to Catalyst's containerd storage. The file structure is similar, and Catalyst's built-in file manager lets you verify everything migrated correctly.",
+  },
+  {
+    q: "How long does migration take?",
+    a: "For a small-to-medium host (under 50 servers), plan for 2-4 hours of active work. The Catalyst install itself takes 60 seconds. Most time is spent verifying eggs, testing servers, and communicating with users.",
+  },
+  {
+    q: "Is there an automatic migration tool?",
+    a: "An automated Pterodactyl-to-Catalyst migration tool is on the roadmap. For now, migration is manual but straightforward. The containerd runtime's compatibility with Docker images makes the process simpler than most platform migrations.",
+  },
+];
+---
+
+<Layout
+  title="Migrate from Pterodactyl"
+  description="Step-by-step guide to migrating from Pterodactyl to Catalyst. Backup, deploy, import eggs, configure nodes, and cut over in under 4 hours."
+  keywords={["migrate from pterodactyl", "pterodactyl to catalyst", "pterodactyl migration", "switch from pterodactyl", "pterodactyl replacement guide", "move servers from pterodactyl"]}
+  canonicalUrl="https://catalystctl.com/migrate-from-pterodactyl/"
+>
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('[data-reveal], [data-reveal-stagger]').forEach((el) => observer.observe(el));
+  </script>
+
+  <!-- Hero -->
+  <section class="max-w-6xl mx-auto px-4 pt-12 pb-8 sm:pt-16 sm:pb-10">
+    <nav class="text-xs text-zinc-600 mb-6" aria-label="Breadcrumb">
+      <a href={B} class="hover:text-zinc-400 transition-colors">Home</a>
+      <span class="mx-2">/</span>
+      <span class="text-zinc-400">Migrate from Pterodactyl</span>
+    </nav>
+
+    <div data-reveal>
+      <div class="flex items-center gap-2 mb-4">
+        <svg class="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+        </svg>
+        <span class="text-xs font-semibold tracking-wider uppercase text-primary">Migration Guide</span>
+      </div>
+      <h1 class="font-display font-bold text-foreground tracking-tight leading-[1.05]" style="font-size: clamp(2rem, 6vw, 4rem);">
+        Migrate from <span class="text-zinc-500">Pterodactyl</span> to Catalyst.
+      </h1>
+      <p class="mt-5 max-w-2xl text-base sm:text-lg text-zinc-400 leading-relaxed">
+        A practical, step-by-step guide to moving your game servers, eggs, users, and nodes from Pterodactyl to Catalyst. Most hosts complete the migration in under 4 hours.
+      </p>
+    </div>
+  </section>
+
+  <!-- Overview -->
+  <section class="max-w-6xl mx-auto px-4 pb-12">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" data-reveal-stagger>
+      <div class="rounded-xl border border-zinc-800/60 bg-surface-1 p-5">
+        <div class="font-display text-3xl font-bold text-foreground">~4 hours</div>
+        <p class="mt-1 text-sm text-zinc-500">Typical migration time for under 50 servers</p>
+      </div>
+      <div class="rounded-xl border border-zinc-800/60 bg-surface-1 p-5">
+        <div class="font-display text-3xl font-bold text-foreground">60s</div>
+        <p class="mt-1 text-sm text-zinc-500">Catalyst install time with the one-line script</p>
+      </div>
+      <div class="rounded-xl border border-zinc-800/60 bg-surface-1 p-5">
+        <div class="font-display text-3xl font-bold text-foreground">Zero</div>
+        <p class="mt-1 text-sm text-zinc-500">Downtime if you run both platforms side by side</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Steps -->
+  <section class="max-w-6xl mx-auto px-4 py-16" aria-label="Migration steps">
+    <div class="mb-10" data-reveal>
+      <h2 class="font-display text-sm font-semibold tracking-[0.12em] uppercase text-zinc-500">The process</h2>
+      <p class="mt-2 text-2xl sm:text-3xl font-display font-semibold text-foreground tracking-tight">Six steps to a clean migration.</p>
+    </div>
+
+    <div class="space-y-8" data-reveal-stagger>
+      {steps.map((step) => (
+        <div class="rounded-xl border border-zinc-800/60 bg-surface-1 p-6 sm:p-8">
+          <div class="flex items-start gap-4 sm:gap-6">
+            <div class="shrink-0">
+              <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary font-display text-lg font-bold">
+                {step.number}
+              </div>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h3 class="font-display text-lg font-semibold text-foreground">{step.title}</h3>
+              <p class="mt-1 text-sm text-zinc-400 leading-relaxed">{step.description}</p>
+              <ul class="mt-4 space-y-2">
+                {step.details.map((d) => (
+                  <li class="flex items-start gap-2.5 text-sm text-zinc-500">
+                    <svg class="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span class="font-mono text-[12px] text-zinc-400">{d}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Compatibility -->
+  <section class="max-w-6xl mx-auto px-4 py-16" aria-label="Compatibility notes">
+    <div class="max-w-3xl" data-reveal>
+      <h2 class="font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight mb-8">Compatibility at a glance</h2>
+
+      <div class="space-y-6 text-zinc-400 leading-relaxed">
+        <div>
+          <h3 class="text-foreground font-semibold text-lg mb-2">Eggs and startup commands</h3>
+          <p>Catalyst's template system is conceptually identical to Pterodactyl's eggs. Startup commands, environment variables, and install scripts transfer with minimal changes. The main difference is that Catalyst uses containerd directly, so any Docker Compose-specific configuration should be reviewed.</p>
+        </div>
+
+        <div>
+          <h3 class="text-foreground font-semibold text-lg mb-2">Server files and volumes</h3>
+          <p>Pterodactyl stores server files in Docker volumes under /var/lib/pterodactyl/volumes. Catalyst uses containerd's snapshotter storage, but the internal file layout is the same. You can tar.gz your server directories and extract them into Catalyst's storage path. The file manager will show everything correctly.</p>
+        </div>
+
+        <div>
+          <h3 class="text-foreground font-semibold text-lg mb-2">Users and permissions</h3>
+          <p>Pterodactyl's basic admin/user roles map cleanly to Catalyst's RBAC system, but Catalyst gives you far more control. Instead of binary permissions, you can create custom roles with exactly the access each user needs. Plan to spend a few minutes tuning permissions after import.</p>
+        </div>
+
+        <div>
+          <h3 class="text-foreground font-semibold text-lg mb-2">API integrations</h3>
+          <p>Catalyst's REST API is different from Pterodactyl's, but it's more comprehensive. Any bots, billing integrations, or automation scripts will need to be updated to use Catalyst's 60+ endpoints. The good news: Catalyst's API is better documented and more consistent.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="max-w-6xl mx-auto px-4 py-16" aria-label="Migration FAQ">
+    <div class="mb-10" data-reveal>
+      <h2 class="font-display text-sm font-semibold tracking-[0.12em] uppercase text-zinc-500">FAQ</h2>
+      <p class="mt-2 text-2xl sm:text-3xl font-display font-semibold text-foreground tracking-tight">Common migration questions.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4" data-reveal-stagger>
+      {faqs.map((faq) => (
+        <div class="rounded-xl border border-zinc-800/60 bg-surface-1 p-6">
+          <h3 class="font-semibold text-foreground text-[15px]">{faq.q}</h3>
+          <p class="mt-2 text-sm text-zinc-500 leading-relaxed">{faq.a}</p>
+        </div>
+      ))}
+    </div>
+
+    <!-- FAQPage JSON-LD -->
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": faqs.map(f => ({
+        "@type": "Question",
+        "name": f.q,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": f.a
+        }
+      }))
+    })} />
+  </section>
+
+  <!-- CTA -->
+  <section class="max-w-6xl mx-auto px-4 py-16">
+    <div class="relative rounded-2xl border border-zinc-800/60 bg-surface-1 p-8 sm:p-12 text-center overflow-hidden" data-reveal>
+      <div class="absolute inset-0 bg-gradient-to-br from-[#1a1510]/50 via-transparent to-transparent pointer-events-none"></div>
+      <div class="relative">
+        <h2 class="font-display text-2xl sm:text-3xl font-bold text-foreground tracking-tight">Start your migration today</h2>
+        <p class="mt-3 text-base text-zinc-500 max-w-md mx-auto">Deploy Catalyst in 60 seconds and begin testing alongside your existing Pterodactyl installation.</p>
+        <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
+          <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary-600 min-h-11">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            Install Catalyst
+          </a>
+          <a href={B + "vs-pterodactyl/"} class="inline-flex items-center gap-2 rounded-lg border border-zinc-800 px-5 py-3 text-sm font-medium text-zinc-400 transition-all duration-200 hover:bg-surface-2 hover:text-zinc-200 min-h-11">
+            Full Comparison
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="h-8"></div>
+</Layout>

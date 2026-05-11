@@ -30,13 +30,23 @@ mkdir -p "$DEST"
   #   - keywords: comma-separated list (optional, use "none" to omit)
 
 MAPPINGS="
-getting-started.md|getting-started/getting-started.md|Getting Started|A step-by-step walkthrough for setting up and using Catalyst for the first time.|0|catalyst setup,first server,game server setup,catalyst tutorial
-installation.md|getting-started/installation.md|Installation|Complete instructions for deploying Catalyst.|1|catalyst install,docker compose,game server panel install,catalyst deployment
+QUICKSTART.md|getting-started/quickstart.md|Quick Start|Get Catalyst running in 5 minutes with Docker.|0|catalyst quickstart,docker setup,5 minute install
+getting-started.md|getting-started/getting-started.md|Getting Started|A step-by-step walkthrough for setting up and using Catalyst for the first time.|1|catalyst setup,first server,game server setup,catalyst tutorial
+installation.md|getting-started/installation.md|Installation|Complete instructions for deploying Catalyst.|2|catalyst install,docker compose,game server panel install,catalyst deployment
+INSTALLATION_DETAILED.md|getting-started/installation-detailed.md|Complete Installation Guide|The comprehensive reference for deploying Catalyst — every option, variable, and edge case.|3|catalyst install detailed,docker production,tls https,build from source
+docker-setup.md|getting-started/docker-setup.md|Docker Setup|Complete reference for deploying Catalyst with Docker Compose — services, volumes, networking, TLS, and production hardening.|4|catalyst docker,docker compose,volumes,networking,TLS
 admin-guide.md|admin-guide/admin-guide.md|Admin Guide|All administrative features — users, roles, nodes, templates, backups, security, and more.|0|catalyst admin,user management,server templates,node management,role permissions
 user-guide.md|user-guide/user-guide.md|User Guide|Dashboard, servers, console, files, SFTP, backups, scheduling, alerts, and profile settings.|0|catalyst user guide,server console,file manager,SFTP access,server backups
-agent.md|nodes/agent.md|Agent Guide|The Rust-based node agent that manages game server containers.|1|catalyst agent,node agent,containerd,rust agent,game server node
+agent.md|nodes/agent.md|Agent Guide|The Rust-based node agent that manages game server containers.|0|catalyst agent,node agent,containerd,rust agent,game server node
 api-reference.md|api-reference/api-reference.md|API Reference|Complete reference for the REST API, WebSocket protocol, and SSE streaming.|0|catalyst api,REST API,websocket,SSE streaming,game server API
 automation.md|automation/automation.md|Automation & Plugins|Scheduled tasks, webhooks, API automation, bulk operations, and plugins.|0|catalyst automation,scheduled tasks,webhooks,plugins,bulk operations
+plugins.md|plugins/plugins.md|Plugin System|Extend Catalyst with custom backend routes, frontend UI, scheduled tasks, WebSocket handlers, and data persistence.|0|catalyst plugins,plugin development,plugin SDK,plugin manifest
+environment-variables.md|reference/environment-variables.md|Environment Variables|Complete reference for all Catalyst environment variables, grouped by service and category.|0|catalyst env,environment variables,configuration,docker env
+architecture.md|reference/architecture.md|Architecture Overview|Deep dive into Catalyst system design, component responsibilities, data flows, and security model.|0|catalyst architecture,system design,data flow,authentication,authorization
+troubleshooting.md|reference/troubleshooting.md|Troubleshooting|Common errors, solutions, FAQ, and debugging steps for Catalyst deployments.|0|catalyst troubleshooting,common errors,debugging,FAQ
+usage-examples.md|reference/usage-examples.md|Usage Examples|Quick-start copy-paste examples for common Catalyst API operations.|0|catalyst usage examples,API examples,curl examples,server operations
+SECURITY.md|reference/security.md|Security Policy|Supported versions, vulnerability reporting, and security best practices.|0|catalyst security,vulnerability reporting,GPLv3,security policy
+development.md|development/development.md|Development Guide|Set up a local dev environment, write tests, follow code style, and submit pull requests.|0|catalyst development,contributing,local dev setup,testing,PR process
 "
 
 synced=0

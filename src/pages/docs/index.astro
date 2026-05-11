@@ -28,9 +28,22 @@ for (const e of entries) {
   group.items.push({ title: e.data.title, slug: e.id, description: e.data.description, order: e.data.order });
 }
 
-const sidebar = Array.from(groups.values())
-  .sort((a, b) => a.label === 'Overview' ? -1 : b.label === 'Overview' ? 1 : a.label.localeCompare(b.label))
-  .map(g => ({ ...g, items: g.items.sort((a, b) => a.order - b.order) }));
+const GROUP_ORDER: Record<string, number> = {
+  '_root': 0,
+  'getting-started': 1,
+  'admin-guide': 2,
+  'user-guide': 3,
+  'nodes': 4,
+  'api-reference': 5,
+  'automation': 6,
+  'plugins': 7,
+  'reference': 8,
+  'development': 9,
+};
+
+const sidebar = Array.from(groups.entries())
+  .sort((a, b) => (GROUP_ORDER[a[0]] ?? 99) - (GROUP_ORDER[b[0]] ?? 99))
+  .map(([, g]) => ({ ...g, items: g.items.sort((a, b) => a.order - b.order) }));
 ---
 
 <Layout title="Documentation" description="Catalyst documentation — installation, configuration, nodes, plugins.">

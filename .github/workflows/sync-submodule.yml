@@ -1,0 +1,46 @@
+name: Sync Catalyst Submodule
+
+on:
+  schedule:
+    # Run daily at 06:00 UTC
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update catalyst submodule to latest main
+        run: |
+          cd catalyst
+          git fetch origin main
+          git checkout origin/main
+          cd ..
+
+      - name: Check for changes
+        id: diff
+        run: |
+          if git diff --quiet catalyst; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and push update
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add catalyst
+          git commit -m "chore: update catalyst submodule to latest main"
+          git push

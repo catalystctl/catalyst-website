@@ -1,4 +1,6 @@
 ---
+export const prerender = true;
+
 import Layout from "../layouts/Layout.astro";
 
 const B = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "") + "/";
@@ -99,10 +101,10 @@ const faqs = [
 ---
 
 <Layout
-  title="Migrate from Pterodactyl"
+  title="Migrate from Pterodactyl to Catalyst"
   description="Migrate from Pterodactyl to Catalyst automatically. Import nodes, users, eggs, servers, and files with Catalyst's built-in migration tool."
-  keywords={["migrate from pterodactyl", "pterodactyl to catalyst", "pterodactyl migration", "switch from pterodactyl", "pterodactyl replacement guide", "move servers from pterodactyl", "auto migration pterodactyl"]}
   canonicalUrl="https://catalystctl.com/migrate-from-pterodactyl/"
+  breadcrumbItems={[{ name: "Pterodactyl Alternative", href: "pterodactyl-alternative/" }, { name: "Migrate" }]}
 >
   <script>
     const observer = new IntersectionObserver((entries) => {
@@ -121,7 +123,9 @@ const faqs = [
     <nav class="text-xs text-zinc-600 mb-6" aria-label="Breadcrumb">
       <a href={B} class="hover:text-zinc-400 transition-colors">Home</a>
       <span class="mx-2">/</span>
-      <span class="text-zinc-400">Migrate from Pterodactyl</span>
+      <a href={B + "pterodactyl-alternative/"} class="hover:text-zinc-400 transition-colors">Pterodactyl Alternative</a>
+      <span class="mx-2">/</span>
+      <span class="text-zinc-400">Migrate</span>
     </nav>
 
     <div data-reveal>
@@ -281,6 +285,25 @@ const faqs = [
       ))}
     </div>
 
+    <!-- HowTo JSON-LD -->
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      "name": "Migrate from Pterodactyl to Catalyst",
+      "description": "Migrate your Pterodactyl nodes, users, eggs, servers, and files to Catalyst using the built-in auto-migration tool.",
+      "totalTime": "PT1H",
+      "step": autoSteps.map((step, i) => ({
+        "@type": "HowToStep",
+        "position": i + 1,
+        "name": step.title,
+        "text": step.description,
+        "itemListElement": step.details.map(d => ({
+          "@type": "HowToDirection",
+          "text": d,
+        })),
+      })),
+    })} />
+
     <!-- FAQPage JSON-LD -->
     <script type="application/ld+json" set:html={JSON.stringify({
       "@context": "https://schema.org",
@@ -308,7 +331,7 @@ const faqs = [
             <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
             Install Catalyst
           </a>
-          <a href={B + "vs-pterodactyl/"} class="inline-flex items-center gap-2 rounded-lg border border-zinc-800 px-5 py-3 text-sm font-medium text-zinc-400 transition-all duration-200 hover:bg-surface-2 hover:text-zinc-200 min-h-11">
+          <a href={B + "pterodactyl-alternative/#comparison"} class="inline-flex items-center gap-2 rounded-lg border border-zinc-800 px-5 py-3 text-sm font-medium text-zinc-400 transition-all duration-200 hover:bg-surface-2 hover:text-zinc-200 min-h-11">
             Full Comparison
           </a>
         </div>

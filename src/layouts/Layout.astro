@@ -2,6 +2,8 @@
 import '@fontsource-variable/dm-sans';
 import '@fontsource-variable/outfit';
 import '@fontsource-variable/jetbrains-mono';
+import { Image } from 'astro:assets';
+import logo from '../assets/logo.png';
 import '../styles/global.css';
 
 export interface Props {
@@ -12,6 +14,7 @@ export interface Props {
   type?: "website" | "article";
   publishDate?: string;
   keywords?: string[];
+  breadcrumbItems?: { name: string; href?: string }[];
 }
 
 const {
@@ -22,17 +25,18 @@ const {
   type = "website",
   publishDate,
   keywords,
+  breadcrumbItems,
 } = Astro.props;
 
 const B = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "") + "/";
-const siteUrl = Astro.site?.toString().replace(/\/+$/, "") || "https://catalystctl.github.io";
+const siteUrl = Astro.site?.toString().replace(/\/+$/, "") || "https://catalystctl.com";
 const fullUrl = canonicalUrl || new URL(Astro.url.pathname, siteUrl).toString();
 const fullTitle = title === "Home" ? "Catalyst — Modern Game Server Management" : `${title} — Catalyst`;
 const ogImageUrl = ogImage ? new URL(ogImage, siteUrl).toString() : siteUrl + B + "og-default.png";
 
 const navLinks = [
   { href: B, label: "Home" },
-  { href: B + "screenshots/", label: "Screenshots" },
+  { href: B + "pterodactyl-alternative/", label: "Compare" },
   { href: B + "docs/", label: "Docs" },
 ];
 
@@ -94,6 +98,28 @@ const jsonLd = isArticle
         "Automatic crash detection and recovery",
       ],
     };
+
+// BreadcrumbList JSON-LD
+const breadcrumbLd = breadcrumbItems && breadcrumbItems.length > 0
+  ? {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": siteUrl + import.meta.env.BASE_URL,
+        },
+        ...breadcrumbItems.map((item, i) => ({
+          "@type": "ListItem",
+          "position": i + 2,
+          "name": item.name,
+          ...(item.href && { "item": siteUrl + import.meta.env.BASE_URL + item.href.replace(/^\//, "") }),
+        })),
+      ],
+    }
+  : null;
 ---
 
 <!doctype html>
@@ -108,10 +134,10 @@ const jsonLd = isArticle
     <meta name="description" content={description} />
     <meta name="robots" content="index, follow" />
     <meta name="generator" content={Astro.generator} />
-    <meta name="keywords" content={["game server management", "pterodactyl alternative", "pterodactyl replacement", "modern game server panel", "server hosting", "containerd", "rust", "typescript", "minecraft server", "game server control panel", ...(keywords || [])].join(', ')} />
     <link rel="canonical" href={fullUrl} />
 
     <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href={B + "favicon.svg"} />
     <link rel="icon" href={B + "favicon.ico"} />
 
     <!-- Open Graph / Facebook -->
@@ -138,6 +164,7 @@ const jsonLd = isArticle
 
     <!-- JSON-LD Structured Data -->
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    {breadcrumbLd && <script type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />}
   </head>
 
   <body class="min-h-screen flex flex-col bg-background text-foreground">
@@ -145,7 +172,7 @@ const jsonLd = isArticle
     <header class="sticky top-0 z-50 flex items-center justify-between border-b border-zinc-800 bg-surface-1/80 backdrop-blur-md shadow-surface-dark px-4 h-14">
       <div class="flex items-center gap-3">
         <a href={B} class="flex items-center gap-2" aria-label="Catalyst home">
-          <img src={B + "logo.png"} alt="Catalyst logo" class="h-6 w-6 rounded" width="24" height="24" />
+          <Image src={logo} alt="Catalyst logo" class="h-6 w-6 rounded" width={24} height={24} />
           <span class="font-display text-lg font-semibold text-zinc-100">Catalyst</span>
         </a>
       </div>
@@ -256,6 +283,11 @@ const jsonLd = isArticle
           &middot; GPLv3
         </div>
         <nav class="flex items-center gap-1" aria-label="Footer navigation">
+          <a href={B + "pterodactyl-alternative/"} class="text-xs text-muted-foreground hover:text-foreground transition-colors py-2 px-2 rounded">Compare</a>
+          <a href={B + "migrate-from-pterodactyl/"} class="text-xs text-muted-foreground hover:text-foreground transition-colors py-2 px-2 rounded">Migrate</a>
+          <a href={B + "docs/"} class="text-xs text-muted-foreground hover:text-foreground transition-colors py-2 px-2 rounded">Docs</a>
+          <a href={B + "screenshots/"} class="text-xs text-muted-foreground hover:text-foreground transition-colors py-2 px-2 rounded">Screenshots</a>
+          <span class="w-px h-3 bg-zinc-800" aria-hidden="true"></span>
           <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" class="text-xs text-muted-foreground hover:text-foreground transition-colors py-2 px-2 rounded">GitHub</a>
           <a href="https://github.com/catalystctl/catalyst/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer" class="text-xs text-muted-foreground hover:text-foreground transition-colors py-2 px-2 rounded">Contributing</a>
           <a href="https://github.com/catalystctl/catalyst/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" class="text-xs text-muted-foreground hover:text-foreground transition-colors py-2 px-2 rounded">License</a>

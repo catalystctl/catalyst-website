@@ -17,4 +17,11 @@ rm -rf "$DEST"
 mkdir -p "$(dirname "$DEST")"
 cp -rL "$SRC" "$DEST"
 
+# Also copy to src/assets for Astro Image component optimization
+ASSETS_DEST="$ROOT_DIR/src/assets/screenshots"
+rm -rf "$ASSETS_DEST"
+mkdir -p "$(dirname "$ASSETS_DEST")"
+cp -rL "$SRC" "$ASSETS_DEST"
+
 echo "✓ Screenshots copied to $DEST"
+echo "✓ Screenshots copied to $ASSETS_DEST (for Image optimization)"

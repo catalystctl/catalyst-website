@@ -9,7 +9,7 @@ import cloudflare from '@astrojs/cloudflare';
 export default defineConfig({
   site: "https://catalystctl.com",
   trailingSlash: "always",
-  output: "server",
+  output: "static",
   compressHTML: true,
 
   build: {
@@ -25,12 +25,17 @@ export default defineConfig({
       changefreq: 'weekly',
       priority: 0.7,
       lastmod: new Date(),
-      filter: (page) => !page.includes('/_'),
+      filter: (page) => !page.includes('/_') && !page.includes('/vs-pterodactyl'),
+      i18n: {
+        defaultLocale: 'en',
+        locales: {
+          en: 'en-US',
+        },
+      },
       serialize(item) {
         const url = item.url;
         if (url === 'https://catalystctl.com/') item.priority = 1.0;
         else if (url === 'https://catalystctl.com/pterodactyl-alternative/') item.priority = 0.9;
-        else if (url === 'https://catalystctl.com/vs-pterodactyl/') item.priority = 0.9;
         else if (url === 'https://catalystctl.com/migrate-from-pterodactyl/') item.priority = 0.85;
         else if (url === 'https://catalystctl.com/docs/') item.priority = 0.8;
         else if (url.includes('/docs/')) item.priority = 0.7;

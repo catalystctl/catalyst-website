@@ -18,4 +18,12 @@ rm -rf public/img/screenshots
 mkdir -p public/img
 cp -rL catalyst/docs/screenshots public/img/screenshots
 
+echo "→ Copying screenshots to src/assets/screenshots (for Image optimization)..."
+mkdir -p src/assets/screenshots
+cp -rL catalyst/docs/screenshots src/assets/screenshots
+
+echo "→ Copying logo to src/assets (for Image optimization)..."
+mkdir -p src/assets
+cp -n public/logo.png src/assets/logo.png 2>/dev/null || true
+
 echo "✓ Done. Run 'npm run dev' to start development."

@@ -1,0 +1,6 @@
+# Cloudflare Pages _redirects
+# 301 redirect the old /vs-pterodactyl/ page to the merged alternative page
+/vs-pterodactyl  /pterodactyl-alternative  301
+/vs-pterodactyl/  /pterodactyl-alternative/  301
+
+# HTTP to HTTPS is handled automatically by Cloudflare Pages

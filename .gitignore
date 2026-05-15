@@ -27,7 +27,6 @@ pnpm-debug.log*
 public/img/screenshots/
 src/assets/screenshots/
 # copied from public/ at setup time
-src/assets/logo.png
 src/content/docs/getting-started/getting-started.md
 src/content/docs/getting-started/installation.md
 src/content/docs/admin-guide/

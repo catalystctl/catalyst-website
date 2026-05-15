@@ -1,0 +1,102 @@
+---
+import Layout from './Layout.astro';
+import type { CollectionEntry } from 'astro:content';
+
+export interface Props {
+  entry: CollectionEntry<'blog'>;
+}
+
+const { entry } = Astro.props;
+
+const B = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "") + "/";
+const GITHUB_URL = "https://github.com/catalystctl/catalyst";
+
+const formattedDate = entry.data.pubDate.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+const updatedFormattedDate = entry.data.updatedDate?.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<Layout
+  title={entry.data.title}
+  description={entry.data.description}
+  type="article"
+  publishDate={entry.data.pubDate.toISOString()}
+  canonicalUrl={`https://catalystctl.com/blog/${entry.id}/`}
+  keywords={entry.data.keywords}
+  breadcrumbItems={[{ name: "Blog", href: "blog/" }, { name: entry.data.title }]}
+>
+  <div class="max-w-3xl mx-auto px-4 sm:px-8 py-16 sm:py-20">
+
+    <!-- Breadcrumb -->
+    <nav class="text-xs text-zinc-600 mb-8" aria-label="Breadcrumb">
+      <a href={B} class="hover:text-zinc-400 transition-colors">Home</a>
+      <span class="mx-2">/</span>
+      <a href={B + "blog/"} class="hover:text-zinc-400 transition-colors">Blog</a>
+      <span class="mx-2">/</span>
+      <span class="text-zinc-400">{entry.data.title}</span>
+    </nav>
+
+    <!-- Article header -->
+    <header class="mb-12">
+      <div class="flex flex-wrap items-center gap-3 mb-4">
+        {entry.data.audience?.map((a) => (
+          <span class="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">{a}</span>
+        ))}
+      </div>
+      <h1 class="font-display text-3xl sm:text-4xl font-bold text-foreground leading-tight">{entry.data.title}</h1>
+      <p class="mt-4 text-lg text-zinc-500 leading-relaxed">{entry.data.description}</p>
+      <div class="mt-6 flex items-center gap-4 text-sm text-zinc-500">
+        <div class="flex items-center gap-2">
+          <div class="flex h-7 w-7 items-center justify-center rounded-full bg-primary/15 text-primary">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+          </div>
+          <span>{entry.data.author}</span>
+        </div>
+        <span class="w-px h-4 bg-zinc-800" aria-hidden="true"></span>
+        <time datetime={entry.data.pubDate.toISOString()}>{formattedDate}</time>
+        {updatedFormattedDate && (
+          <>
+            <span class="w-px h-4 bg-zinc-800" aria-hidden="true"></span>
+            <span class="text-zinc-600">Updated {updatedFormattedDate}</span>
+          </>
+        )}
+      </div>
+    </header>
+
+    <!-- Article body -->
+    <div class="doc">
+      <slot />
+    </div>
+
+    <!-- CTA -->
+    <div class="mt-16 rounded-xl border border-primary/20 bg-primary/5 p-6 sm:p-8">
+      <h3 class="font-display text-lg font-semibold text-foreground mb-2">Try Catalyst today</h3>
+      <p class="text-sm text-zinc-400 mb-4">Deploy in 60 seconds. Free, open source, GPLv3. The modern Pterodactyl alternative.</p>
+      <div class="flex flex-wrap gap-3">
+        <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary-600">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          View on GitHub
+        </a>
+        <a href={B + "pterodactyl-alternative/"} class="inline-flex items-center gap-2 rounded-lg border border-zinc-800 px-4 py-2.5 text-sm font-medium text-zinc-400 transition-all hover:bg-surface-2 hover:text-zinc-200">
+          Compare to Pterodactyl
+        </a>
+      </div>
+    </div>
+
+    <!-- Related posts nav -->
+    <nav class="mt-12 pt-8 border-t border-zinc-800/60">
+      <a href={B + "blog/"} class="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary-400 transition-colors">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>
+        All posts
+      </a>
+    </nav>
+  </div>
+</Layout>

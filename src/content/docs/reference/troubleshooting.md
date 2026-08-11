@@ -86,8 +86,8 @@ docker volume rm catalyst-catalyst-postgres-data
 docker compose up -d
 
 # Re-run migrations
-docker compose exec backend bun run db:migrate
-docker compose exec backend bun run db:seed
+docker compose exec backend pnpm run db:migrate
+docker compose exec backend pnpm run db:seed
 ```
 
 ### Containerd Not Found (Agent)
@@ -161,12 +161,12 @@ docker compose restart postgres
 docker compose down postgres
 docker volume prune --filter "label=catalyst-postgres-data" --force
 docker compose up -d postgres
-docker compose exec backend bun run db:migrate
+docker compose exec backend pnpm run db:migrate
 ```
 
 ### Prisma Migration Errors
 
-**Symptoms:** `bun run db:migrate` fails or hangs.
+**Symptoms:** `pnpm run db:migrate` fails or hangs.
 
 **Common causes:**
 - Stale migration files
@@ -187,8 +187,8 @@ docker compose exec postgres dropdb --if-exists catalyst
 docker compose exec postgres createdb -U postgres catalyst
 
 # Re-run migrations
-docker compose exec backend bun run db:migrate
-docker compose exec backend bun run db:seed
+docker compose exec backend pnpm run db:migrate
+docker compose exec backend pnpm run db:seed
 
 # Restart all services
 docker compose up -d
@@ -224,7 +224,7 @@ SELECT pg_reload_conf();
 
 ```bash
 # Verify the user exists in the database
-docker compose exec backend bun run db:studio
+docker compose exec backend pnpm run db:studio
 # Or via SQL:
 docker compose exec postgres psql -U postgres -d catalyst -c "SELECT email, name FROM users ORDER BY created_at DESC LIMIT 5;"
 
@@ -383,6 +383,13 @@ ping -c 10 panel.example.com
 # - WebSocket upgrade headers
 # - No proxy timeout shorter than agent heartbeat (15s)
 ```
+
+> **External reverse proxy users:** If you are using an external reverse proxy
+> (nginx, Caddy, etc.) in front of the bundled `frontend` container,
+> **do not proxy `/ws` directly to the backend** (port 3000). Proxy everything
+> to the `frontend` container (port 80/8080) and let the bundled nginx handle
+> `/ws` routing. The examples below are for debugging a **direct backend
+> connection only**.
 
 **Proxy configuration fixes:**
 
@@ -1544,7 +1551,7 @@ sudo journalctl -u containerd -f --no-pager
 
 **A:** Seed a new admin user:
 ```bash
-docker compose exec backend bun run db:seed:admin
+docker compose exec backend pnpm run db:seed:admin
 # Or create one manually:
 docker compose exec postgres psql -U postgres -d catalyst -c \
   "INSERT INTO users (email, name, username, password, role) VALUES ('admin@example.com', 'Admin', 'admin', 'hashed_password', 'admin');"

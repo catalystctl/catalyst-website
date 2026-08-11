@@ -1,0 +1,20 @@
+{
+  "todos": [
+    {
+      "status": "completed",
+      "subject": "Redesign Layout, BlogLayout, DocsLayout chrome"
+    },
+    {
+      "status": "completed",
+      "subject": "Redesign pterodactyl-alternative + migrate pages"
+    },
+    {
+      "status": "completed",
+      "subject": "Redesign screenshots, blog index/slug, docs, 404"
+    },
+    {
+      "status": "completed",
+      "subject": "Build + pre-flight consistency check"
+    }
+  ]
+}

@@ -321,6 +321,18 @@ Traefik offers Docker-native service discovery, a web dashboard, and more routin
 
 ### Option C: Existing Reverse Proxy
 
+If you already run Nginx, Apache, HAProxy, or another proxy, the recommended
+approach is to **proxy everything to the bundled frontend nginx container**
+and let its internal routing handle `/ws`, `/api/`, `/auth/`, `/docs`, and
+static assets.
+
+> **Do NOT add a separate `/ws` block in your external proxy.** The bundled
+> nginx (`frontend` container) already has optimized `/ws`, `/api/`, `/auth/`,
+> `/docs`, and static asset routing with correct buffering, timeouts, and
+> WebSocket upgrade headers. Adding a separate `/ws` location in your external
+> proxy bypasses these settings and can cause console streaming failures,
+> truncated responses, and agent disconnections.
+
 If you already run Nginx, Apache, HAProxy, or another proxy:
 
 1. **Bind Catalyst to localhost only:**
@@ -329,6 +341,7 @@ If you already run Nginx, Apache, HAProxy, or another proxy:
    FRONTEND_PORT=127.0.0.1:8080
    PUBLIC_URL=https://panel.example.com
    NODE_ENV=production
+   BACKEND_EXTERNAL_ADDRESS=https://panel.example.com
    ```
 
 2. **Proxy traffic to `http://localhost:8080`:**
@@ -345,23 +358,28 @@ If you already run Nginx, Apache, HAProxy, or another proxy:
 
        client_max_body_size 100m;
 
-       # WebSocket support (critical for console streaming)
+       location / {
+           proxy_pass http://127.0.0.1:8080;
+           proxy_http_version 1.1;
+           proxy_set_header Connection "";
+           proxy_set_header Host $host;
+           proxy_set_header X-Real-IP $remote_addr;
+           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+           proxy_set_header X-Forwarded-Proto $scheme;
+       }
+
+       # WebSocket support (agent connections, admin event stream)
        location /ws {
            proxy_pass http://127.0.0.1:8080;
            proxy_http_version 1.1;
            proxy_set_header Upgrade $http_upgrade;
            proxy_set_header Connection "upgrade";
-           proxy_read_timeout 86400s;
-           proxy_send_timeout 86400s;
-       }
-
-       # All other requests
-       location / {
-           proxy_pass http://127.0.0.1:8080;
            proxy_set_header Host $host;
            proxy_set_header X-Real-IP $remote_addr;
            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
            proxy_set_header X-Forwarded-Proto $scheme;
+           proxy_read_timeout 86400s;
+           proxy_send_timeout 86400s;
        }
    }
 
@@ -570,7 +588,7 @@ docker compose up -d
 Migrations run automatically, but you can verify:
 
 ```bash
-docker compose exec backend bunx prisma migrate status --schema prisma/schema.prisma
+docker compose exec backend npx prisma migrate status --schema prisma/schema.prisma
 ```
 
 If migrations are pending but the backend is running, they were likely applied on startup. If you see failures:
@@ -580,7 +598,7 @@ If migrations are pending but the backend is running, they were likely applied o
 docker compose logs backend | grep -i "migrat"
 
 # Run manually (only if auto-migration failed)
-docker compose exec backend bun run db:migrate
+docker compose exec backend pnpm run db:migrate
 ```
 
 ---
@@ -766,8 +784,8 @@ All other commands are identical — just replace `docker` with `podman`.
 | `docker compose logs -f` | Tail all logs |
 | `docker compose logs -f backend` | Tail backend logs |
 | `docker compose logs -f --tail=100 backend` | Last 100 lines of backend logs |
-| `docker compose exec backend bun run db:seed` | Seed database with sample data |
-| `docker compose exec backend bun run db:studio` | Open Prisma Studio |
+| `docker compose exec backend pnpm run db:seed` | Seed database with sample data |
+| `docker compose exec backend pnpm run db:studio` | Open Prisma Studio |
 | `docker compose exec backend sh` | Shell into backend container |
 | `docker compose exec postgres psql -U catalyst -d catalyst_db` | PostgreSQL CLI |
 | `docker compose down` | Stop services |
@@ -787,14 +805,14 @@ To build images locally instead of using pre-built ones:
 
 ```dockerfile
 # catalyst-backend/Dockerfile
-FROM oven/bun:latest
+FROM node:22-alpine
 WORKDIR /app
-COPY package.json bun.lock ./
-RUN bun install
+COPY package.json pnpm-lock.yaml ./
+RUN corepack enable && corepack prepare pnpm@latest --activate && pnpm install
 COPY . .
-RUN bun run build
+RUN pnpm run build
 EXPOSE 3000 2022
-CMD ["bun", "dist/index.js"]
+CMD ["node", "dist/index.js"]
 ```
 
 ```bash
@@ -807,12 +825,12 @@ docker build -t catalyst-backend:local .
 
 ```dockerfile
 # catalyst-frontend/Dockerfile
-FROM oven/bun:latest AS builder
+FROM node:22-alpine AS builder
 WORKDIR /app
-COPY package.json bun.lock ./
-RUN bun install
+COPY package.json pnpm-lock.yaml ./
+RUN corepack enable && corepack prepare pnpm@latest --activate && pnpm install
 COPY . .
-RUN bun run build
+RUN pnpm run build
 
 FROM nginx:alpine
 COPY --from=builder /app/dist /usr/share/nginx/html

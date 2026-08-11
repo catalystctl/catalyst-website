@@ -3,6 +3,8 @@ export const prerender = true;
 
 import Layout from "../layouts/Layout.astro";
 import { Image } from 'astro:assets';
+import githubStats from "../data/github-stats.json";
+import { formatCount } from "../lib/github-stats.mjs";
 import heroImg from "../assets/screenshots/user/dashboard.png";
 import shot1 from "../assets/screenshots/user/dashboard.png";
 import shot2 from "../assets/screenshots/user/profile.png";
@@ -71,6 +73,39 @@ const metrics = [
   { value: "GPLv3", label: "Open source" },
 ];
 
+const gh = githubStats;
+const ciState = gh.ci?.state ?? "unknown";
+const ciLabel = gh.ci?.label ?? "Unknown";
+
+// Build-time seed; the client refreshes these from /api/github-stats.json hourly.
+const repoStats = [
+  {
+    key: "commits",
+    label: "Commits",
+    value: formatCount(gh.commits) ?? "?",
+    href: `${gh.repoUrl}/commits/main`,
+  },
+  {
+    key: "releases",
+    label: "Releases",
+    value: formatCount(gh.releases) ?? "?",
+    href: `${gh.repoUrl}/releases`,
+  },
+  {
+    key: "ci",
+    label: "CI Status",
+    value: ciLabel,
+    state: ciState,
+    href: gh.ci?.url ?? `${gh.repoUrl}/actions`,
+  },
+  {
+    key: "contributors",
+    label: "Contributors",
+    value: formatCount(gh.contributors) ?? "?",
+    href: `${gh.repoUrl}/graphs/contributors`,
+  },
+];
+
 const faqs = [
   {
     q: "Is Catalyst a Pterodactyl replacement?",
@@ -122,6 +157,67 @@ const faqs = [
         setTimeout(() => { btn.innerHTML = original; btn.classList.remove('copied'); }, 2000);
       });
     });
+
+    // Live GitHub stats: the endpoint is edge cached for an hour, so this is cheap.
+    // Refresh on load, when the tab regains focus, and on an hourly timer.
+    (function () {
+      const root = document.getElementById('github-stats');
+      if (!root) return;
+
+      const REFRESH_MS = 60 * 60 * 1000;
+      let lastFetch = 0;
+
+      function format(n) {
+        if (n === null || n === undefined) return null;
+        if (n < 1000) return String(n);
+        if (n < 10000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+        return Math.round(n / 1000) + 'k';
+      }
+
+      function setValue(key, text) {
+        if (text === null) return;
+        const el = root.querySelector(`[data-stat-value="${key}"]`);
+        if (el && el.textContent !== text) el.textContent = text;
+      }
+
+      async function refresh() {
+        if (Date.now() - lastFetch < 60000) return;
+        lastFetch = Date.now();
+        try {
+          const res = await fetch('/api/github-stats.json', { headers: { accept: 'application/json' } });
+          if (!res.ok) return;
+          const data = await res.json();
+
+          setValue('commits', format(data.commits));
+          setValue('releases', format(data.releases));
+          setValue('contributors', format(data.contributors));
+
+          if (data.ci) {
+            setValue('ci', data.ci.label || 'Unknown');
+            const dot = root.querySelector('[data-ci-dot]');
+            if (dot) {
+              dot.classList.remove('bg-success', 'bg-danger', 'bg-warning', 'bg-zinc-600');
+              dot.classList.add(
+                data.ci.state === 'passing' ? 'bg-success'
+                  : data.ci.state === 'failing' ? 'bg-danger'
+                  : data.ci.state === 'running' ? 'bg-warning'
+                  : 'bg-zinc-600'
+              );
+            }
+            const link = root.querySelector('[data-stat-key="ci"]');
+            if (link && data.ci.url) link.setAttribute('href', data.ci.url);
+          }
+        } catch {
+          /* keep the server-rendered values */
+        }
+      }
+
+      refresh();
+      setInterval(refresh, REFRESH_MS);
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') refresh();
+      });
+    })();
   </script>
 
   <!-- HERO: asymmetric split, conversion-first -->
@@ -182,6 +278,43 @@ const faqs = [
           </div>
           <div class="absolute -bottom-6 left-8 right-8 h-16 bg-primary/[0.12] blur-3xl rounded-full pointer-events-none" aria-hidden="true"></div>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GITHUB STATS strip (layout family: live OSS activity) -->
+  <section class="max-w-6xl mx-auto px-4 pt-6 pb-2" aria-label="Repository activity" data-reveal>
+    <div id="github-stats" class="rounded-xl border border-zinc-800/60 bg-surface-1/80 backdrop-blur-sm px-4 sm:px-6 py-4">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {repoStats.map((s) => (
+          <a
+            href={s.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="group flex flex-col items-center sm:items-start transition-colors hover:opacity-80"
+            data-stat-key={s.key}
+          >
+            <div class="flex items-center gap-2 mb-1">
+              {s.key === "ci" && (
+                <span
+                  class:list={[
+                    "inline-block w-2 h-2 rounded-full",
+                    s.state === "passing" ? "bg-success" : s.state === "failing" ? "bg-danger" : "bg-zinc-600",
+                  ]}
+                  data-ci-dot
+                  aria-hidden="true"
+                />
+              )}
+              <span class="text-xs text-zinc-500">{s.label}</span>
+            </div>
+            <div
+              class="font-display text-xl sm:text-2xl font-bold text-foreground tracking-tight tabular-nums"
+              data-stat-value={s.key}
+            >
+              {s.value}
+            </div>
+          </a>
+        ))}
       </div>
     </div>
   </section>

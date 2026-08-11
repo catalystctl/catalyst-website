@@ -284,7 +284,8 @@ For development or when you need to modify the code before deploying.
 
 ### Prerequisites
 
-- [Bun](https://bun.sh/) >= 1.0.0
+- [Node.js](https://nodejs.org/) >= 22
+- [pnpm](https://pnpm.io/) >= 8
 - Docker or Podman (for PostgreSQL + Redis infrastructure)
 - Rust toolchain (for the agent, if needed)
 
@@ -298,15 +299,15 @@ cd catalyst
 ### 2. Install Workspace Dependencies
 
 ```bash
-bun install
+pnpm install
 ```
 
-This installs dependencies for all packages in the Bun workspace.
+This installs dependencies for all packages in the pnpm workspace.
 
 ### 3. Start Infrastructure
 
 ```bash
-bun run dev:infra
+pnpm run dev:infra
 ```
 
 This starts PostgreSQL and Redis containers. They run in the background.
@@ -329,15 +330,15 @@ BETTER_AUTH_SECRET=$(openssl rand -base64 32)
 ### 5. Set Up the Database
 
 ```bash
-bun run db:generate    # Generate Prisma client
-bun run db:push        # Push schema to database
-bun run db:seed        # Seed with sample data (dev only)
+pnpm run db:generate    # Generate Prisma client
+pnpm run db:push        # Push schema to database
+pnpm run db:seed        # Seed with sample data (dev only)
 ```
 
 ### 6. Start the Backend
 
 ```bash
-bun run dev
+pnpm run dev
 ```
 
 The backend starts on `http://localhost:3000` with hot reload.
@@ -348,8 +349,8 @@ In a new terminal:
 
 ```bash
 cd catalyst-frontend
-bun install            # Already installed at workspace root, but safe to run
-bun run dev
+pnpm install            # Already installed at workspace root, but safe to run
+pnpm run dev
 ```
 
 The frontend dev server starts (usually on `http://localhost:5173`).
@@ -359,7 +360,7 @@ The frontend dev server starts (usually on `http://localhost:5173`).
 In a new terminal:
 
 ```bash
-bun run dev:agent
+pnpm run dev:agent
 ```
 
 This builds and runs the Rust agent locally. Requires root for containerd access.
@@ -368,19 +369,19 @@ This builds and runs the Rust agent locally. Requires root for containerd access
 
 | Command | Context | Description |
 |---------|---------|-------------|
-| `bun run dev` | Root | Backend + frontend with hot reload |
-| `bun run dev:infra` | Root | PostgreSQL + Redis containers |
-| `bun run dev:agent` | Root | Rust agent (local build) |
-| `bun run build` | Root | Build all packages |
-| `bun run build:agent` | Root | Build Rust agent (release) |
-| `bun run db:generate` | `catalyst-backend/` | Regenerate Prisma client |
-| `bun run db:push` | `catalyst-backend/` | Push schema to database |
-| `bun run db:migrate` | `catalyst-backend/` | Create and apply migrations |
-| `bun run db:seed` | `catalyst-backend/` | Seed database with sample data |
-| `bun run db:seed:admin` | `catalyst-backend/` | Seed only admin user |
-| `bun run db:studio` | `catalyst-backend/` | Open Prisma Studio GUI |
-| `bun run test` | Root | Run Vitest test suite |
-| `bun run lint` | Root | Run ESLint on all packages |
+| `pnpm run dev` | Root | Backend + frontend with hot reload |
+| `pnpm run dev:infra` | Root | PostgreSQL + Redis containers |
+| `pnpm run dev:agent` | Root | Rust agent (local build) |
+| `pnpm run build` | Root | Build all packages |
+| `pnpm run build:agent` | Root | Build Rust agent (release) |
+| `pnpm run db:generate` | `catalyst-backend/` | Regenerate Prisma client |
+| `pnpm run db:push` | `catalyst-backend/` | Push schema to database |
+| `pnpm run db:migrate` | `catalyst-backend/` | Create and apply migrations |
+| `pnpm run db:seed` | `catalyst-backend/` | Seed database with sample data |
+| `pnpm run db:seed:admin` | `catalyst-backend/` | Seed only admin user |
+| `pnpm run db:studio` | `catalyst-backend/` | Open Prisma Studio GUI |
+| `pnpm run test` | Root | Run Vitest test suite |
+| `pnpm run lint` | Root | Run ESLint on all packages |
 
 ---
 
@@ -396,7 +397,7 @@ When you first visit your Catalyst URL, the setup wizard detects that no users e
 
 > **Alternative:** Run the seed script to create a default admin:
 > ```bash
-> docker compose exec -e NODE_ENV=development catalyst-backend bun run db:seed
+> docker compose exec -e NODE_ENV=development catalyst-backend pnpm run db:seed
 > ```
 > Default credentials: `admin@example.com` / `admin123` — **change this password immediately**.
 
@@ -645,6 +646,18 @@ Traefik offers Docker-native service discovery and a web dashboard.
 
 ### Option C: Existing Reverse Proxy
 
+If you already run Nginx, Apache, HAProxy, or another proxy, the recommended
+approach is to **proxy everything to the bundled frontend nginx container**
+and let its internal routing handle `/ws`, `/api/`, `/auth/`, `/docs`, and
+static assets.
+
+> **Do NOT add a separate `/ws` block in your external proxy.** The bundled
+> nginx (`frontend` container) already has optimized `/ws`, `/api/`, `/auth/`,
+> `/docs`, and static asset routing with correct buffering, timeouts, and
+> WebSocket upgrade headers. Adding a separate `/ws` location in your external
+> proxy bypasses these settings and can cause console streaming failures,
+> truncated responses, and agent disconnections.
+
 If you already run Nginx, Apache, HAProxy, or another proxy:
 
 1. **Bind Catalyst to localhost only:**
@@ -680,7 +693,17 @@ If you already run Nginx, Apache, HAProxy, or another proxy:
 
        client_max_body_size 100m;
 
-       # WebSocket support — critical for console streaming
+       location / {
+           proxy_pass http://catalyst;
+           proxy_http_version 1.1;
+           proxy_set_header Connection "";
+           proxy_set_header Host $host;
+           proxy_set_header X-Real-IP $remote_addr;
+           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+           proxy_set_header X-Forwarded-Proto $scheme;
+       }
+
+       # WebSocket support (agent connections, admin event stream)
        location /ws {
            proxy_pass http://catalyst;
            proxy_http_version 1.1;
@@ -692,15 +715,6 @@ If you already run Nginx, Apache, HAProxy, or another proxy:
            proxy_set_header X-Forwarded-Proto $scheme;
            proxy_read_timeout 86400s;
            proxy_send_timeout 86400s;
-       }
-
-       # All other requests
-       location / {
-           proxy_pass http://catalyst;
-           proxy_set_header Host $host;
-           proxy_set_header X-Real-IP $remote_addr;
-           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-           proxy_set_header X-Forwarded-Proto $scheme;
        }
    }
 
@@ -1020,7 +1034,7 @@ docker compose exec backend bunx prisma migrate status --schema prisma/schema.pr
 docker compose logs backend | grep -i "migrat"
 
 # Run manually (only if auto-migration failed)
-docker compose exec backend bun run db:migrate
+docker compose exec backend pnpm run db:migrate
 ```
 
 ### Post-Update Verification

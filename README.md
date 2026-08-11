@@ -72,11 +72,29 @@ npm run preview
 
 ## Deployment
 
-The site deploys to **Cloudflare Pages** via Wrangler:
+The site runs on **Cloudflare Workers** (`wrangler.jsonc`, worker name `catalyst-website`) and serves [catalystctl.com](https://catalystctl.com/).
+
+### Automatic (GitHub Actions)
+
+On every push to `main`, [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) builds and runs `wrangler deploy`.
+
+Required repository secrets / variables:
+
+| Name | Type | Notes |
+|------|------|--------|
+| `CLOUDFLARE_API_TOKEN` | secret | Token with **Workers Scripts Edit** (and account read) |
+| `CLOUDFLARE_ACCOUNT_ID` | secret or variable | Cloudflare account ID |
 
 ```sh
-# Deploy to Cloudflare Pages
-npm run deploy
+# One-time setup
+gh secret set CLOUDFLARE_API_TOKEN -R catalystctl/catalyst-website
+gh variable set CLOUDFLARE_ACCOUNT_ID -R catalystctl/catalyst-website -b "<account-id>"
+```
+
+### Manual
+
+```sh
+npm run deploy   # build + wrangler deploy
 ```
 
 The `wrangler.jsonc` configures the Cloudflare adapter. Static pages are prerendered at build time; the docs index uses SSR for dynamic content collection rendering.

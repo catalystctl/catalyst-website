@@ -157,67 +157,6 @@ const faqs = [
         setTimeout(() => { btn.innerHTML = original; btn.classList.remove('copied'); }, 2000);
       });
     });
-
-    // Live GitHub stats: the endpoint is edge cached for an hour, so this is cheap.
-    // Refresh on load, when the tab regains focus, and on an hourly timer.
-    (function () {
-      const root = document.getElementById('github-stats');
-      if (!root) return;
-
-      const REFRESH_MS = 60 * 60 * 1000;
-      let lastFetch = 0;
-
-      function format(n) {
-        if (n === null || n === undefined) return null;
-        if (n < 1000) return String(n);
-        if (n < 10000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
-        return Math.round(n / 1000) + 'k';
-      }
-
-      function setValue(key, text) {
-        if (text === null) return;
-        const el = root.querySelector(`[data-stat-value="${key}"]`);
-        if (el && el.textContent !== text) el.textContent = text;
-      }
-
-      async function refresh() {
-        if (Date.now() - lastFetch < 60000) return;
-        lastFetch = Date.now();
-        try {
-          const res = await fetch('/api/github-stats.json', { headers: { accept: 'application/json' } });
-          if (!res.ok) return;
-          const data = await res.json();
-
-          setValue('commits', format(data.commits));
-          setValue('releases', format(data.releases));
-          setValue('contributors', format(data.contributors));
-
-          if (data.ci) {
-            setValue('ci', data.ci.label || 'Unknown');
-            const dot = root.querySelector('[data-ci-dot]');
-            if (dot) {
-              dot.classList.remove('bg-success', 'bg-danger', 'bg-warning', 'bg-zinc-600');
-              dot.classList.add(
-                data.ci.state === 'passing' ? 'bg-success'
-                  : data.ci.state === 'failing' ? 'bg-danger'
-                  : data.ci.state === 'running' ? 'bg-warning'
-                  : 'bg-zinc-600'
-              );
-            }
-            const link = root.querySelector('[data-stat-key="ci"]');
-            if (link && data.ci.url) link.setAttribute('href', data.ci.url);
-          }
-        } catch {
-          /* keep the server-rendered values */
-        }
-      }
-
-      refresh();
-      setInterval(refresh, REFRESH_MS);
-      document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') refresh();
-      });
-    })();
   </script>
 
   <!-- HERO: asymmetric split, conversion-first -->

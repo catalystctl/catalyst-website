@@ -38,7 +38,21 @@ export const GET: APIRoute = async ({ request, locals }) => {
 
   try {
     const stats = await fetchGitHubStats({ token: runtime?.env?.GITHUB_TOKEN });
-    const response = payloadResponse(stats, true);
+    
+    // If we got nulls back (rate limit or API error), merge with the seed so we serve *something*.
+    const merged = {
+      ...stats,
+      commits: stats.commits ?? seed.commits,
+      releases: stats.releases ?? seed.releases,
+      contributors: stats.contributors ?? seed.contributors,
+      stars: stats.stars ?? seed.stars,
+      forks: stats.forks ?? seed.forks,
+      lastPushedAt: stats.lastPushedAt ?? seed.lastPushedAt,
+      latestRelease: stats.latestRelease ?? seed.latestRelease,
+      ci: stats.ci ?? seed.ci,
+    };
+    
+    const response = payloadResponse(merged, true);
 
     if (cache) {
       const store = cache.put(cacheKey, response.clone());
@@ -48,7 +62,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
 
     return response;
   } catch {
-    // Rate limited or GitHub is down: serve the build-time seed, flagged stale.
+    // Complete failure: serve the build-time seed, flagged stale.
     return payloadResponse({ ...seed, stale: true }, false);
   }
 };

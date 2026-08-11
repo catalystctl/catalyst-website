@@ -1,0 +1,44 @@
+name: Update GitHub Stats
+
+on:
+  schedule:
+    # Run every hour at :05 past the hour
+    - cron: "5 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: update-github-stats
+  cancel-in-progress: true
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Regenerate stats seed
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npm install --no-save
+          node scripts/generate-github-stats.js
+
+      - name: Commit if changed
+        run: |
+          if git diff --quiet src/data/github-stats.json; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/data/github-stats.json
+          git commit -m "chore: update GitHub stats [skip ci]"
+          git push

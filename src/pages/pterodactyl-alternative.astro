@@ -5,36 +5,37 @@ import Layout from "../layouts/Layout.astro";
 
 const B = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "") + "/";
 const GITHUB_URL = "https://github.com/catalystctl/catalyst";
+const DISCORD_URL = "https://discord.gg/mybxhmru3y";
 
 const reasons = [
   {
     title: "Sub-10ms console latency",
-    description: "Catalyst's WebSocket console streams logs with under 10 milliseconds of latency. Pterodactyl's Node.js-based WebSocket layer averages ~100ms. For competitive game servers, that difference matters.",
+    description: "Catalyst's WebSocket console streams logs under 10ms. Pterodactyl's Node.js layer averages ~100ms. For competitive game servers, that gap is the product.",
     icon: `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" /></svg>`,
   },
   {
     title: "Rust backend, not PHP",
-    description: "Catalyst is built with Rust and Axum — compiling to a single binary with zero runtime dependencies. No PHP-FPM, no Composer, no Laravel upgrade cycles. Just a fast, type-safe, memory-efficient server that starts in under a second.",
+    description: "Axum compiles to a single binary with zero runtime deps. No PHP-FPM, no Composer, no Laravel upgrade treadmill. Cold start under a second.",
     icon: `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" /></svg>`,
   },
   {
     title: "containerd, not Docker daemon",
-    description: "Pterodactyl wraps the Docker daemon, adding layers of overhead. Catalyst talks directly to containerd — the same runtime that powers Kubernetes. Faster container startups, lower per-server memory usage, and no daemon to babysit.",
+    description: "Talks straight to containerd, the runtime behind Kubernetes. Faster startups, lower per-server memory, no daemon to babysit.",
     icon: `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 01-3-3m3 3a3 3 0 100 6h13.5a3 3 0 100-6m-16.5-3a3 3 0 013-3h13.5a3 3 0 013 3m-19.5 0a4.5 4.5 0 01.9-2.7L5.737 5.1a3.375 3.375 0 012.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 01.9 2.7m0 0a3 3 0 01-3 3m0 3h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008zm-3 6h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008z" /></svg>`,
   },
   {
     title: "Native plugin system",
-    description: "Pterodactyl has no plugin architecture. Want custom API routes? Fork the project. Catalyst's plugin system lets you write TypeScript extensions that register hooks, add REST endpoints, and run scheduled tasks — all without modifying core code.",
+    description: "Pterodactyl has no plugin architecture. Catalyst lets you register TypeScript hooks, REST routes, and scheduled tasks without forking core.",
     icon: `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.25 9.75L16.5 12l-2.25 2.25m-4.5 0L7.5 12l2.25-2.25M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" /></svg>`,
   },
   {
     title: "20+ granular permissions",
-    description: "Pterodactyl's RBAC is essentially admin vs user. Catalyst ships with 20+ fine-grained permissions: restart servers, view files, manage nodes, create API keys, view audit logs — mix and match to build precise roles.",
+    description: "Not just admin vs user. Restart servers, view files, manage nodes, create API keys, read audit logs. Mix precise roles.",
     icon: `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg>`,
   },
   {
     title: "60+ REST API endpoints",
-    description: "Automation is critical at scale. Catalyst exposes 60+ documented REST endpoints covering servers, nodes, users, files, backups, and plugins. Pterodactyl's API is smaller (~40 endpoints) and less flexible for advanced workflows.",
+    description: "Servers, nodes, users, files, backups, plugins. Pterodactyl sits around ~40 endpoints and is harder to automate at scale.",
     icon: `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" /></svg>`,
   },
 ];
@@ -95,23 +96,48 @@ const competitors = [
 const verdicts = [
   {
     title: "Choose Catalyst if...",
+    accent: true,
     points: [
-      "You want a modern, Rust-based stack with superior performance",
-      "You need a plugin system to extend functionality without forking",
-      "You want sub-10ms WebSocket console latency",
-      "You prefer a single-script install over manual configuration",
+      "You want a modern Rust stack with real performance headroom",
+      "You need plugins without forking core",
+      "You care about sub-10ms console latency",
+      "You prefer a one-script install",
       "You need granular RBAC with 20+ permissions",
-      "You want 60+ REST API endpoints for full automation",
+      "You want 60+ REST endpoints for automation",
     ],
   },
   {
     title: "Stick with Pterodactyl if...",
+    accent: false,
     points: [
-      "You have a large existing installation and no migration bandwidth",
-      "Your team is deeply familiar with PHP/Laravel ecosystems",
-      "You rely on third-party Pterodactyl-specific plugins/themes",
-      "You need mature multi-language community support today",
+      "You have a large install and no migration bandwidth",
+      "Your team is deep in PHP and Laravel",
+      "You depend on Pterodactyl-only plugins or themes",
+      "You need the largest community ecosystem today",
     ],
+  },
+];
+
+const lookFor = [
+  {
+    title: "Performance that scales",
+    body: "Game panels are I/O-bound and connection-heavy. PHP plus a Node WebSocket hop struggles under concurrent consoles. A modern alternative should hold thousands of streams. Catalyst's Rust backend is built for that load.",
+  },
+  {
+    title: "A real plugin architecture",
+    body: "Pterodactyl is monolithic. Custom work means a fork. Look for hooks, extra API routes, and background tasks without touching core. That is the Catalyst plugin model.",
+  },
+  {
+    title: "Modern container runtime",
+    body: "containerd is lighter and the runtime behind Kubernetes. A panel on containerd starts faster and lines up with cloud-native ops.",
+  },
+  {
+    title: "API coverage",
+    body: "At scale everything is automated. Aim for broad endpoints across servers, nodes, users, files, backups, and permissions. Catalyst ships 60+.",
+  },
+  {
+    title: "Security by default",
+    body: "Granular RBAC, scoped keys, audit logs, and TLS should ship day one. Catalyst exposes 20+ permissions so roles like support or billing stay precise.",
   },
 ];
 ---
@@ -134,143 +160,182 @@ const verdicts = [
     document.querySelectorAll('[data-reveal], [data-reveal-stagger]').forEach((el) => observer.observe(el));
   </script>
 
-  <!-- Hero -->
-  <section class="max-w-6xl mx-auto px-4 pt-12 pb-8 sm:pt-16 sm:pb-10">
-    <nav class="text-xs text-zinc-600 mb-6" aria-label="Breadcrumb">
-      <a href={B} class="hover:text-zinc-400 transition-colors">Home</a>
-      <span class="mx-2">/</span>
-      <span class="text-zinc-400">Pterodactyl Alternative</span>
-    </nav>
-
-    <div data-reveal>
-      <div class="flex items-center gap-2 mb-4">
-        <svg class="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
-        </svg>
-        <span class="text-xs font-semibold tracking-wider uppercase text-primary">Pterodactyl Alternative</span>
-      </div>
-      <h1 class="font-display font-bold text-foreground tracking-tight leading-[1.05]" style="font-size: clamp(2rem, 6vw, 4rem);">
-        The best Pterodactyl <span class="text-primary">alternative</span> in 2026.
-      </h1>
-      <p class="mt-5 max-w-2xl text-base sm:text-lg text-zinc-400 leading-relaxed">
-        Catalyst is a modern, open-source game server management platform built to replace Pterodactyl. Rust backend, containerd runtime, native plugins, and sub-10ms console streaming — all under GPLv3.
-      </p>
-      <div class="mt-7 flex flex-wrap items-center gap-3">
-        <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary-600 min-h-11">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-          View on GitHub
-        </a>
-        <a href={B + "migrate-from-pterodactyl/"} class="inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-transparent px-5 py-3 text-sm font-medium text-zinc-300 transition-all duration-200 hover:bg-surface-2 hover:text-zinc-100 min-h-11">
-          Migration Guide
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Stats -->
-  <section class="max-w-6xl mx-auto px-4 pb-12">
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" data-reveal-stagger>
-      <div class="rounded-xl border border-zinc-800/60 bg-surface-1 p-4">
-        <div class="font-display text-2xl font-bold text-foreground">&lt;10ms</div>
-        <div class="text-xs text-zinc-600 mt-0.5">WebSocket latency</div>
-      </div>
-      <div class="rounded-xl border border-zinc-800/60 bg-surface-1 p-4">
-        <div class="font-display text-2xl font-bold text-foreground">60+</div>
-        <div class="text-xs text-zinc-600 mt-0.5">API endpoints</div>
-      </div>
-      <div class="rounded-xl border border-zinc-800/60 bg-surface-1 p-4">
-        <div class="font-display text-2xl font-bold text-foreground">20+</div>
-        <div class="text-xs text-zinc-600 mt-0.5">RBAC permissions</div>
-      </div>
-      <div class="rounded-xl border border-zinc-800/60 bg-surface-1 p-4">
-        <div class="font-display text-2xl font-bold text-foreground">GPLv3</div>
-        <div class="text-xs text-zinc-600 mt-0.5">Open source</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Reasons -->
-  <section class="max-w-6xl mx-auto px-4 py-16" aria-label="Why Catalyst is the best alternative">
-    <div class="mb-10" data-reveal>
-      <h2 class="font-display text-sm font-semibold tracking-[0.12em] uppercase text-zinc-500">Why switch?</h2>
-      <p class="mt-2 text-2xl sm:text-3xl font-display font-semibold text-foreground tracking-tight">Six reasons Catalyst beats Pterodactyl.</p>
+  <!-- Hero: asymmetric -->
+  <section class="relative overflow-hidden" aria-label="Pterodactyl alternative overview">
+    <div class="pointer-events-none absolute inset-0" aria-hidden="true">
+      <div class="absolute -top-24 -left-16 h-80 w-80 rounded-full bg-primary/[0.09] blur-3xl"></div>
+      <div class="absolute top-1/3 right-0 h-64 w-64 rounded-full bg-primary/[0.04] blur-3xl"></div>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3" data-reveal-stagger>
-      {reasons.map((r) => (
-        <div class="group rounded-xl border border-zinc-800/60 bg-surface-1 p-6 transition-all duration-200 hover:border-zinc-700 hover:bg-surface-2">
-          <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-800 text-zinc-400 transition-colors group-hover:text-zinc-200">
-            <Fragment set:html={r.icon} />
+    <div class="relative max-w-6xl mx-auto px-4 pt-10 sm:pt-14 pb-10">
+      <nav class="text-xs text-zinc-600 mb-6" aria-label="Breadcrumb">
+        <a href={B} class="hover:text-zinc-400 transition-colors">Home</a>
+        <span class="mx-1.5 text-zinc-700">/</span>
+        <span class="text-zinc-400">Pterodactyl Alternative</span>
+      </nav>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-end" data-reveal>
+        <div class="lg:col-span-7">
+          <h1 class="font-display font-bold text-foreground tracking-tight leading-[1.08] text-balance" style="font-size: clamp(2.1rem, 5.5vw, 3.75rem);">
+            The Pterodactyl alternative built for <span class="text-primary">2026</span>.
+          </h1>
+          <p class="mt-5 max-w-xl text-base sm:text-lg text-zinc-400 leading-relaxed text-pretty">
+            Rust backend, containerd runtime, native plugins, sub-10ms console streaming. Free under GPLv3.
+          </p>
+          <div class="mt-7 flex flex-wrap items-center gap-3">
+            <a href={B + "#install"} class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary-600 active:scale-[0.98] min-h-11 shadow-[0_0_0_1px_hsl(25_55%_50%/0.3),0_8px_28px_-8px_hsl(25_55%_58%/0.45)]">
+              Install in 60s
+            </a>
+            <a href={B + "migrate-from-pterodactyl/"} class="inline-flex items-center gap-2 rounded-lg border border-zinc-700/80 bg-surface-1/60 px-5 py-3 text-sm font-medium text-zinc-200 transition-all duration-200 hover:bg-surface-2 active:scale-[0.98] min-h-11">
+              Open migration guide
+            </a>
           </div>
-          <h3 class="mt-4 font-semibold text-foreground text-[15px]">{r.title}</h3>
-          <p class="mt-1.5 text-sm text-zinc-500 leading-relaxed">{r.description}</p>
+        </div>
+
+        <div class="lg:col-span-5">
+          <div class="rounded-xl border border-zinc-800/60 bg-surface-1/80 p-5 grid grid-cols-2 gap-4">
+            <div>
+              <div class="font-display text-2xl font-bold text-foreground tabular-nums">&lt;10ms</div>
+              <div class="text-xs text-zinc-500 mt-0.5">Console latency</div>
+            </div>
+            <div>
+              <div class="font-display text-2xl font-bold text-foreground tabular-nums">60+</div>
+              <div class="text-xs text-zinc-500 mt-0.5">API endpoints</div>
+            </div>
+            <div>
+              <div class="font-display text-2xl font-bold text-foreground tabular-nums">20+</div>
+              <div class="text-xs text-zinc-500 mt-0.5">RBAC permissions</div>
+            </div>
+            <div>
+              <div class="font-display text-2xl font-bold text-foreground">GPLv3</div>
+              <div class="text-xs text-zinc-500 mt-0.5">Open source</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reasons: featured + list, not equal 6-card grid -->
+  <section class="max-w-6xl mx-auto px-4 py-16 sm:py-20" aria-label="Why Catalyst is the best alternative">
+    <div class="mb-10 max-w-xl" data-reveal>
+      <h2 class="font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight text-balance">
+        Six reasons hosts switch.
+      </h2>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3" data-reveal-stagger>
+      {reasons.map((r, i) => (
+        <div class:list={[
+          "group rounded-xl border p-5 sm:p-6 transition-all duration-200 hover:border-zinc-700",
+          i === 0
+            ? "md:col-span-2 border-primary/25 bg-gradient-to-br from-primary/[0.1] via-surface-1 to-surface-0"
+            : i % 2 === 0
+              ? "border-zinc-800/60 bg-surface-2/60 hover:bg-surface-2"
+              : "border-zinc-800/60 bg-surface-1 hover:bg-surface-2",
+        ]}>
+          <div class="flex items-start gap-4">
+            <div class:list={[
+              "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors",
+              i === 0 ? "bg-primary/20 text-primary" : "bg-zinc-800 text-zinc-400 group-hover:text-primary group-hover:bg-primary/15",
+            ]}>
+              <Fragment set:html={r.icon} />
+            </div>
+            <div>
+              <h3 class:list={["font-semibold text-foreground", i === 0 ? "text-lg" : "text-[15px]"]}>{r.title}</h3>
+              <p class="mt-1.5 text-sm text-zinc-500 leading-relaxed max-w-2xl">{r.description}</p>
+            </div>
+          </div>
         </div>
       ))}
     </div>
   </section>
 
-  <!-- Landscape -->
+  <!-- Landscape table -->
   <section class="max-w-6xl mx-auto px-4 py-16" aria-label="Alternative landscape">
-    <div data-reveal>
-      <h2 class="font-display text-sm font-semibold tracking-[0.12em] uppercase text-zinc-500 mb-6">The landscape</h2>
-      <p class="text-2xl sm:text-3xl font-display font-semibold text-foreground tracking-tight mb-8">How the alternatives stack up.</p>
+    <div class="mb-8 max-w-xl" data-reveal>
+      <h2 class="font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight text-balance">
+        How the alternatives stack up.
+      </h2>
     </div>
 
     <div class="rounded-xl border border-zinc-800/60 overflow-hidden" data-reveal>
       <table class="w-full text-left border-collapse">
         <thead>
-          <tr class="border-b border-zinc-800/60 bg-surface-1">
-            <th class="py-3 px-5 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">Platform</th>
-            <th class="py-3 px-5 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">Stack</th>
-            <th class="py-3 px-5 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">Notes</th>
+          <tr class="bg-surface-1">
+            <th class="py-3.5 px-5 text-sm font-medium text-zinc-500">Platform</th>
+            <th class="py-3.5 px-5 text-sm font-medium text-zinc-500">Stack</th>
+            <th class="py-3.5 px-5 text-sm font-medium text-zinc-500 hidden sm:table-cell">Notes</th>
           </tr>
         </thead>
         <tbody>
-          {competitors.map((c, i) => (
-            <tr class={`border-b border-zinc-800/40 last:border-0 ${c.name === 'Catalyst' ? 'bg-primary/[0.03]' : 'hover:bg-surface-1/50'} transition-colors`}>
-              <td class="py-3.5 px-5 text-sm font-medium {c.name === 'Catalyst' ? 'text-primary' : 'text-foreground'}">
-                {c.name === 'Catalyst' && <span class="inline-block w-1.5 h-1.5 rounded-full bg-primary mr-2" aria-hidden="true" />}
+          {competitors.map((c) => (
+            <tr class:list={[
+              "border-t border-zinc-800/40 transition-colors",
+              c.name === "Catalyst" ? "bg-primary/[0.06]" : "hover:bg-surface-1/40",
+            ]}>
+              <td class:list={["py-3.5 px-5 text-sm font-medium", c.name === "Catalyst" ? "text-primary" : "text-foreground"]}>
                 {c.name}
               </td>
               <td class="py-3.5 px-5 text-sm text-zinc-400 font-mono text-[12px]">{c.type}</td>
-              <td class="py-3.5 px-5 text-sm text-zinc-500">{c.note}</td>
+              <td class="py-3.5 px-5 text-sm text-zinc-500 hidden sm:table-cell">{c.note}</td>
             </tr>
           ))}
         </tbody>
       </table>
     </div>
 
-    <div class="mt-8 max-w-3xl text-zinc-400 leading-relaxed" data-reveal>
-      <h3 class="text-foreground font-semibold text-lg mb-3">Why not Pelican or PufferPanel?</h3>
-      <p class="mb-4">Pelican is a fork of Pterodactyl with a different team and roadmap, but it shares the same PHP + Docker architecture. If you're looking for a true alternative with a modern stack, Catalyst is the only option built on Rust and containerd.</p>
-      <p>PufferPanel is lightweight and written in Go, which is a step up from PHP. However, it lacks the feature depth of Catalyst: no plugin system, fewer API endpoints, and a more limited permission model.</p>
+    <div class="mt-8 max-w-3xl space-y-4 text-sm sm:text-base text-zinc-400 leading-relaxed" data-reveal>
+      <h3 class="text-foreground font-semibold text-lg">Why not Pelican or PufferPanel?</h3>
+      <p>Pelican forks Pterodactyl with a new team but keeps the PHP + Docker stack. If you want a true modern alternative, Catalyst is the option on Rust and containerd.</p>
+      <p>PufferPanel is lighter and written in Go, a step up from PHP. It still lacks Catalyst depth: no plugin system, fewer API endpoints, thinner permissions.</p>
     </div>
   </section>
 
-  <!-- Detailed Comparison Tables -->
-  <section id="comparison" class="max-w-6xl mx-auto px-4 py-16 space-y-16" aria-label="Detailed comparison with Pterodactyl">
-    <div data-reveal>
-      <h2 class="font-display text-sm font-semibold tracking-[0.12em] uppercase text-zinc-500">Catalyst vs Pterodactyl</h2>
-      <p class="mt-2 text-2xl sm:text-3xl font-display font-semibold text-foreground tracking-tight mb-8">Feature-by-feature comparison.</p>
+  <!-- Detailed comparison -->
+  <section id="comparison" class="max-w-6xl mx-auto px-4 py-16 space-y-12 scroll-mt-20" aria-label="Detailed comparison with Pterodactyl">
+    <div class="max-w-xl" data-reveal>
+      <h2 class="font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight text-balance">
+        Feature-by-feature comparison.
+      </h2>
     </div>
 
     {comparisons.map((section) => (
       <div data-reveal>
-        <h3 class="font-display text-sm font-semibold tracking-[0.12em] uppercase text-zinc-500 mb-6">{section.category}</h3>
-        <div class="rounded-xl border border-zinc-800/60 overflow-hidden">
+        <h3 class="font-display text-lg font-semibold text-foreground mb-4">{section.category}</h3>
+
+        <div class="sm:hidden space-y-2">
+          {section.rows.map((row) => (
+            <div class="rounded-xl border border-zinc-800/60 bg-surface-1 p-4">
+              <div class="text-sm font-medium text-zinc-300 mb-3">{row.feature}</div>
+              <div class="grid grid-cols-2 gap-2">
+                <div class="rounded-lg bg-primary/[0.08] border border-primary/20 p-2.5">
+                  <div class="text-[10px] text-primary font-semibold mb-0.5">Catalyst</div>
+                  <div class="text-sm font-medium text-foreground">{row.catalyst}</div>
+                </div>
+                <div class="rounded-lg bg-zinc-900/40 p-2.5">
+                  <div class="text-[10px] text-zinc-600 font-semibold mb-0.5">Pterodactyl</div>
+                  <div class="text-sm text-zinc-500">{row.pterodactyl}</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div class="hidden sm:block rounded-xl border border-zinc-800/60 overflow-hidden">
           <table class="w-full text-left border-collapse">
             <thead>
-              <tr class="border-b border-zinc-800/60 bg-surface-1">
-                <th class="py-3 px-5 text-[11px] font-semibold uppercase tracking-wider text-zinc-500 w-[30%]">Feature</th>
-                <th class="py-3 px-5 text-[11px] font-semibold uppercase tracking-wider text-primary w-[35%]">Catalyst</th>
-                <th class="py-3 px-5 text-[11px] font-semibold uppercase tracking-wider text-zinc-500 w-[35%]">Pterodactyl</th>
+              <tr class="bg-surface-1">
+                <th class="py-3 px-5 text-sm font-medium text-zinc-500 w-[30%]">Feature</th>
+                <th class="py-3 px-5 text-sm font-semibold text-primary w-[35%] bg-primary/[0.06]">Catalyst</th>
+                <th class="py-3 px-5 text-sm font-medium text-zinc-500 w-[35%]">Pterodactyl</th>
               </tr>
             </thead>
             <tbody>
               {section.rows.map((row) => (
-                <tr class="border-b border-zinc-800/40 last:border-0 hover:bg-surface-1/50 transition-colors">
+                <tr class="border-t border-zinc-800/40 hover:bg-surface-1/40 transition-colors">
                   <td class="py-3.5 px-5 text-sm text-zinc-400">{row.feature}</td>
-                  <td class="py-3.5 px-5 text-sm font-medium text-foreground">
+                  <td class="py-3.5 px-5 text-sm font-medium text-foreground bg-primary/[0.04]">
                     <span class="inline-flex items-center gap-1.5">
                       {row.winner === "catalyst" && <span class="w-1.5 h-1.5 rounded-full bg-success shrink-0" aria-hidden="true" />}
                       {row.catalyst}
@@ -293,14 +358,24 @@ const verdicts = [
 
   <!-- Verdict -->
   <section class="max-w-6xl mx-auto px-4 py-12" aria-label="Verdict">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" data-reveal-stagger>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4" data-reveal-stagger>
       {verdicts.map((v) => (
-        <div class="rounded-xl border border-zinc-800/60 bg-surface-1 p-6">
+        <div class:list={[
+          "rounded-xl border p-6 sm:p-7",
+          v.accent
+            ? "border-primary/25 bg-gradient-to-br from-primary/[0.08] to-surface-1"
+            : "border-zinc-800/60 bg-surface-1",
+        ]}>
           <h3 class="font-display text-lg font-semibold text-foreground mb-4">{v.title}</h3>
           <ul class="space-y-3">
             {v.points.map((p) => (
               <li class="flex items-start gap-3 text-sm text-zinc-400">
-                <svg class="w-4 h-4 text-primary shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <span class:list={[
+                  "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md",
+                  v.accent ? "bg-primary/15 text-primary" : "bg-zinc-800 text-zinc-500",
+                ]}>
+                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                </span>
                 {p}
               </li>
             ))}
@@ -310,54 +385,44 @@ const verdicts = [
     </div>
   </section>
 
-  <!-- Long-form SEO content -->
+  <!-- Long-form SEO -->
   <section class="max-w-6xl mx-auto px-4 py-16" aria-label="What to look for in a Pterodactyl alternative">
     <div class="max-w-3xl" data-reveal>
-      <h2 class="font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight mb-8">What to look for in a Pterodactyl replacement</h2>
-
-      <div class="space-y-8 text-zinc-400 leading-relaxed">
-        <div>
-          <h3 class="text-foreground font-semibold text-lg mb-2">Performance that scales</h3>
-          <p>Game server panels are I/O-bound and connection-heavy. Pterodactyl's PHP backend and Node.js WebSocket layer struggle under high concurrent load. A modern alternative should handle thousands of simultaneous console connections without breaking a sweat. Catalyst's Rust backend and native WebSocket implementation are designed exactly for this.</p>
-        </div>
-
-        <div>
-          <h3 class="text-foreground font-semibold text-lg mb-2">A real plugin architecture</h3>
-          <p>The biggest limitation of Pterodactyl is its monolithic design. Every customization requires forking the project and maintaining a separate codebase. A true alternative needs a plugin system that lets you extend the API, add UI components, and run background tasks without touching core code.</p>
-        </div>
-
-        <div>
-          <h3 class="text-foreground font-semibold text-lg mb-2">Modern container runtime</h3>
-          <p>Docker served the industry well, but containerd is the future. It's lighter, faster, and the standard runtime for Kubernetes and cloud-native platforms. A panel built on containerd will have better performance characteristics and align with modern DevOps practices.</p>
-        </div>
-
-        <div>
-          <h3 class="text-foreground font-semibold text-lg mb-2">Comprehensive API coverage</h3>
-          <p>At scale, everything is automated. Your panel's API is the interface your tools, bots, and platforms integrate with. Look for 50+ endpoints covering servers, nodes, users, files, backups, scheduling, and permissions. Catalyst delivers 60+.</p>
-        </div>
-
-        <div>
-          <h3 class="text-foreground font-semibold text-lg mb-2">Security by default</h3>
-          <p>Granular RBAC, scoped API keys, audit logging, and TLS shouldn't be afterthoughts. They should be built into the platform from day one. Catalyst's permission model has 20+ individual permissions, letting you create precise roles like "support staff" or "billing admin."</p>
-        </div>
+      <h2 class="font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight mb-8 text-balance">
+        What to look for in a Pterodactyl replacement
+      </h2>
+      <div class="space-y-0">
+        {lookFor.map((item) => (
+          <div class="border-b border-zinc-800/50 py-6 first:pt-0 last:border-0">
+            <h3 class="text-foreground font-semibold text-lg mb-2">{item.title}</h3>
+            <p class="text-zinc-400 leading-relaxed text-sm sm:text-base">{item.body}</p>
+          </div>
+        ))}
       </div>
     </div>
   </section>
 
   <!-- CTA -->
-  <section class="max-w-6xl mx-auto px-4 py-16">
-    <div class="relative rounded-2xl border border-zinc-800/60 bg-surface-1 p-8 sm:p-12 text-center overflow-hidden" data-reveal>
-      <div class="absolute inset-0 bg-gradient-to-br from-[#1a1510]/50 via-transparent to-transparent pointer-events-none"></div>
-      <div class="relative">
-        <h2 class="font-display text-2xl sm:text-3xl font-bold text-foreground tracking-tight">Ready to switch from Pterodactyl?</h2>
-        <p class="mt-3 text-base text-zinc-500 max-w-md mx-auto">Free, open-source, and deployable in 60 seconds. See why Catalyst is the best Pterodactyl alternative.</p>
-        <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
-          <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary-600 min-h-11">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-            Get Started on GitHub
+  <section class="max-w-6xl mx-auto px-4 py-16" aria-label="Call to action">
+    <div class="relative rounded-2xl border border-primary/20 overflow-hidden p-8 sm:p-12 lg:p-14" data-reveal>
+      <div class="absolute inset-0 bg-gradient-to-br from-[#1a1510] via-surface-1 to-surface-0 pointer-events-none"></div>
+      <div class="absolute top-0 right-0 w-72 h-72 bg-primary/[0.12] rounded-full blur-3xl pointer-events-none"></div>
+      <div class="relative max-w-xl">
+        <h2 class="font-display text-2xl sm:text-3xl font-bold text-foreground tracking-tight text-balance">
+          Ready to leave Pterodactyl behind?
+        </h2>
+        <p class="mt-3 text-base text-zinc-400">
+          Free, open source, deployable in a minute. Import your fleet when you are ready.
+        </p>
+        <div class="mt-7 flex flex-wrap gap-3">
+          <a href={B + "#install"} class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary-600 active:scale-[0.98] min-h-11 shadow-[0_0_0_1px_hsl(25_55%_50%/0.3),0_8px_28px_-8px_hsl(25_55%_58%/0.45)]">
+            Install in 60s
           </a>
-          <a href={B + "migrate-from-pterodactyl/"} class="inline-flex items-center gap-2 rounded-lg border border-zinc-800 px-5 py-3 text-sm font-medium text-zinc-400 transition-all duration-200 hover:bg-surface-2 hover:text-zinc-200 min-h-11">
-            Migration Guide
+          <a href={B + "migrate-from-pterodactyl/"} class="inline-flex items-center gap-2 rounded-lg border border-zinc-700/80 px-5 py-3 text-sm font-medium text-zinc-300 transition-all duration-200 hover:bg-surface-2 hover:text-zinc-100 active:scale-[0.98] min-h-11">
+            Open migration guide
+          </a>
+          <a href={DISCORD_URL} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-lg border border-zinc-700/80 px-5 py-3 text-sm font-medium text-zinc-300 transition-all duration-200 hover:bg-surface-2 hover:text-zinc-100 active:scale-[0.98] min-h-11">
+            Join Discord
           </a>
         </div>
       </div>

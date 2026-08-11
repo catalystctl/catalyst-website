@@ -1,6 +1,6 @@
 ---
 title: "Pterodactyl vs Pelican vs Catalyst: Which Game Server Panel Should You Use?"
-description: "An honest, side-by-side comparison of the three most popular game server panels — Pterodactyl, Pelican, and Catalyst. Architecture, performance, features, and when to pick each one."
+description: "An honest, side-by-side comparison of the three most popular game server panels - Pterodactyl, Pelican, and Catalyst. Architecture, performance, features, and when to pick each one."
 pubDate: 2026-05-10
 author: "Catalyst Team"
 audience: ["hobbyists", "businesses", "hosting-providers"]
@@ -15,21 +15,21 @@ keywords:
 
 Choosing a game server panel used to be simple: you picked Pterodactyl and moved on. But with Pelican emerging as a fork and Catalyst building an entirely new architecture, you now have a real decision to make.
 
-This comparison cuts through the noise. We'll look at architecture, performance, features, operations, and ecosystem — so you can pick the panel that actually fits your needs, not just the one with the most GitHub stars.
+This comparison cuts through the noise. We'll look at architecture, performance, features, operations, and ecosystem - so you can pick the panel that actually fits your needs, not just the one with the most GitHub stars.
 
 ## The three contenders
 
-### Pterodactyl — The incumbent
+### Pterodactyl - The incumbent
 
 Pterodactyl has been the standard for game server management since the mid-2010s. It's built with PHP (Laravel) on the backend, React on the frontend, and uses Docker for container management via the Wings daemon.
 
-### Pelican — The fork
+### Pelican - The fork
 
 Pelican is a community fork of Pterodactyl. Same codebase, same architecture, but with a different governance model and development roadmap. It was created as an alternative to Pterodactyl's original maintainer model.
 
-### Catalyst — The new architecture
+### Catalyst - The new architecture
 
-Catalyst is built from scratch with Rust (Axum) on the backend, TypeScript (React + Vite) on the frontend, and containerd for container management instead of Docker. It's not a fork — it's a fundamentally different approach.
+Catalyst is built from scratch with Rust (Axum) on the backend, TypeScript (React + Vite) on the frontend, and containerd for container management instead of Docker. It's not a fork - it's a fundamentally different approach.
 
 ## Architecture comparison
 
@@ -50,7 +50,7 @@ Pelican and Pterodactyl share the same architecture because Pelican is a fork. C
 
 - **PHP vs Rust:** Rust compiles to a single binary with zero runtime dependencies. No PHP-FPM, no Composer, no Laravel upgrade cycles. Catalyst starts in under a second and uses roughly 50MB of RAM for the panel process. Pterodactyl's PHP process uses 200MB+ at rest.
 
-- **Docker vs containerd:** Docker is a convenience layer on top of containerd. Pterodactyl adds yet another layer by wrapping Docker through Wings. Catalyst talks directly to containerd — the same runtime that powers Kubernetes. Less overhead, faster container startup, lower per-server memory usage.
+- **Docker vs containerd:** Docker is a convenience layer on top of containerd. Pterodactyl adds yet another layer by wrapping Docker through Wings. Catalyst talks directly to containerd - the same runtime that powers Kubernetes. Less overhead, faster container startup, lower per-server memory usage.
 
 - **Wings vs Rust agent:** Wings is a Node.js daemon that has to run on every node. It's another process to monitor, update, and debug. Catalyst's node agent is a single Rust binary with no runtime dependencies.
 
@@ -87,7 +87,7 @@ Pelican and Pterodactyl have identical performance because they're the same code
 | Built-in migration tool | No | No | Yes (from Pterodactyl) |
 | Scheduled tasks | Basic | Basic | Native |
 
-The plugin system is the biggest differentiator. With Pterodactyl or Pelican, if you need custom API routes, new UI components, or integration with external services, you fork the project and maintain a separate codebase. With Catalyst, you write a TypeScript plugin that registers hooks, adds routes, and runs scheduled tasks — all without touching core code.
+The plugin system is the biggest differentiator. With Pterodactyl or Pelican, if you need custom API routes, new UI components, or integration with external services, you fork the project and maintain a separate codebase. With Catalyst, you write a TypeScript plugin that registers hooks, adds routes, and runs scheduled tasks - all without touching core code.
 
 The RBAC difference matters for hosting providers. Pterodactyl and Pelican give you admin or user. Catalyst lets you create precise roles: "support staff" can restart servers but not delete them; "billing admin" can view allocations but not access consoles; "node operator" can manage their assigned nodes but not others.
 
@@ -125,10 +125,10 @@ Pterodactyl has the largest community and the most third-party resources. Pelica
 
 ## Can you switch later?
 
-Yes. Catalyst has a built-in migration tool that imports Pterodactyl (and by extension, Pelican) nodes, allocations, users, eggs, servers, and file data. The migration runs from the admin panel — no manual scripting required.
+Yes. Catalyst has a built-in migration tool that imports Pterodactyl (and by extension, Pelican) nodes, allocations, users, eggs, servers, and file data. The migration runs from the admin panel - no manual scripting required.
 
 Check out the [migration guide](/migrate-from-pterodactyl/) for details.
 
 ## The bottom line
 
-Pterodactyl and Pelican are the same architecture with different teams. If you want "Pterodactyl but different governance," pick Pelican. If you want a panel that's actually different — faster, more extensible, more secure, more API-complete — Catalyst is the one. The [side-by-side comparison](/pterodactyl-alternative/#comparison) tells the full story.
+Pterodactyl and Pelican are the same architecture with different teams. If you want "Pterodactyl but different governance," pick Pelican. If you want a panel that's actually different - faster, more extensible, more secure, more API-complete - Catalyst is the one. The [side-by-side comparison](/pterodactyl-alternative/#comparison) tells the full story.

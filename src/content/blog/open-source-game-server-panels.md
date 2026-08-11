@@ -13,7 +13,7 @@ keywords:
   - free game server panel
 ---
 
-Self-hosting game servers doesn't mean you have to SSH into a box and run shell scripts. Open source game server panels give you a web interface, console access, file management, and automation — for free.
+Self-hosting game servers doesn't mean you have to SSH into a box and run shell scripts. Open source game server panels give you a web interface, console access, file management, and automation - for free.
 
 But which one should you use? This guide compares every significant open source game server panel available in 2026, so you can pick the right tool for your situation.
 
@@ -21,12 +21,12 @@ But which one should you use? This guide compares every significant open source 
 
 If you're running one Minecraft server for three friends, a panel might seem like overkill. But even for small setups, panels provide real value:
 
-- **Web console access** — See server logs in real-time, send commands, without SSH
-- **File manager** — Edit configs, upload mods, manage worlds from your browser
-- **Scheduled tasks** — Automatic restarts, backups, and updates
-- **User management** — Give friends limited access instead of full server control
-- **Multi-server management** — Run multiple games from one dashboard
-- **Monitoring** — Resource usage, server status, crash detection
+- **Web console access** - See server logs in real-time, send commands, without SSH
+- **File manager** - Edit configs, upload mods, manage worlds from your browser
+- **Scheduled tasks** - Automatic restarts, backups, and updates
+- **User management** - Give friends limited access instead of full server control
+- **Multi-server management** - Run multiple games from one dashboard
+- **Monitoring** - Resource usage, server status, crash detection
 
 Once you've used a panel, going back to manual server management feels like editing documents without a word processor.
 
@@ -46,7 +46,7 @@ Pterodactyl is the most widely used open source game server panel. It's been aro
 
 **Cons:**
 - PHP backend is slower and more resource-intensive than modern alternatives
-- No plugin system — customization requires forking
+- No plugin system - customization requires forking
 - Wings daemon adds operational complexity
 - Coarse permissions (admin vs user, nothing in between)
 - Installation is manual and takes 30+ minutes
@@ -76,7 +76,7 @@ Pelican is a fork of Pterodactyl with a different governance model. It's Pteroda
 
 **License:** GPLv3 | **Stack:** Rust + TypeScript + containerd | **Maturity:** Medium (growing fast)
 
-Catalyst is built from scratch with a modern stack — Rust backend, containerd runtime, and a native plugin system. It's designed as a true alternative, not a fork.
+Catalyst is built from scratch with a modern stack - Rust backend, containerd runtime, and a native plugin system. It's designed as a true alternative, not a fork.
 
 **Pros:**
 - Fastest panel (sub-10ms console, <1s startup, 50MB RAM)
@@ -101,13 +101,13 @@ Catalyst is built from scratch with a modern stack — Rust backend, containerd 
 PufferPanel is a lightweight panel written in Go. It's simpler than Pterodactyl and designed for ease of use.
 
 **Pros:**
-- Written in Go — faster and lighter than PHP
+- Written in Go - faster and lighter than PHP
 - Simple, clean interface
 - Low resource requirements
 - Easy to set up
 
 **Cons:**
-- Limited feature set — fewer API endpoints, no plugin system
+- Limited feature set - fewer API endpoints, no plugin system
 - Smaller community and fewer templates
 - Less comprehensive admin tools
 - Not designed for commercial hosting scale

@@ -4,6 +4,7 @@ export const prerender = true;
 import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 
+const B = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "") + "/";
 const entries = await getCollection('docs');
 
 interface DocGroup {
@@ -46,9 +47,15 @@ const GROUP_ORDER: Record<string, number> = {
 const sidebar = Array.from(groups.entries())
   .sort((a, b) => (GROUP_ORDER[a[0]] ?? 99) - (GROUP_ORDER[b[0]] ?? 99))
   .map(([, g]) => ({ ...g, items: g.items.sort((a, b) => a.order - b.order) }));
+
+const quickStarts = [
+  { title: "Quickstart", slug: "getting-started/quickstart", blurb: "From zero to a live panel." },
+  { title: "Installation", slug: "getting-started/installation", blurb: "One-line install and Docker Compose." },
+  { title: "Admin guide", slug: "admin-guide/admin-guide", blurb: "Nodes, users, and fleet ops." },
+].filter((q) => entries.some((e) => e.id === q.slug));
 ---
 
-<Layout title="Documentation" description="Catalyst documentation — installation, configuration, nodes, plugins.">
+<Layout title="Documentation" description="Catalyst documentation: installation, configuration, nodes, plugins, and API reference.">
 
   <script>
     const observer = new IntersectionObserver((entries) => {
@@ -62,54 +69,96 @@ const sidebar = Array.from(groups.entries())
     document.querySelectorAll('[data-reveal], [data-reveal-stagger]').forEach((el) => observer.observe(el));
   </script>
 
-  <div class="max-w-3xl mx-auto px-4 sm:px-10 py-16 sm:py-20">
+  <div class="relative overflow-hidden">
+    <div class="pointer-events-none absolute -top-20 right-0 h-72 w-72 rounded-full bg-primary/[0.06] blur-3xl" aria-hidden="true"></div>
 
-    <div data-reveal>
-      <h1 class="font-display font-bold text-foreground tracking-tight" style="font-size: clamp(2rem, 5vw, 3.5rem);">
-        Documentation
-      </h1>
-      <p class="mt-3 text-base sm:text-lg text-zinc-400 leading-relaxed">
-        Everything you need to set up and run Catalyst.
-      </p>
-    </div>
+    <div class="relative max-w-6xl mx-auto px-4 pt-12 sm:pt-16 pb-20">
+      <div class="max-w-2xl mb-10" data-reveal>
+        <h1 class="font-display font-bold text-foreground tracking-tight text-balance" style="font-size: clamp(2.1rem, 5vw, 3.5rem);">
+          Documentation
+        </h1>
+        <p class="mt-4 text-base sm:text-lg text-zinc-400 leading-relaxed text-pretty">
+          Install, configure nodes, wire the API, and ship plugins. Start with a quick path or browse by topic.
+        </p>
+      </div>
 
-    <div class="mt-12 space-y-14" data-reveal-stagger>
-      {sidebar.map(group => (
-        <section>
-          <h2 class="text-xs font-semibold uppercase tracking-[0.15em] text-zinc-500 mb-4">{group.label}</h2>
-          <div class="space-y-1">
-            {group.items.map(item => (
-              <a
-                href={`/docs/${item.slug}/`}
-                class="group flex items-center justify-between rounded-lg px-4 py-3 -mx-1 transition-all hover:bg-surface-1 border border-transparent hover:border-zinc-800/60"
-              >
-                <div>
-                  <span class="text-[15px] text-zinc-300 group-hover:text-foreground transition-colors font-medium">{item.title}</span>
-                  {item.description && (
-                    <span class="block text-sm text-zinc-600 mt-0.5">{item.description}</span>
-                  )}
-                </div>
-                <svg class="w-4 h-4 text-zinc-700 group-hover:text-primary shrink-0 opacity-0 group-hover:opacity-100 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                </svg>
-              </a>
-            ))}
+      {quickStarts.length > 0 && (
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-14" data-reveal-stagger>
+          {quickStarts.map((q, i) => (
+            <a
+              href={`/docs/${q.slug}/`}
+              class:list={[
+                "group rounded-xl border p-5 transition-all duration-200 hover:border-primary/35",
+                i === 0
+                  ? "border-primary/25 bg-gradient-to-br from-primary/[0.1] to-surface-1"
+                  : "border-zinc-800/60 bg-surface-1 hover:bg-surface-2",
+              ]}
+            >
+              <h2 class="font-semibold text-foreground text-[15px] group-hover:text-primary transition-colors">{q.title}</h2>
+              <p class="mt-1.5 text-sm text-zinc-500">{q.blurb}</p>
+              <span class="mt-4 inline-flex text-xs font-medium text-zinc-600 group-hover:text-primary transition-colors">Open guide</span>
+            </a>
+          ))}
+        </div>
+      )}
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-10 gap-y-12" data-reveal>
+        {sidebar.map((group) => (
+          <section>
+            <h2 class="font-display text-sm font-semibold text-zinc-200 mb-3 pb-2 border-b border-zinc-800/60">
+              {group.label}
+            </h2>
+            <ul class="space-y-0.5">
+              {group.items.map((item) => (
+                <li>
+                  <a
+                    href={`/docs/${item.slug}/`}
+                    class="group flex items-start justify-between gap-3 rounded-lg px-3 py-2.5 -mx-1 transition-all hover:bg-surface-1 border border-transparent hover:border-zinc-800/50"
+                  >
+                    <div class="min-w-0">
+                      <span class="text-[14px] text-zinc-300 group-hover:text-foreground transition-colors font-medium">{item.title}</span>
+                      {item.description && (
+                        <span class="block text-sm text-zinc-600 mt-0.5 line-clamp-1">{item.description}</span>
+                      )}
+                    </div>
+                    <svg class="w-4 h-4 text-zinc-700 group-hover:text-primary shrink-0 mt-0.5 opacity-0 group-hover:opacity-100 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                    </svg>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))}
+      </div>
+
+      <div class="mt-16 relative rounded-2xl border border-zinc-800/60 overflow-hidden p-6 sm:p-8" data-reveal>
+        <div class="absolute inset-0 bg-gradient-to-br from-[#1a1510]/60 via-surface-1 to-transparent pointer-events-none"></div>
+        <div class="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="font-display text-lg font-semibold text-foreground">Spot a gap?</h2>
+            <p class="mt-1 text-sm text-zinc-500">Docs live next to the product. PRs welcome. Stuck mid-install? Ask in Discord.</p>
           </div>
-        </section>
-      ))}
-    </div>
-
-    <div class="mt-20 pt-8 border-t border-zinc-800/60 text-center" data-reveal>
-      <p class="text-sm text-zinc-500 mb-4">Contributions welcome</p>
-      <a
-        href="https://github.com/catalystctl/catalyst-website"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary-600 transition-colors"
-      >
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-        Edit on GitHub
-      </a>
+          <div class="flex flex-wrap gap-2 self-start sm:self-auto">
+            <a
+              href="https://discord.gg/mybxhmru3y"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-2 rounded-lg border border-zinc-700/80 px-4 py-2.5 text-sm font-medium text-zinc-300 hover:bg-surface-2 hover:text-zinc-100 transition-colors active:scale-[0.98]"
+            >
+              Join Discord
+            </a>
+            <a
+              href="https://github.com/catalystctl/catalyst-website"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary-600 transition-colors active:scale-[0.98]"
+            >
+              Edit on GitHub
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </Layout>

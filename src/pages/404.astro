@@ -3,36 +3,64 @@ import Layout from "../layouts/Layout.astro";
 
 const B = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "") + "/";
 const GITHUB_URL = "https://github.com/catalystctl/catalyst";
+
+const links = [
+  { href: B, label: "Home", blurb: "Product overview and install" },
+  { href: B + "docs/", label: "Documentation", blurb: "Install, nodes, API, plugins" },
+  { href: B + "pterodactyl-alternative/", label: "Open comparison", blurb: "Catalyst vs Pterodactyl" },
+  { href: "https://discord.gg/mybxhmru3y", label: "Discord", blurb: "Ask the community", external: true },
+];
 ---
 
-<Layout title="Page Not Found" description="The page you're looking for doesn't exist.">
+<Layout title="Page Not Found" description="The page you are looking for does not exist.">
 
-  <section class="max-w-6xl mx-auto px-4 pt-20 pb-24 text-center">
-    <div class="mb-6">
-      <span class="font-display text-8xl font-bold text-zinc-800">404</span>
+  <section class="relative overflow-hidden min-h-[70vh] flex items-center">
+    <div class="pointer-events-none absolute inset-0" aria-hidden="true">
+      <div class="absolute top-1/4 left-1/2 -translate-x-1/2 h-80 w-80 rounded-full bg-primary/[0.08] blur-3xl"></div>
+      <div class="absolute bottom-0 right-1/4 h-48 w-48 rounded-full bg-primary/[0.04] blur-3xl"></div>
     </div>
-    <h1 class="font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight">
-      Page not found
-    </h1>
-    <p class="mt-3 text-base text-zinc-500 max-w-md mx-auto">
-      The page you're looking for doesn't exist or has been moved. Try one of these links instead.
-    </p>
-    <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
-      <a href={B} class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary-600 min-h-11">
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
-        Go Home
-      </a>
-      <a href={B + "docs/"} class="inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-transparent px-5 py-3 text-sm font-medium text-zinc-300 transition-all duration-200 hover:bg-surface-2 hover:text-zinc-100 min-h-11">
-        Documentation
-      </a>
-      <a href={B + "pterodactyl-alternative/"} class="inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-transparent px-5 py-3 text-sm font-medium text-zinc-300 transition-all duration-200 hover:bg-surface-2 hover:text-zinc-100 min-h-11">
-        Pterodactyl Alternative
-      </a>
-    </div>
-    <div class="mt-12">
-      <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" class="text-xs text-zinc-600 hover:text-zinc-400 transition-colors">
-        Think this is a bug? Open an issue on GitHub
-      </a>
+
+    <div class="relative max-w-6xl mx-auto px-4 py-16 sm:py-24 w-full">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
+        <div class="lg:col-span-5">
+          <p class="font-mono text-sm text-primary mb-3">404</p>
+          <h1 class="font-display text-3xl sm:text-4xl font-bold text-foreground tracking-tight text-balance">
+            This route is offline.
+          </h1>
+          <p class="mt-4 text-base text-zinc-400 leading-relaxed max-w-md text-pretty">
+            The page does not exist or moved. Pick a destination below, or jump straight to install.
+          </p>
+          <div class="mt-8 flex flex-wrap gap-3">
+            <a href={B + "#install"} class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary-600 active:scale-[0.98] min-h-11 shadow-[0_0_0_1px_hsl(25_55%_50%/0.3),0_8px_28px_-8px_hsl(25_55%_58%/0.45)]">
+              Install in 60s
+            </a>
+            <a href={B} class="inline-flex items-center gap-2 rounded-lg border border-zinc-700/80 px-5 py-3 text-sm font-medium text-zinc-300 transition-all duration-200 hover:bg-surface-2 hover:text-zinc-100 active:scale-[0.98] min-h-11">
+              Go home
+            </a>
+          </div>
+        </div>
+
+        <div class="lg:col-span-7">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-px rounded-xl border border-zinc-800/60 overflow-hidden bg-zinc-800/60">
+            {links.map((link) => (
+              <a
+                href={link.href}
+                class="group bg-surface-1 p-5 sm:p-6 transition-colors hover:bg-surface-2"
+                {...(link.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+              >
+                <h2 class="font-semibold text-foreground text-[15px] group-hover:text-primary transition-colors">{link.label}</h2>
+                <p class="mt-1.5 text-sm text-zinc-500">{link.blurb}</p>
+              </a>
+            ))}
+          </div>
+          <p class="mt-6 text-xs text-zinc-600">
+            Think this is a bug?
+            <a href={GITHUB_URL + "/issues"} target="_blank" rel="noopener noreferrer" class="text-zinc-500 hover:text-zinc-300 transition-colors underline underline-offset-2 decoration-zinc-700">
+              Open an issue on GitHub
+            </a>
+          </p>
+        </div>
+      </div>
     </div>
   </section>
 

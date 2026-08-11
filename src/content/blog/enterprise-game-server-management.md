@@ -15,7 +15,7 @@ keywords:
 
 Game server management at the enterprise level isn't the same as running a Minecraft server for friends. When you're deploying game infrastructure for schools, esports organizations, military training simulations, or large hosting providers, the requirements change dramatically.
 
-Security, compliance, audit trails, and role-based access control aren't nice-to-haves — they're requirements that can make or break a deployment. This article covers what enterprise game server management actually requires and how to evaluate platforms against those requirements.
+Security, compliance, audit trails, and role-based access control aren't nice-to-haves - they're requirements that can make or break a deployment. This article covers what enterprise game server management actually requires and how to evaluate platforms against those requirements.
 
 ## What makes enterprise different
 
@@ -23,7 +23,7 @@ Enterprise game server deployments share some characteristics that hobbyist and 
 
 - **Multi-tenant by default.** Different departments, teams, or clients share the same infrastructure with strict isolation requirements.
 - **Compliance obligations.** GDPR, SOC 2, FERPA (education), or internal security policies dictate how data is handled, who can access it, and what must be logged.
-- **Formal access control.** Not "admin vs user" — granular, auditable role definitions that map to organizational structure.
+- **Formal access control.** Not "admin vs user" - granular, auditable role definitions that map to organizational structure.
 - **Operational rigor.** SLAs, incident response procedures, change management, and disaster recovery plans.
 - **Scale.** Hundreds or thousands of servers across multiple regions, managed by teams of operators.
 
@@ -31,7 +31,7 @@ Enterprise game server deployments share some characteristics that hobbyist and 
 
 ### Container isolation
 
-Game servers run arbitrary code — game binaries, mods, plugins, user-uploaded scripts. At enterprise scale, you need to trust that one compromised server can't affect others.
+Game servers run arbitrary code - game binaries, mods, plugins, user-uploaded scripts. At enterprise scale, you need to trust that one compromised server can't affect others.
 
 **Docker isolation (Pterodactyl/Pelican):**
 
@@ -39,7 +39,7 @@ Docker provides namespace isolation, but the Docker daemon itself is a single po
 
 **containerd isolation (Catalyst):**
 
-containerd is the container runtime that powers Kubernetes. It's designed for multi-tenant isolation from the ground up. Catalyst talks directly to containerd — no Docker daemon in the middle. This means:
+containerd is the container runtime that powers Kubernetes. It's designed for multi-tenant isolation from the ground up. Catalyst talks directly to containerd - no Docker daemon in the middle. This means:
 
 - No shared daemon that's a single point of failure
 - Namespace isolation per server, matching Kubernetes best practices
@@ -185,7 +185,7 @@ Common enterprise integration patterns:
 
 Catalyst's architecture supports HA deployments:
 
-- **Stateless panel instances** behind a load balancer — no sticky sessions required
+- **Stateless panel instances** behind a load balancer - no sticky sessions required
 - **PostgreSQL with streaming replication** for database HA
 - **Multiple nodes per region** for geographic redundancy
 - **Automated failover** via API-driven health checks
@@ -204,11 +204,11 @@ Backup schedules are configurable per server, and restore operations are availab
 
 If you're evaluating game server platforms for an enterprise deployment, the requirements go beyond "can it run a Minecraft server." You need:
 
-1. **Granular RBAC** — Not admin/user. 20+ permissions that map to your organizational structure.
-2. **Audit logging** — Built-in, comprehensive, exportable. Not a third-party afterthought.
-3. **Containerd runtime** — Kubernetes-grade isolation, no Docker daemon risk.
-4. **API coverage** — 60+ endpoints for automation, not ~40 with gaps.
-5. **Plugin extensibility** — Integration without forking. SSO, monitoring, ticketing, custom workflows.
-6. **Rust backend** — Memory-safe, predictable performance, single binary, minimal attack surface.
+1. **Granular RBAC** - Not admin/user. 20+ permissions that map to your organizational structure.
+2. **Audit logging** - Built-in, comprehensive, exportable. Not a third-party afterthought.
+3. **Containerd runtime** - Kubernetes-grade isolation, no Docker daemon risk.
+4. **API coverage** - 60+ endpoints for automation, not ~40 with gaps.
+5. **Plugin extensibility** - Integration without forking. SSO, monitoring, ticketing, custom workflows.
+6. **Rust backend** - Memory-safe, predictable performance, single binary, minimal attack surface.
 
 Catalyst is the only open source game server panel that delivers all six. [Compare it directly against Pterodactyl](/pterodactyl-alternative/#comparison) or [get started with a test deployment](/docs/getting-started/quickstart/).

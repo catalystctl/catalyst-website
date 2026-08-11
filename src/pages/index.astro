@@ -3,7 +3,6 @@ export const prerender = true;
 
 import Layout from "../layouts/Layout.astro";
 import { Image } from 'astro:assets';
-import previewData from "../data/preview-shots.json";
 import heroImg from "../assets/screenshots/user/dashboard.png";
 import shot1 from "../assets/screenshots/user/dashboard.png";
 import shot2 from "../assets/screenshots/user/profile.png";
@@ -12,12 +11,14 @@ import shot4 from "../assets/screenshots/user/servers.png";
 
 const B = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "") + "/";
 const GITHUB_URL = "https://github.com/catalystctl/catalyst";
+const DISCORD_URL = "https://discord.gg/mybxhmru3y";
+const INSTALL_CMD = "curl -fsSL https://raw.githubusercontent.com/catalystctl/catalyst/main/install.sh | bash";
 
 const previewShots = [
-  { img: shot1, alt: "Catalyst dashboard" },
-  { img: shot2, alt: "Catalyst profile" },
-  { img: shot3, alt: "Catalyst server test" },
-  { img: shot4, alt: "Catalyst servers" },
+  { img: shot1, alt: "Catalyst dashboard with server fleet overview" },
+  { img: shot2, alt: "Catalyst user profile and account settings" },
+  { img: shot3, alt: "Catalyst live server console and test output" },
+  { img: shot4, alt: "Catalyst servers list with status and resources" },
 ];
 
 const features = [
@@ -63,15 +64,42 @@ const comparison = [
   { feature: "Install", catalyst: "Single script", pterodactyl: "Manual + Wings" },
 ];
 
-const healthChecks = [
-  { name: "Database", status: "healthy", latency: null },
-  { name: "Cluster Nodes", status: "degraded", latency: "1/2" },
-  { name: "API Gateway", status: "healthy", latency: "32ms" },
-  { name: "WebSocket", status: "healthy", latency: "Active" },
+const metrics = [
+  { value: "60+", label: "REST endpoints" },
+  { value: "<10ms", label: "Console latency" },
+  { value: "60s", label: "Typical install" },
+  { value: "GPLv3", label: "Open source" },
+];
+
+const faqs = [
+  {
+    q: "Is Catalyst a Pterodactyl replacement?",
+    a: "Yes. Catalyst covers the same core use cases (game server management, node orchestration, user panels, admin dashboards) with a faster Rust backend, containerd runtime, and a plugin system Pterodactyl lacks.",
+  },
+  {
+    q: "How is Catalyst different from Pterodactyl?",
+    a: "Catalyst uses Rust instead of PHP, containerd instead of Docker, and ships 60+ REST endpoints. You also get a native plugin system, sub-10ms WebSocket console latency, and RBAC with 20+ granular permissions.",
+  },
+  {
+    q: "Can I migrate from Pterodactyl to Catalyst?",
+    a: "Yes. Catalyst supports importing servers, eggs, and user data from Pterodactyl. The migration guide walks through each step. The containerd runtime works with most Pterodactyl Docker images.",
+  },
+  {
+    q: "Is Catalyst free and open source?",
+    a: "Yes. Catalyst is GPLv3. Backend, frontend, node agent, and docs are on GitHub. No paid tiers or feature gates.",
+  },
+  {
+    q: "What games does Catalyst support?",
+    a: "Any game that runs in a Linux container: Minecraft (Java and Bedrock), Counter-Strike 2, Rust, ARK, Terraria, Team Fortress 2, and hundreds more through custom egg definitions.",
+  },
+  {
+    q: "What are the system requirements?",
+    a: "Any Linux server with Docker and Docker Compose. The panel needs about one CPU core and 512MB RAM for small fleets. Nodes need containerd and the Catalyst agent.",
+  },
 ];
 ---
 
-<Layout title="Home" description="Catalyst is the modern Pterodactyl replacement — a fast, secure game server management platform built with Rust, TypeScript, and containerd. Deploy game servers in 60 seconds.">
+<Layout title="Home" description="Catalyst is the modern Pterodactyl replacement. A fast, secure game server management platform built with Rust, TypeScript, and containerd. Deploy game servers in 60 seconds.">
 
   <script>
     const observer = new IntersectionObserver((entries) => {
@@ -96,252 +124,239 @@ const healthChecks = [
     });
   </script>
 
-  <!-- ═══════════════════════════════════════════════
-       HERO
-       ═══════════════════════════════════════════════ -->
-  <section class="relative" aria-label="Catalyst overview">
-    <div class="max-w-6xl mx-auto px-4 pt-12 pb-6 sm:pt-16 sm:pb-10">
-      <!-- Welcome card — matches product dashboard hero -->
-      <div class="relative rounded-2xl border border-zinc-800/60 overflow-hidden" data-reveal>
-        <!-- Warm gradient bg like the product dashboard -->
-        <div class="absolute inset-0 bg-gradient-to-br from-[#1a1510] via-[#0f0f11] to-[#0a0a0c]"></div>
-        <div class="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
+  <!-- HERO: asymmetric split, conversion-first -->
+  <section class="relative overflow-hidden" aria-label="Catalyst overview">
+    <div class="pointer-events-none absolute inset-0" aria-hidden="true">
+      <div class="absolute -top-32 -left-24 h-[28rem] w-[28rem] rounded-full bg-primary/[0.09] blur-3xl"></div>
+      <div class="absolute top-1/3 right-0 h-72 w-72 rounded-full bg-primary/[0.04] blur-3xl"></div>
+      <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,hsl(25_55%_58%/0.08),transparent_55%)]"></div>
+    </div>
 
-        <div class="relative p-5 sm:p-8 lg:p-10">
-          <div class="flex flex-wrap items-start justify-between gap-4 mb-6">
-            <div class="flex items-center gap-2">
-              <svg class="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
-              </svg>
-              <span class="text-xs font-semibold tracking-wider uppercase text-primary">Game Server Management</span>
-            </div>
-            <div class="flex items-center gap-2 rounded-full border border-success/20 bg-success/[0.08] px-3 py-1 text-xs font-medium text-success">
-              <span class="status-dot status-dot-success"></span>
-              Early Testing
-            </div>
+    <div class="relative max-w-6xl mx-auto px-4 pt-10 pb-8 sm:pt-14 sm:pb-12 lg:pt-16">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+        <div class="lg:col-span-5" data-reveal>
+          <div class="inline-flex items-center gap-2 rounded-full border border-success/20 bg-success/[0.08] px-3 py-1 text-xs font-medium text-success mb-5">
+            <span class="status-dot status-dot-success"></span>
+            Open source · early testing
           </div>
 
-          <h1 class="font-display font-bold text-foreground tracking-tight leading-[1.05]" style="font-size: clamp(2rem, 6.5vw, 4.5rem);">
-            The modern <span class="text-primary">Pterodactyl alternative</span> built with Rust.
+          <h1 class="font-display font-bold text-foreground tracking-tight text-balance leading-[1.08]" style="font-size: clamp(2.15rem, 5.2vw, 3.65rem);">
+            Game servers that feel instant.
+            <span class="text-primary"> Built in Rust.</span>
           </h1>
 
-          <p class="mt-5 max-w-lg text-base text-zinc-400 leading-relaxed">
-            Catalyst replaces Pterodactyl with a fraction of the overhead, better security, sub-10ms WebSocket console streaming, and an API you'll actually want to use. Deploy game servers in 60 seconds with Docker Compose.
+          <p class="mt-4 max-w-[36ch] text-base sm:text-lg text-zinc-400 leading-relaxed text-pretty">
+            Drop-in Pterodactyl alternative with sub-10ms console streaming and a one-line install.
           </p>
 
           <div class="mt-7 flex flex-wrap items-center gap-3">
-            <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary-600 min-h-11">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-              View on GitHub
+            <a href="#install" class="cta-primary inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary-600 active:scale-[0.98] min-h-11 shadow-[0_0_0_1px_hsl(25_55%_50%/0.3),0_8px_28px_-8px_hsl(25_55%_58%/0.45)]">
+              Install in 60s
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3" /></svg>
             </a>
-            <a href={B + "screenshots/"} class="inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-transparent px-5 py-3 text-sm font-medium text-zinc-300 transition-all duration-200 hover:bg-surface-2 hover:text-zinc-100 min-h-11">
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.91m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
-              Screenshots
+            <a href={B + "screenshots/"} class="inline-flex items-center gap-2 rounded-lg border border-zinc-700/80 bg-surface-1/60 px-5 py-3 text-sm font-medium text-zinc-200 transition-all duration-200 hover:bg-surface-2 hover:border-zinc-600 active:scale-[0.98] min-h-11">
+              See the panel
             </a>
-            <a href="https://github.com/catalystctl/catalyst#quick-start" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 rounded-lg px-4 py-3 text-sm font-medium text-zinc-500 transition-all duration-200 hover:text-zinc-300 min-h-11">
-              Read Docs
+          </div>
+        </div>
+
+        <div class="lg:col-span-7 relative" data-reveal>
+          <div class="relative rounded-xl border border-zinc-800/80 bg-[#0c0c0e] overflow-hidden shadow-2xl shadow-black/50 ring-1 ring-primary/10">
+            <div class="flex items-center gap-2 px-4 py-2.5 border-b border-zinc-800/60 bg-[#111113]">
+              <div class="w-2.5 h-2.5 rounded-full bg-[#ec6b5e]"></div>
+              <div class="w-2.5 h-2.5 rounded-full bg-[#f3bf4f]"></div>
+              <div class="w-2.5 h-2.5 rounded-full bg-[#61c253]"></div>
+              <div class="ml-3 flex-1 max-w-xs">
+                <div class="h-5 rounded bg-zinc-800/80 flex items-center px-2.5">
+                  <span class="text-[10px] text-zinc-600 font-mono">localhost/dashboard</span>
+                </div>
+              </div>
+            </div>
+            <Image
+              src={heroImg}
+              alt="Catalyst game server management dashboard showing server list and real-time console"
+              class="w-full object-cover object-top max-h-[220px] sm:max-h-[340px] lg:max-h-[420px]"
+              loading="eager"
+              fetchpriority="high"
+            />
+          </div>
+          <div class="absolute -bottom-6 left-8 right-8 h-16 bg-primary/[0.12] blur-3xl rounded-full pointer-events-none" aria-hidden="true"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- METRICS strip (layout family: tight horizontal stats) -->
+  <section class="max-w-6xl mx-auto px-4 pt-6 pb-4" aria-label="Key metrics" data-reveal>
+    <div class="rounded-xl border border-zinc-800/60 bg-surface-1/80 backdrop-blur-sm px-4 sm:px-6 py-5 grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-4">
+      {metrics.map((m) => (
+        <div class="text-center sm:text-left sm:border-r sm:border-zinc-800/60 sm:last:border-0 sm:pr-4">
+          <div class="font-display text-2xl sm:text-3xl font-bold text-foreground tracking-tight tabular-nums">{m.value}</div>
+          <div class="mt-1 text-xs text-zinc-500">{m.label}</div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- INSTALL: conversion block (layout family: terminal-first) -->
+  <section id="install" class="max-w-6xl mx-auto px-4 py-20 scroll-mt-20" aria-label="Quick start">
+    <div class="relative rounded-2xl border border-zinc-800/70 overflow-hidden" data-reveal>
+      <div class="absolute inset-0 bg-gradient-to-br from-[#1a1510]/70 via-surface-1 to-surface-0 pointer-events-none"></div>
+      <div class="absolute -top-20 -right-16 h-64 w-64 rounded-full bg-primary/[0.07] blur-3xl pointer-events-none"></div>
+
+      <div class="relative grid grid-cols-1 lg:grid-cols-5 gap-0">
+        <div class="lg:col-span-2 p-6 sm:p-8 lg:p-10 flex flex-col justify-center border-b lg:border-b-0 lg:border-r border-zinc-800/60">
+          <h2 class="font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight text-balance">
+            One command. Sixty seconds.
+          </h2>
+          <p class="mt-3 text-sm sm:text-base text-zinc-400 leading-relaxed max-w-sm">
+            No Wings daemon. No dependency maze. Clone, set PUBLIC_URL, bring the stack up.
+          </p>
+          <ul class="mt-6 space-y-2.5">
+            {["Docker Compose included", "Auto-generated secrets", "TLS-ready defaults", "Works on bare Linux"].map((t) => (
+              <li class="flex items-center gap-2.5 text-sm text-zinc-300">
+                <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-primary/15 text-primary">
+                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                </span>
+                {t}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div class="lg:col-span-3 p-4 sm:p-6 lg:p-8 flex flex-col justify-center">
+          <div class="terminal overflow-x-auto shadow-elevated-dark">
+            <div class="terminal-header">
+              <div class="terminal-dot" style="background:#ec6b5e;"></div>
+              <div class="terminal-dot" style="background:#f3bf4f;"></div>
+              <div class="terminal-dot" style="background:#61c253;"></div>
+              <span class="text-[11px] text-zinc-600 font-mono ml-2">install.sh</span>
+              <button class="copy-btn" data-copy={INSTALL_CMD} aria-label="Copy install command">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5"/></svg>
+                Copy
+              </button>
+            </div>
+            <div class="terminal-body whitespace-pre-wrap sm:whitespace-normal text-[13px] sm:text-sm">
+              <div><span class="prompt">$</span> <span class="cmd">curl -fsSL https://raw.githubusercontent.com/</span></div>
+              <div class="pl-[1.1rem]"><span class="cmd">catalystctl/catalyst/main/install.sh | bash</span></div>
+              <div class="mt-1.5"><span class="prompt">$</span> <span class="cmd">cd catalyst-docker && nano .env</span></div>
+              <div class="comment"># Set PUBLIC_URL at minimum</div>
+              <div class="mt-1.5"><span class="prompt">$</span> <span class="cmd">docker compose up -d</span></div>
+              <div class="mt-2.5"><span class="success">✓</span> <span class="cmd">Panel live at</span> <span class="url">http://localhost</span></div>
+            </div>
+          </div>
+          <div class="mt-4 flex flex-wrap items-center gap-3">
+            <a href={B + "docs/"} class="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary-400 transition-colors py-1">
+              Read the docs
               <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
             </a>
+            <span class="text-zinc-700">·</span>
+            <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-500 hover:text-zinc-300 transition-colors py-1">
+              Source on GitHub
+            </a>
+            <span class="text-zinc-700">·</span>
+            <a href={DISCORD_URL} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-500 hover:text-zinc-300 transition-colors py-1">
+              Discord
+            </a>
           </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Product screenshot with window chrome -->
-    <div class="relative max-w-6xl mx-auto px-4" data-reveal>
-      <div class="rounded-xl border border-zinc-800/80 bg-[#0c0c0e] overflow-hidden shadow-2xl shadow-black/60">
-        <div class="flex items-center gap-2 px-4 py-2.5 border-b border-zinc-800/60 bg-[#111113]">
-          <div class="w-2.5 h-2.5 rounded-full bg-[#ec6b5e]"></div>
-          <div class="w-2.5 h-2.5 rounded-full bg-[#f3bf4f]"></div>
-          <div class="w-2.5 h-2.5 rounded-full bg-[#61c253]"></div>
-          <div class="ml-4 flex-1 max-w-sm">
-            <div class="h-5 rounded bg-zinc-800/80 flex items-center px-2.5">
-              <svg class="w-3 h-3 text-zinc-600 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" /></svg>
-              <span class="text-[10px] text-zinc-600 font-mono">localhost/dashboard</span>
-            </div>
-          </div>
-        </div>
-        <Image src={heroImg} alt="Catalyst game server management dashboard showing server list and real-time console" class="w-full object-cover object-top max-h-[240px] sm:max-h-[400px] lg:max-h-[520px]" loading="eager" />
-      </div>
-      <!-- Ambient glow -->
-      <div class="absolute -bottom-10 left-1/4 right-1/4 h-24 bg-primary/[0.03] blur-3xl rounded-full pointer-events-none"></div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════════
-       STATS + SYSTEM HEALTH
-       ═══════════════════════════════════════════════ -->
-  <section class="max-w-6xl mx-auto px-4 pt-16 pb-4" data-reveal>
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-      <!-- Stat cards — matches product stat row -->
-      <div class="lg:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div class="rounded-xl border border-zinc-800/60 bg-surface-1 p-4">
-          <div class="flex items-center gap-2 text-zinc-500 mb-2">
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" /></svg>
-            <span class="text-[10px] font-semibold uppercase tracking-wider">Endpoints</span>
-          </div>
-          <div class="font-display text-2xl font-bold text-foreground">60+</div>
-          <div class="text-xs text-zinc-600 mt-0.5">REST API</div>
-        </div>
-        <div class="rounded-xl border border-zinc-800/60 bg-surface-1 p-4">
-          <div class="flex items-center gap-2 text-zinc-500 mb-2">
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" /></svg>
-            <span class="text-[10px] font-semibold uppercase tracking-wider">Pages</span>
-          </div>
-          <div class="font-display text-2xl font-bold text-foreground">25+</div>
-          <div class="text-xs text-zinc-600 mt-0.5">Admin panel</div>
-        </div>
-        <div class="rounded-xl border border-zinc-800/60 bg-surface-1 p-4">
-          <div class="flex items-center gap-2 text-zinc-500 mb-2">
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" /></svg>
-            <span class="text-[10px] font-semibold uppercase tracking-wider">Tests</span>
-          </div>
-          <div class="font-display text-2xl font-bold text-foreground">23</div>
-          <div class="text-xs text-zinc-600 mt-0.5">E2E suites</div>
-        </div>
-        <div class="rounded-xl border border-zinc-800/60 bg-surface-1 p-4">
-          <div class="flex items-center gap-2 text-zinc-500 mb-2">
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" /></svg>
-            <span class="text-[10px] font-semibold uppercase tracking-wider">Latency</span>
-          </div>
-          <div class="font-display text-2xl font-bold text-foreground">&lt;10ms</div>
-          <div class="text-xs text-zinc-600 mt-0.5">WebSocket</div>
-        </div>
-      </div>
-
-      <!-- System Health — matches product System Health card -->
-      <div class="rounded-xl border border-zinc-800/60 bg-surface-1 p-5">
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center gap-2">
-            <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" /></svg>
-            <span class="text-sm font-semibold text-foreground">System Health</span>
-          </div>
-          <span class="text-[10px] font-medium text-zinc-600">Live</span>
-        </div>
-        <div class="space-y-3">
-          {healthChecks.map((check) => (
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2.5">
-                <span class={`status-dot ${check.status === 'healthy' ? 'status-dot-success' : check.status === 'degraded' ? 'status-dot-warning' : 'status-dot-danger'}`}></span>
-                <span class="text-sm text-zinc-400">{check.name}</span>
-              </div>
-              <span class="text-xs font-mono text-zinc-500">{check.latency || 'OK'}</span>
-            </div>
-          ))}
-        </div>
-        <div class="mt-4 pt-3 border-t border-zinc-800/60 flex items-center justify-between">
-          <span class="text-[11px] text-zinc-600">Last updated</span>
-          <span class="text-[11px] text-zinc-600 font-mono">Just now</span>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ═══════════════════════════════════════════════
-       COMPARISON
-       ═══════════════════════════════════════════════ -->
-  <section class="max-w-6xl mx-auto px-4 py-20" aria-label="Comparison with Pterodactyl">
-    <div class="mb-10" data-reveal>
-      <h2 class="font-display text-sm font-semibold tracking-[0.12em] uppercase text-zinc-500">Comparison</h2>
-      <p class="mt-2 text-2xl sm:text-3xl font-display font-semibold text-foreground tracking-tight">How we stack up.</p>
+  <!-- COMPARISON (layout family: highlighted data table) -->
+  <section class="max-w-6xl mx-auto px-4 py-16 sm:py-20" aria-label="Comparison with Pterodactyl">
+    <div class="mb-8 max-w-xl" data-reveal>
+      <h2 class="font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight text-balance">
+        Why hosts switch from Pterodactyl.
+      </h2>
+      <p class="mt-3 text-sm sm:text-base text-zinc-400 leading-relaxed">
+        Same job, modern stack. Rust where it hurts, containerd where Docker layers drag you down.
+      </p>
     </div>
 
-    <!-- Mobile: stacked cards. Desktop: table -->
     <div class="sm:hidden space-y-3" data-reveal>
       {comparison.map((row) => (
         <div class="rounded-xl border border-zinc-800/60 bg-surface-1 p-4">
-          <div class="text-[11px] font-semibold uppercase tracking-wider text-zinc-600 mb-2">{row.feature}</div>
-          <div class="flex items-center justify-between gap-4">
-            <div>
-              <div class="text-[10px] text-primary font-semibold uppercase tracking-wider">Catalyst</div>
+          <div class="text-sm font-medium text-zinc-300 mb-3">{row.feature}</div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="rounded-lg bg-primary/[0.08] border border-primary/20 p-3">
+              <div class="text-[10px] text-primary font-semibold mb-1">Catalyst</div>
               <div class="text-sm font-medium text-foreground">{row.catalyst}</div>
             </div>
-            <div class="text-right">
-              <div class="text-[10px] text-zinc-600 font-semibold uppercase tracking-wider">Pterodactyl</div>
+            <div class="rounded-lg bg-zinc-900/40 p-3">
+              <div class="text-[10px] text-zinc-600 font-semibold mb-1">Pterodactyl</div>
               <div class="text-sm text-zinc-500">{row.pterodactyl}</div>
             </div>
           </div>
         </div>
       ))}
     </div>
+
     <div class="hidden sm:block rounded-xl border border-zinc-800/60 overflow-hidden" data-reveal>
       <table class="w-full text-left border-collapse">
         <thead>
-          <tr class="border-b border-zinc-800/60 bg-surface-1">
-            <th class="py-3 px-5 text-[11px] font-semibold uppercase tracking-wider text-zinc-500 w-[35%]">Feature</th>
-            <th class="py-3 px-5 text-[11px] font-semibold uppercase tracking-wider text-primary w-[32%]">Catalyst</th>
-            <th class="py-3 px-5 text-[11px] font-semibold uppercase tracking-wider text-zinc-500 w-[33%]">Pterodactyl</th>
+          <tr class="bg-surface-1">
+            <th class="py-3.5 px-5 text-sm font-medium text-zinc-500 w-[34%]">Feature</th>
+            <th class="py-3.5 px-5 text-sm font-semibold text-primary w-[33%] bg-primary/[0.06]">Catalyst</th>
+            <th class="py-3.5 px-5 text-sm font-medium text-zinc-500 w-[33%]">Pterodactyl</th>
           </tr>
         </thead>
         <tbody>
-          {comparison.map((row, i) => (
-            <tr class="border-b border-zinc-800/40 last:border-0 hover:bg-surface-1/50 transition-colors">
+          {comparison.map((row) => (
+            <tr class="border-t border-zinc-800/40 hover:bg-surface-1/40 transition-colors">
               <td class="py-3.5 px-5 text-sm text-zinc-400">{row.feature}</td>
-              <td class="py-3.5 px-5 text-sm font-medium text-foreground">{row.catalyst}</td>
+              <td class="py-3.5 px-5 text-sm font-medium text-foreground bg-primary/[0.04]">{row.catalyst}</td>
               <td class="py-3.5 px-5 text-sm text-zinc-600">{row.pterodactyl}</td>
             </tr>
           ))}
         </tbody>
       </table>
     </div>
-  </section>
 
-  <!-- ═══════════════════════════════════════════════
-       QUICK START
-       ═══════════════════════════════════════════════ -->
-  <section class="max-w-6xl mx-auto px-4 py-20" aria-label="Quick start">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
-      <div data-reveal>
-        <h2 class="font-display text-sm font-semibold tracking-[0.12em] uppercase text-zinc-500">Quick Start</h2>
-        <p class="mt-2 text-2xl sm:text-3xl font-display font-semibold text-foreground tracking-tight">One command. Sixty seconds.</p>
-        <p class="mt-4 text-base text-zinc-400 leading-relaxed max-w-md">
-          No manual dependency hell. No Wings daemon to wrestle with. Clone, configure, deploy. Catalyst handles the rest.
-        </p>
-        <div class="mt-6 flex flex-wrap gap-2">
-          {["Docker Compose", "install.sh", "Auto-generated secrets", "TLS ready"].map((t) => (
-            <span class="inline-flex items-center rounded-md border border-zinc-800 bg-surface-1 text-[11px] font-medium text-zinc-500 px-2 py-1">{t}</span>
-          ))}
-        </div>
-      </div>
-
-      <div data-reveal>
-        <div class="terminal overflow-x-auto">
-          <div class="terminal-header">
-            <div class="terminal-dot" style="background:#ec6b5e;"></div>
-            <div class="terminal-dot" style="background:#f3bf4f;"></div>
-            <div class="terminal-dot" style="background:#61c253;"></div>
-            <span class="text-[11px] text-zinc-600 font-mono ml-2">bash</span>
-            <button class="copy-btn" data-copy="curl -fsSL https://raw.githubusercontent.com/catalystctl/catalyst/main/install.sh | bash" aria-label="Copy install command">
-              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5"/></svg>
-              Copy
-            </button>
-          </div>
-          <div class="terminal-body whitespace-pre-wrap sm:whitespace-normal">
-            <div><span class="prompt">$</span> <span class="cmd">curl -fsSL https://raw.githubusercontent.com/</span></div>
-            <div class="pl-[1.1rem]"><span class="cmd">catalystctl/catalyst/main/install.sh | bash</span></div>
-            <div class="mt-1"><span class="prompt">$</span> <span class="cmd">cd catalyst-docker && nano .env</span></div>
-            <div class="comment"># Set PUBLIC_URL at minimum</div>
-            <div class="mt-1"><span class="prompt">$</span> <span class="cmd">docker compose up -d</span></div>
-            <div class="mt-2"><span class="success">✓</span> <span class="cmd">Panel live at</span> <span class="url">http://localhost</span></div>
-          </div>
-        </div>
-      </div>
+    <div class="mt-6 flex flex-wrap gap-4" data-reveal>
+      <a href={B + "pterodactyl-alternative/"} class="text-sm font-medium text-primary hover:text-primary-400 transition-colors">
+        Open comparison
+      </a>
+      <a href={B + "migrate-from-pterodactyl/"} class="text-sm font-medium text-zinc-500 hover:text-zinc-300 transition-colors">
+        Open migration guide
+      </a>
     </div>
   </section>
 
-  <!-- ═══════════════════════════════════════════════
-       FEATURES
-       ═══════════════════════════════════════════════ -->
-  <section class="max-w-6xl mx-auto px-4 py-20" aria-label="Features">
-    <div class="mb-12" data-reveal>
-      <h2 class="font-display text-sm font-semibold tracking-[0.12em] uppercase text-zinc-500">Features</h2>
-      <p class="mt-2 text-2xl sm:text-3xl font-display font-semibold text-foreground tracking-tight">Everything you need to run a fleet.</p>
+  <!-- FEATURES bento (layout family: asymmetric feature mosaic) -->
+  <section class="max-w-6xl mx-auto px-4 py-16 sm:py-20" aria-label="Features">
+    <div class="mb-10 max-w-lg" data-reveal>
+      <h2 class="font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight text-balance">
+        Everything you need to run a fleet.
+      </h2>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3" data-reveal-stagger>
-      {features.map((f) => (
-        <div class="group rounded-xl border border-zinc-800/60 bg-surface-1 p-6 transition-all duration-200 hover:border-zinc-700 hover:bg-surface-2">
-          <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-800 text-zinc-400 transition-colors group-hover:text-zinc-200">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3" data-reveal-stagger>
+      <div class="md:col-span-2 md:row-span-2 group relative rounded-xl border border-primary/25 overflow-hidden p-6 sm:p-8 flex flex-col justify-between min-h-[280px] transition-all duration-300 hover:border-primary/40">
+        <div class="absolute inset-0 bg-gradient-to-br from-primary/[0.14] via-surface-1 to-surface-0 pointer-events-none"></div>
+        <div class="absolute bottom-0 right-0 w-48 h-48 bg-primary/[0.08] rounded-full blur-3xl pointer-events-none"></div>
+        <div class="relative">
+          <div class="flex h-11 w-11 items-center justify-center rounded-lg bg-primary/20 text-primary">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 011.06 0z" /></svg>
+          </div>
+          <h3 class="mt-5 font-display text-2xl font-semibold text-foreground text-balance">Real-time console, zero latency theatre.</h3>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed max-w-md">
+            Live logs over a native Rust WebSocket layer. Sub-10ms round-trip, bidirectional I/O, no Node hop in the middle.
+          </p>
+        </div>
+        <div class="relative mt-8 font-mono text-[11px] text-zinc-600 space-y-1 hidden sm:block">
+          <div><span class="text-primary">ws</span> · console stream active</div>
+          <div class="text-zinc-700">rtt 6.2ms · frames 120/s</div>
+        </div>
+      </div>
+
+      {features.filter((f) => f.title !== "Real-Time Console").map((f, i) => (
+        <div class:list={[
+          "group rounded-xl border border-zinc-800/60 p-5 transition-all duration-200 hover:border-zinc-700 hover:bg-surface-2",
+          i === 0 ? "bg-surface-2/80" : i === 2 ? "bg-gradient-to-b from-surface-1 to-[#12100e]" : "bg-surface-1",
+        ]}>
+          <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-800/80 text-zinc-400 transition-colors group-hover:text-primary group-hover:bg-primary/15">
             <Fragment set:html={f.icon} />
           </div>
           <h3 class="mt-4 font-semibold text-foreground text-[15px]">{f.title}</h3>
@@ -351,187 +366,124 @@ const healthChecks = [
     </div>
   </section>
 
-  <!-- ═══════════════════════════════════════════════
-       SCREENSHOTS
-       ═══════════════════════════════════════════════ -->
-  <section class="max-w-6xl mx-auto px-4 py-20" aria-label="Screenshots preview">
-    <div class="flex flex-wrap items-end justify-between gap-4 mb-10" data-reveal>
-      <div>
-        <h2 class="font-display text-sm font-semibold tracking-[0.12em] uppercase text-zinc-500">Screenshots</h2>
-        <p class="mt-2 text-2xl sm:text-3xl font-display font-semibold text-foreground tracking-tight">See it in action.</p>
-      </div>
-      <a href={B + "screenshots/"} class="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary-400 transition-colors py-2 px-2 -mr-2 rounded">
-        View all
+  <!-- SCREENSHOTS (layout family: horizontal scroll-snap) -->
+  <section class="py-16 sm:py-20 overflow-hidden" aria-label="Screenshots preview">
+    <div class="max-w-6xl mx-auto px-4 mb-8 flex flex-wrap items-end justify-between gap-4" data-reveal>
+      <h2 class="font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight">
+        See it in action.
+      </h2>
+      <a href={B + "screenshots/"} class="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary-400 transition-colors py-2">
+        All screenshots
         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
       </a>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" data-reveal-stagger>
-      {previewShots.map((shot) => (
-        <a href={B + "screenshots"} class="group block rounded-xl border border-zinc-800/60 overflow-hidden bg-[#0c0c0e] transition-all duration-300 hover:border-zinc-700">
-          <div class="aspect-video overflow-hidden">
+    <div class="max-w-6xl mx-auto px-4" data-reveal>
+      <div class="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 -mx-4 px-4 no-scrollbar">
+        {previewShots.map((shot) => (
+          <a
+            href={B + "screenshots/"}
+            class="group snap-start shrink-0 w-[85%] sm:w-[55%] lg:w-[42%] block rounded-xl border border-zinc-800/60 overflow-hidden bg-[#0c0c0e] transition-all duration-300 hover:border-primary/30 hover:shadow-[0_0_40px_-12px_hsl(25_55%_58%/0.25)]"
+          >
             <div class="flex items-center gap-1.5 px-3 py-2 bg-[#111113] border-b border-zinc-800/60">
               <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
               <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
               <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
             </div>
-            <Image src={shot.img} alt={shot.alt} class="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]" loading="lazy" />
-          </div>
-        </a>
-      ))}
+            <div class="aspect-video overflow-hidden">
+              <Image
+                src={shot.img}
+                alt={shot.alt}
+                class="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
+                loading="lazy"
+              />
+            </div>
+          </a>
+        ))}
+      </div>
     </div>
   </section>
 
-  <!-- ═══════════════════════════════════════════════
-       RELATED PAGES
-       ═══════════════════════════════════════════════ -->
+  <!-- PATHS (layout family: three destination tiles, different from feature cards) -->
   <section class="max-w-6xl mx-auto px-4 py-12" aria-label="Related pages">
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" data-reveal>
-      <a href={B + "pterodactyl-alternative/#comparison"} class="group rounded-xl border border-zinc-800/60 bg-surface-1 p-5 transition-all duration-200 hover:border-zinc-700 hover:bg-surface-2">
-        <div class="flex items-center gap-2 text-primary mb-2">
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>
-          <span class="text-xs font-semibold uppercase tracking-wider">Compare</span>
-        </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-px rounded-xl border border-zinc-800/60 overflow-hidden bg-zinc-800/60" data-reveal-stagger>
+      <a href={B + "pterodactyl-alternative/#comparison"} class="group bg-surface-1 p-6 sm:p-7 transition-colors hover:bg-surface-2">
         <h3 class="font-semibold text-foreground text-[15px] group-hover:text-primary transition-colors">Catalyst vs Pterodactyl</h3>
-        <p class="mt-1 text-sm text-zinc-500">Feature-by-feature comparison tables covering architecture, performance, features, and operations.</p>
-      <a href={B + "migrate-from-pterodactyl/"} class="group rounded-xl border border-zinc-800/60 bg-surface-1 p-5 transition-all duration-200 hover:border-zinc-700 hover:bg-surface-2">
-        <div class="flex items-center gap-2 text-primary mb-2">
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" /></svg>
-          <span class="text-xs font-semibold uppercase tracking-wider">Migrate</span>
-        </div>
-        <h3 class="font-semibold text-foreground text-[15px] group-hover:text-primary transition-colors">Migrate from Pterodactyl</h3>
-        <p class="mt-1 text-sm text-zinc-500">Step-by-step guide to move your servers, eggs, and users from Pterodactyl to Catalyst.</p>
+        <p class="mt-2 text-sm text-zinc-500 leading-relaxed">Architecture, performance, and ops compared side by side.</p>
+        <span class="mt-4 inline-flex text-xs font-medium text-zinc-600 group-hover:text-primary transition-colors">Open comparison</span>
       </a>
-      <a href={B + "pterodactyl-alternative/"} class="group rounded-xl border border-zinc-800/60 bg-surface-1 p-5 transition-all duration-200 hover:border-zinc-700 hover:bg-surface-2">
-        <div class="flex items-center gap-2 text-primary mb-2">
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" /></svg>
-          <span class="text-xs font-semibold uppercase tracking-wider">Learn</span>
-        </div>
-        <h3 class="font-semibold text-foreground text-[15px] group-hover:text-primary transition-colors">Best Pterodactyl Alternative</h3>
-        <p class="mt-1 text-sm text-zinc-500">Why Catalyst is the best Pterodactyl replacement — reasons, landscape, and detailed comparison.</p>
+      <a href={B + "migrate-from-pterodactyl/"} class="group bg-surface-1 p-6 sm:p-7 transition-colors hover:bg-surface-2">
+        <h3 class="font-semibold text-foreground text-[15px] group-hover:text-primary transition-colors">Migrate from Pterodactyl</h3>
+        <p class="mt-2 text-sm text-zinc-500 leading-relaxed">Move servers, eggs, and users without starting from scratch.</p>
+        <span class="mt-4 inline-flex text-xs font-medium text-zinc-600 group-hover:text-primary transition-colors">Open migration guide</span>
+      </a>
+      <a href={B + "docs/"} class="group bg-surface-1 p-6 sm:p-7 transition-colors hover:bg-surface-2">
+        <h3 class="font-semibold text-foreground text-[15px] group-hover:text-primary transition-colors">Documentation</h3>
+        <p class="mt-2 text-sm text-zinc-500 leading-relaxed">Install, configure nodes, and wire up the API in one place.</p>
+        <span class="mt-4 inline-flex text-xs font-medium text-zinc-600 group-hover:text-primary transition-colors">Read the docs</span>
       </a>
     </div>
   </section>
 
-  <!-- ═══════════════════════════════════════════════
-       FAQ
-       ═══════════════════════════════════════════════ -->
-  <section class="max-w-6xl mx-auto px-4 py-20" aria-label="Frequently asked questions">
-    <div class="mb-10" data-reveal>
-      <h2 class="font-display text-sm font-semibold tracking-[0.12em] uppercase text-zinc-500">FAQ</h2>
-      <p class="mt-2 text-2xl sm:text-3xl font-display font-semibold text-foreground tracking-tight">Questions? Answered.</p>
+  <!-- FAQ (layout family: definition list, no card grid) -->
+  <section class="max-w-6xl mx-auto px-4 py-16 sm:py-20" aria-label="Frequently asked questions">
+    <div class="mb-10 max-w-lg" data-reveal>
+      <h2 class="font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight text-balance">
+        Common questions, plain answers.
+      </h2>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4" data-reveal-stagger>
-      {[
-        {
-          q: "Is Catalyst a Pterodactyl replacement?",
-          a: "Yes. Catalyst is designed from the ground up as a modern replacement for Pterodactyl. It covers the same core use cases — game server management, node orchestration, user panels, and admin dashboards — with a faster Rust backend, containerd runtime, and a plugin system Pterodactyl lacks.",
-        },
-        {
-          q: "How is Catalyst different from Pterodactyl?",
-          a: "Catalyst uses Rust instead of PHP for the backend, containerd instead of Docker for the runtime, and provides 60+ REST API endpoints compared to Pterodactyl's ~40. Catalyst also has a native plugin system, sub-10ms WebSocket console latency, and RBAC with 20+ granular permissions.",
-        },
-        {
-          q: "Can I migrate from Pterodactyl to Catalyst?",
-          a: "Yes. Catalyst supports importing servers, eggs, and user data from Pterodactyl. Our migration guide walks you through the process step by step. The containerd runtime is compatible with most Pterodactyl Docker images.",
-        },
-        {
-          q: "Is Catalyst free and open source?",
-          a: "Yes. Catalyst is released under GPLv3. The entire codebase — backend, frontend, node agent, and documentation — is available on GitHub. There are no paid tiers or feature gates.",
-        },
-        {
-          q: "What games does Catalyst support?",
-          a: "Catalyst supports any game that runs in a Linux container. This includes Minecraft (Java and Bedrock), Counter-Strike 2, Rust, ARK, Terraria, Team Fortress 2, and hundreds more through custom egg definitions.",
-        },
-        {
-          q: "What are the system requirements?",
-          a: "Catalyst runs on any Linux server with Docker and Docker Compose. The panel and API require minimal resources — a single CPU core and 512MB RAM is sufficient for small deployments. Nodes need containerd and the Catalyst agent installed.",
-        },
-      ].map((faq) => (
-        <div class="rounded-xl border border-zinc-800/60 bg-surface-1 p-6">
-          <h3 class="font-semibold text-foreground text-[15px]">{faq.q}</h3>
-          <p class="mt-2 text-sm text-zinc-500 leading-relaxed">{faq.a}</p>
-        </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-0" data-reveal>
+      {faqs.map((faq) => (
+        <details class="faq-item group border-b border-zinc-800/50 py-5">
+          <summary class="flex cursor-pointer list-none items-start justify-between gap-4 text-left">
+            <h3 class="font-semibold text-foreground text-[15px] leading-snug pr-2">{faq.q}</h3>
+            <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-zinc-800 text-zinc-500 transition-colors group-open:border-primary/40 group-open:text-primary group-open:bg-primary/10">
+              <svg class="w-3.5 h-3.5 transition-transform duration-200 group-open:rotate-45" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+            </span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-500 leading-relaxed max-w-prose pr-10">{faq.a}</p>
+        </details>
       ))}
     </div>
 
-    <!-- FAQPage JSON-LD -->
     <script type="application/ld+json" set:html={JSON.stringify({
       "@context": "https://schema.org",
       "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "Is Catalyst a Pterodactyl replacement?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes. Catalyst is designed from the ground up as a modern replacement for Pterodactyl. It covers the same core use cases — game server management, node orchestration, user panels, and admin dashboards — with a faster Rust backend, containerd runtime, and a plugin system Pterodactyl lacks."
-          }
+      "mainEntity": faqs.map((faq) => ({
+        "@type": "Question",
+        "name": faq.q,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": faq.a,
         },
-        {
-          "@type": "Question",
-          "name": "How is Catalyst different from Pterodactyl?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Catalyst uses Rust instead of PHP for the backend, containerd instead of Docker for the runtime, and provides 60+ REST API endpoints compared to Pterodactyl's ~40. Catalyst also has a native plugin system, sub-10ms WebSocket console latency, and RBAC with 20+ granular permissions."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Can I migrate from Pterodactyl to Catalyst?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes. Catalyst supports importing servers, eggs, and user data from Pterodactyl. Our migration guide walks you through the process step by step. The containerd runtime is compatible with most Pterodactyl Docker images."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Is Catalyst free and open source?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes. Catalyst is released under GPLv3. The entire codebase — backend, frontend, node agent, and documentation — is available on GitHub. There are no paid tiers or feature gates."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What games does Catalyst support?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Catalyst supports any game that runs in a Linux container. This includes Minecraft (Java and Bedrock), Counter-Strike 2, Rust, ARK, Terraria, Team Fortress 2, and hundreds more through custom egg definitions."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What are the system requirements?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Catalyst runs on any Linux server with Docker and Docker Compose. The panel and API require minimal resources — a single CPU core and 512MB RAM is sufficient for small deployments. Nodes need containerd and the Catalyst agent installed."
-          }
-        },
-      ]
+      })),
     })} />
   </section>
 
-  <!-- ═══════════════════════════════════════════════
-       CTA
-       ═══════════════════════════════════════════════ -->
-  <section class="max-w-6xl mx-auto px-4 py-20" aria-label="Call to action">
-    <div class="relative rounded-2xl border border-zinc-800/60 bg-surface-1 p-6 sm:p-10 lg:p-14 text-center overflow-hidden" data-reveal>
-      <!-- Warm gradient like product dashboard -->
-      <div class="absolute inset-0 bg-gradient-to-br from-[#1a1510]/50 via-transparent to-transparent pointer-events-none"></div>
-      <div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
+  <!-- FINAL CTA -->
+  <section class="max-w-6xl mx-auto px-4 py-16 sm:py-20" aria-label="Call to action">
+    <div class="relative rounded-2xl border border-primary/20 overflow-hidden p-8 sm:p-12 lg:p-14" data-reveal>
+      <div class="absolute inset-0 bg-gradient-to-br from-[#1a1510] via-surface-1 to-surface-0 pointer-events-none"></div>
+      <div class="absolute top-0 right-0 w-80 h-80 bg-primary/[0.12] rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute bottom-0 left-0 w-56 h-56 bg-primary/[0.05] rounded-full blur-3xl pointer-events-none"></div>
 
-      <div class="relative">
-        <h2 class="font-display text-3xl sm:text-4xl font-bold text-foreground tracking-tight">Ready to switch?</h2>
-        <p class="mt-3 text-base text-zinc-500 max-w-md mx-auto">Free, open-source, GPLv3. Join the early testing phase and help shape the future of game server management.</p>
-        <div class="mt-8 flex items-center justify-center gap-3">
-          <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary-600 min-h-11">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-            Star on GitHub
+      <div class="relative max-w-xl">
+        <h2 class="font-display text-3xl sm:text-4xl font-bold text-foreground tracking-tight text-balance">
+          Spin up a panel tonight.
+        </h2>
+        <p class="mt-3 text-base text-zinc-400 max-w-md">
+          Free, GPLv3, no feature gates. Copy the install command and be live before the coffee cools.
+        </p>
+        <div class="mt-8 flex flex-wrap items-center gap-3">
+          <a href="#install" class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary-600 active:scale-[0.98] min-h-11 shadow-[0_0_0_1px_hsl(25_55%_50%/0.3),0_8px_28px_-8px_hsl(25_55%_58%/0.45)]">
+            Install in 60s
           </a>
-          <a href={B + "migrate-from-pterodactyl/"} class="inline-flex items-center gap-2 rounded-lg border border-zinc-800 px-5 py-3 text-sm font-medium text-zinc-400 transition-all duration-200 hover:bg-surface-2 hover:text-zinc-200 min-h-11">
-            Migration Guide
+          <a href={B + "docs/"} class="inline-flex items-center gap-2 rounded-lg border border-zinc-700/80 px-5 py-3 text-sm font-medium text-zinc-300 transition-all duration-200 hover:bg-surface-2 hover:text-zinc-100 active:scale-[0.98] min-h-11">
+            Read the docs
+          </a>
+          <a href={DISCORD_URL} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-lg border border-zinc-700/80 px-5 py-3 text-sm font-medium text-zinc-300 transition-all duration-200 hover:bg-surface-2 hover:text-zinc-100 active:scale-[0.98] min-h-11">
+            Join Discord
           </a>
         </div>
       </div>

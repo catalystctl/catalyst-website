@@ -13,6 +13,9 @@ const AUDIENCE_LABELS: Record<string, string> = {
   "hosting-providers": "Hosting Providers",
   enterprises: "Enterprises",
 };
+
+const featured = posts[0];
+const rest = posts.slice(1);
 ---
 
 <Layout title="Blog" description="Guides, comparisons, and tutorials for game server management with Catalyst. For hobbyists, hosting providers, and enterprises.">
@@ -29,54 +32,102 @@ const AUDIENCE_LABELS: Record<string, string> = {
     document.querySelectorAll('[data-reveal], [data-reveal-stagger]').forEach((el) => observer.observe(el));
   </script>
 
-  <div class="max-w-4xl mx-auto px-4 sm:px-8 py-16 sm:py-20">
-    <div data-reveal>
-      <h1 class="font-display font-bold text-foreground tracking-tight" style="font-size: clamp(2rem, 5vw, 3.5rem);">
-        Blog
-      </h1>
-      <p class="mt-3 text-base sm:text-lg text-zinc-400 leading-relaxed max-w-lg">
-        Guides, comparisons, and deep dives for everyone running game servers — from hobbyists to hosting providers to enterprises.
-      </p>
-    </div>
+  <div class="relative overflow-hidden">
+    <div class="pointer-events-none absolute -top-24 left-1/4 h-72 w-72 rounded-full bg-primary/[0.07] blur-3xl" aria-hidden="true"></div>
 
-    <div class="mt-12 space-y-4" data-reveal-stagger>
-      {posts.map((post) => {
-        const formattedDate = post.data.pubDate.toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric',
-        });
-
-        return (
-          <a
-            href={`/blog/${post.id}/`}
-            class="group block rounded-xl border border-zinc-800/60 bg-surface-1 p-5 sm:p-6 transition-all duration-200 hover:border-zinc-700 hover:bg-surface-2"
-          >
-            <div class="flex flex-wrap items-center gap-2 mb-3">
-              {post.data.audience?.map((a) => (
-                <span class="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-medium text-primary">
-                  {AUDIENCE_LABELS[a] || a}
-                </span>
-              ))}
-              <time datetime={post.data.pubDate.toISOString()} class="text-xs text-zinc-600">
-                {formattedDate}
-              </time>
-            </div>
-            <h2 class="font-display text-lg sm:text-xl font-semibold text-foreground group-hover:text-primary transition-colors leading-tight">
-              {post.data.title}
-            </h2>
-            <p class="mt-2 text-sm text-zinc-500 leading-relaxed line-clamp-2">
-              {post.data.description}
-            </p>
-          </a>
-        );
-      })}
-    </div>
-
-    {posts.length === 0 && (
-      <div class="mt-12 text-center text-zinc-500">
-        <p>Coming soon — stay tuned for guides, comparisons, and tutorials.</p>
+    <div class="relative max-w-6xl mx-auto px-4 pt-12 sm:pt-16 pb-20">
+      <div class="max-w-2xl mb-12" data-reveal>
+        <h1 class="font-display font-bold text-foreground tracking-tight text-balance" style="font-size: clamp(2.1rem, 5vw, 3.5rem);">
+          Guides for hosts who ship.
+        </h1>
+        <p class="mt-4 text-base sm:text-lg text-zinc-400 leading-relaxed max-w-lg text-pretty">
+          Comparisons, migrations, and ops notes for hobby fleets and hosting providers.
+        </p>
       </div>
-    )}
+
+      {featured && (
+        <a
+          href={`/blog/${featured.id}/`}
+          class="group relative block rounded-2xl border border-primary/20 overflow-hidden mb-10 transition-all duration-300 hover:border-primary/40 hover:shadow-[0_0_48px_-16px_hsl(25_55%_58%/0.3)]"
+          data-reveal
+        >
+          <div class="absolute inset-0 bg-gradient-to-br from-[#1a1510] via-surface-1 to-surface-0 pointer-events-none"></div>
+          <div class="absolute top-0 right-0 w-64 h-64 bg-primary/[0.1] rounded-full blur-3xl pointer-events-none"></div>
+          <div class="relative p-6 sm:p-8 lg:p-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
+            <div class="lg:col-span-8">
+              <div class="flex flex-wrap items-center gap-2 mb-4">
+                <span class="inline-flex items-center rounded-full border border-primary/25 bg-primary/10 px-2.5 py-0.5 text-[11px] font-medium text-primary">
+                  Latest
+                </span>
+                {featured.data.audience?.map((a) => (
+                  <span class="inline-flex items-center rounded-full bg-zinc-800/80 px-2.5 py-0.5 text-[11px] font-medium text-zinc-400">
+                    {AUDIENCE_LABELS[a] || a}
+                  </span>
+                ))}
+                <time datetime={featured.data.pubDate.toISOString()} class="text-xs text-zinc-600">
+                  {featured.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                </time>
+              </div>
+              <h2 class="font-display text-2xl sm:text-3xl font-semibold text-foreground group-hover:text-primary transition-colors leading-tight text-balance">
+                {featured.data.title}
+              </h2>
+              <p class="mt-3 text-sm sm:text-base text-zinc-400 leading-relaxed max-w-xl">
+                {featured.data.description}
+              </p>
+            </div>
+            <div class="lg:col-span-4 flex lg:items-end lg:justify-end">
+              <span class="inline-flex items-center gap-1.5 text-sm font-medium text-primary">
+                Read post
+                <svg class="w-4 h-4 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+              </span>
+            </div>
+          </div>
+        </a>
+      )}
+
+      {rest.length > 0 && (
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" data-reveal-stagger>
+          {rest.map((post) => {
+            const formattedDate = post.data.pubDate.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+            });
+            return (
+              <a
+                href={`/blog/${post.id}/`}
+                class="group flex flex-col rounded-xl border border-zinc-800/60 bg-surface-1 p-5 sm:p-6 transition-all duration-200 hover:border-zinc-700 hover:bg-surface-2"
+              >
+                <div class="flex flex-wrap items-center gap-2 mb-3">
+                  {post.data.audience?.map((a) => (
+                    <span class="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-medium text-primary">
+                      {AUDIENCE_LABELS[a] || a}
+                    </span>
+                  ))}
+                  <time datetime={post.data.pubDate.toISOString()} class="text-xs text-zinc-600">
+                    {formattedDate}
+                  </time>
+                </div>
+                <h2 class="font-display text-lg font-semibold text-foreground group-hover:text-primary transition-colors leading-snug text-balance">
+                  {post.data.title}
+                </h2>
+                <p class="mt-2 text-sm text-zinc-500 leading-relaxed line-clamp-2 flex-1">
+                  {post.data.description}
+                </p>
+                <span class="mt-4 text-xs font-medium text-zinc-600 group-hover:text-primary transition-colors">
+                  Read post
+                </span>
+              </a>
+            );
+          })}
+        </div>
+      )}
+
+      {posts.length === 0 && (
+        <div class="rounded-xl border border-zinc-800/60 bg-surface-1 p-10 text-center text-zinc-500" data-reveal>
+          <p>Coming soon. Guides, comparisons, and tutorials are on the way.</p>
+        </div>
+      )}
+    </div>
   </div>
 </Layout>

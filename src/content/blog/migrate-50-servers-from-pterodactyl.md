@@ -30,7 +30,7 @@ Before touching anything, document what you have:
 6. **API integrations:** What's connected to Pterodactyl's API? (WHMCS, Discord bots, custom dashboards, etc.)
 7. **DNS and SSL:** What domain is the panel on, and how is SSL configured?
 
-Run this from your Pterodactyl admin panel. Export the data if you can — you'll reference it during migration.
+Run this from your Pterodactyl admin panel. Export the data if you can - you'll reference it during migration.
 
 ### Choose your migration strategy
 
@@ -80,7 +80,7 @@ For each Wings node:
 
 2. **Migrate servers from this node.** In Catalyst's migration tool:
    - Select scope: "Node" and choose the specific node
-   - Start the migration — Catalyst imports server metadata and streams file data from Pterodactyl's Docker volumes to Catalyst's containerd storage
+   - Start the migration - Catalyst imports server metadata and streams file data from Pterodactyl's Docker volumes to Catalyst's containerd storage
    - Monitor progress in the migration dashboard
 
 3. **Verify a sample of migrated servers.** Before cutting over:
@@ -88,7 +88,7 @@ For each Wings node:
    - Verify they boot correctly
    - Check file ownership and permissions
    - Test console access
-   - If anything is wrong, the servers are still running on Pterodactyl — fix the issue and retry
+   - If anything is wrong, the servers are still running on Pterodactyl - fix the issue and retry
 
 4. **Cut over the node.** Once you're confident:
    - Stop the servers on Pterodactyl for this node
@@ -149,7 +149,7 @@ Pterodactyl and Catalyst both use port allocation systems. During migration, Cat
 If something goes wrong during migration, you can roll back at any phase:
 
 - **Phase 0-1 rollback:** Simply stop using Catalyst. Nothing has changed in Pterodactyl.
-- **Phase 2 rollback (per-node):** Stop the migrated servers in Catalyst, restart them in Pterodactyl on the original Wings node. The Pterodactyl data hasn't been touched — it's still there.
+- **Phase 2 rollback (per-node):** Stop the migrated servers in Catalyst, restart them in Pterodactyl on the original Wings node. The Pterodactyl data hasn't been touched - it's still there.
 - **Phase 3 rollback:** Revert your API integrations to point at Pterodactyl. This is why you keep both panels running until Phase 4.
 
 The phased approach means you can always roll back to the last known-good state for any individual node.
@@ -171,11 +171,11 @@ Hosting providers who've migrated to Catalyst report:
 
 - **Zero data loss** when following the phased approach
 - **Average migration time** of 2-3 hours per node for a typical 20-server node
-- **Customer impact:** None when using the phased approach — players don't notice the migration
+- **Customer impact:** None when using the phased approach - players don't notice the migration
 - **Post-migration benefits:** Lower memory usage per server (containerd is more efficient), faster API responses, and easier automation through Catalyst's plugin system
 
 ## Ready to migrate?
 
-The [migration guide](/migrate-from-pterodactyl/) has step-by-step instructions for each phase. Catalyst's built-in migration tool handles the heavy lifting — you just need to plan the sequence and verify along the way.
+The [migration guide](/migrate-from-pterodactyl/) has step-by-step instructions for each phase. Catalyst's built-in migration tool handles the heavy lifting - you just need to plan the sequence and verify along the way.
 
 For large migrations (100+ servers), consider reaching out to the Catalyst community on GitHub for advice from hosts who've done it at your scale.

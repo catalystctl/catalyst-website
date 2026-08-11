@@ -13,7 +13,7 @@ keywords:
   - rust axum
 ---
 
-PHP powered the web for two decades. It ran Facebook, Wikipedia, and — until recently — the most popular game server management panel in the world. But the game server landscape is changing, and PHP's limitations are becoming harder to ignore.
+PHP powered the web for two decades. It ran Facebook, Wikipedia, and - until recently - the most popular game server management panel in the world. But the game server landscape is changing, and PHP's limitations are becoming harder to ignore.
 
 This article explains why the industry is moving from PHP to Rust for game server infrastructure, what the technical differences mean in practice, and whether you should care.
 
@@ -25,7 +25,7 @@ The problems emerge when you scale:
 
 ### Concurrency
 
-PHP's traditional request-per-process model means every concurrent user consumes a separate process with its own memory space. 500 users viewing their consoles simultaneously? That's 500 PHP-FPM workers, each using 30-50MB of RAM. You're at 15-25GB of memory just for the panel process — before any game servers start.
+PHP's traditional request-per-process model means every concurrent user consumes a separate process with its own memory space. 500 users viewing their consoles simultaneously? That's 500 PHP-FPM workers, each using 30-50MB of RAM. You're at 15-25GB of memory just for the panel process - before any game servers start.
 
 PHP 8 introduced fiber-based concurrency, and Laravel Octane supports long-running workers. These help, but they're retrofitting concurrency onto a runtime that was designed for the request-response web, not for persistent WebSocket connections.
 
@@ -35,13 +35,13 @@ Game server panels need real-time console streaming. Every connected player and 
 
 In PHP, WebSocket handling requires a separate Node.js process (that's why Pterodactyl uses Wings as a WebSocket relay). This adds latency, complexity, and another process to manage on every node.
 
-In Rust, WebSocket handling is native. The same process that serves the REST API also handles thousands of concurrent WebSocket connections — no relay, no extra daemon, no added latency.
+In Rust, WebSocket handling is native. The same process that serves the REST API also handles thousands of concurrent WebSocket connections - no relay, no extra daemon, no added latency.
 
 ### Memory safety at scale
 
 PHP is memory-safe by default (garbage collected), which is great for developer productivity. But at scale, PHP's memory usage per connection is significantly higher than Rust's. A Rust server handling 10,000 concurrent WebSocket connections might use 100MB total. A PHP-FPM setup handling the same load needs 15-25GB.
 
-This isn't a theoretical difference. For a hosting provider running 500 servers, the panel memory overhead directly affects how many servers fit on each node — which directly affects margins.
+This isn't a theoretical difference. For a hosting provider running 500 servers, the panel memory overhead directly affects how many servers fit on each node - which directly affects margins.
 
 ## Why Rust, specifically?
 
@@ -57,7 +57,7 @@ Rust's ownership model prevents data races at compile time. This means you can w
 
 ### Single binary deployment
 
-Rust compiles to a single static binary. No runtime, no interpreter, no dependency hell. Deploying a Rust application is copying one file and running it. Compare this to a PHP deployment: PHP-FPM, Composer, Laravel, vendor directory, extensions, configuration files — and then Wings separately for WebSocket handling.
+Rust compiles to a single static binary. No runtime, no interpreter, no dependency hell. Deploying a Rust application is copying one file and running it. Compare this to a PHP deployment: PHP-FPM, Composer, Laravel, vendor directory, extensions, configuration files - and then Wings separately for WebSocket handling.
 
 ### containerd-native
 
@@ -83,13 +83,13 @@ These numbers come from benchmarking Catalyst (Rust) against Pterodactyl (PHP) i
 | Concurrent WebSocket connections | ~1,000 | 10,000+ | 10x |
 | Max API requests/second | ~200 | ~2,000 | 10x |
 
-These aren't synthetic benchmarks. They're measured with real game server workloads — console streaming, server start/stop cycles, file operations, and concurrent API usage.
+These aren't synthetic benchmarks. They're measured with real game server workloads - console streaming, server start/stop cycles, file operations, and concurrent API usage.
 
 ## What this means for different users
 
 ### For hobbyists
 
-The performance difference is nice but not critical. You'll notice faster console responses and lower memory usage, but it won't change your life. The bigger benefit is the simpler deployment — one command to install, no Wings to configure.
+The performance difference is nice but not critical. You'll notice faster console responses and lower memory usage, but it won't change your life. The bigger benefit is the simpler deployment - one command to install, no Wings to configure.
 
 ### For hosting providers
 
@@ -100,16 +100,16 @@ This is where it matters most. The numbers above translate directly to your bott
 - **10x faster API** means your WHMCS integration and automation scripts run faster
 - **containerd's efficiency** means more servers per node, improving your margin
 
-For a 500-server host, the difference between Pterodactyl and Catalyst on infrastructure costs can be $200-500/month — just from panel overhead and node efficiency.
+For a 500-server host, the difference between Pterodactyl and Catalyst on infrastructure costs can be $200-500/month - just from panel overhead and node efficiency.
 
 ### For enterprises
 
 Enterprises care about reliability, security, and compliance. Rust delivers:
 
-- **Memory safety guarantees** — No buffer overflows, use-after-free, or null pointer dereferences. Entire classes of vulnerabilities are eliminated at compile time.
-- **Predictable performance** — No garbage collection pauses. Latency is consistent and measured in single-digit milliseconds.
-- **Minimal attack surface** — Single binary, no runtime dependencies, fewer moving parts to exploit.
-- **Audit-friendly** — Rust's type system makes code review and security auditing more effective.
+- **Memory safety guarantees** - No buffer overflows, use-after-free, or null pointer dereferences. Entire classes of vulnerabilities are eliminated at compile time.
+- **Predictable performance** - No garbage collection pauses. Latency is consistent and measured in single-digit milliseconds.
+- **Minimal attack surface** - Single binary, no runtime dependencies, fewer moving parts to exploit.
+- **Audit-friendly** - Rust's type system makes code review and security auditing more effective.
 
 ## The ecosystem shift
 

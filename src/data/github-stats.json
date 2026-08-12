@@ -7,7 +7,11 @@
   "stars": 18,
   "forks": 4,
   "lastPushedAt": "2026-08-12T00:07:14Z",
-  "latestRelease": null,
+  "latestRelease": {
+    "tag": "v1.18.7",
+    "publishedAt": "2026-08-12T00:07:23Z",
+    "url": "https://github.com/catalystctl/catalyst/releases/tag/v1.18.7"
+  },
   "ci": {
     "state": "passing",
     "label": "Passing",
@@ -16,5 +20,5 @@
     "finishedAt": "2026-08-12T00:09:16Z",
     "url": "https://github.com/catalystctl/catalyst/actions/runs/31549059463"
   },
-  "fetchedAt": "2026-08-12T08:25:56.353Z"
+  "fetchedAt": "2026-08-12T10:17:00.279Z"
 }

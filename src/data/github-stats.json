@@ -16,9 +16,9 @@
     "state": "passing",
     "label": "Passing",
     "conclusion": "success",
-    "workflow": "npm_and_yarn in /catalyst-backend, /catalyst-frontend, /tests/lib for js-yaml, nodemailer, ws, ws - Update #1505574041",
-    "finishedAt": "2026-08-04T11:49:41Z",
-    "url": "https://github.com/catalystctl/catalyst/actions/runs/30906352063"
+    "workflow": "npm_and_yarn in /. - Update #1528593982",
+    "finishedAt": "2026-08-17T09:28:50Z",
+    "url": "https://github.com/catalystctl/catalyst/actions/runs/32014638749"
   },
-  "fetchedAt": "2026-08-17T10:42:03.827Z"
+  "fetchedAt": "2026-08-17T11:35:09.771Z"
 }

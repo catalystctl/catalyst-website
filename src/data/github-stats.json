@@ -6,7 +6,7 @@
   "contributors": 7,
   "stars": 21,
   "forks": 5,
-  "lastPushedAt": "2026-08-15T14:48:27Z",
+  "lastPushedAt": "2026-08-17T09:28:44Z",
   "latestRelease": {
     "tag": "v1.20.4",
     "publishedAt": "2026-08-15T14:48:36Z",
@@ -16,9 +16,9 @@
     "state": "passing",
     "label": "Passing",
     "conclusion": "success",
-    "workflow": "Push on main",
-    "finishedAt": "2026-08-15T14:51:24Z",
-    "url": "https://github.com/catalystctl/catalyst/actions/runs/31890934379"
+    "workflow": "npm_and_yarn in /. - Update #1528593982",
+    "finishedAt": "2026-08-17T09:28:50Z",
+    "url": "https://github.com/catalystctl/catalyst/actions/runs/32014638749"
   },
-  "fetchedAt": "2026-08-17T08:55:29.352Z"
+  "fetchedAt": "2026-08-17T09:52:48.881Z"
 }

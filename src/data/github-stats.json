@@ -16,9 +16,9 @@
     "state": "passing",
     "label": "Passing",
     "conclusion": "success",
-    "workflow": "Code Quality: Push on main",
-    "finishedAt": "2026-08-19T15:39:03Z",
-    "url": "https://github.com/catalystctl/catalyst/actions/runs/32271154587"
+    "workflow": "Code Quality: Scheduled",
+    "finishedAt": "2026-08-19T18:43:09Z",
+    "url": "https://github.com/catalystctl/catalyst/actions/runs/32288755909"
   },
-  "fetchedAt": "2026-08-19T17:35:11.506Z"
+  "fetchedAt": "2026-08-19T18:48:37.733Z"
 }

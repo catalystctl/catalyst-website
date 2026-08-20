@@ -13,9 +13,11 @@ keywords:
   - free game server panel
 ---
 
+> **TL;DR:** Four open-source panels dominate in 2026: **Pterodactyl** (largest community), **Pelican** (its fork), **Catalyst** (Rust + containerd, fastest), and **PufferPanel** (lightweight Go). Pick Pterodactyl for maturity, Catalyst for performance and plugins, Pelican for community preference, PufferPanel for simplicity.
+
 Self-hosting game servers doesn't mean you have to SSH into a box and run shell scripts. Open source game server panels give you a web interface, console access, file management, and automation - for free.
 
-But which one should you use? This guide compares every significant open source game server panel available in 2026, so you can pick the right tool for your situation.
+But which one should you use? This guide compares every significant open source game server panel available in 2026, so you can pick the right tool for your situation. For a focused look at modern Pterodactyl replacements, see [every Pterodactyl alternative compared](/blog/pterodactyl-alternatives-2026/).
 
 ## Why use a game server panel at all?
 
@@ -166,4 +168,4 @@ All four panels are open source and free to use. That means:
 
 If you're new to game server panels, start with Catalyst's [quick start guide](/docs/getting-started/quickstart/). One command, sixty seconds, and you have a fully functional game server management panel.
 
-For a broader comparison of Pterodactyl alternatives, check out our [Pterodactyl alternatives guide](/pterodactyl-alternative/).
+For a broader comparison, check out [every Pterodactyl alternative in the 2026 buyer's guide](/blog/pterodactyl-alternatives-2026/) and the [three-way Pterodactyl vs Pelican vs Catalyst comparison](/blog/pterodactyl-vs-pelican-vs-catalyst/). For the infrastructure angle, see [why platforms are moving to Rust](/blog/why-game-server-platforms-moving-to-rust/).

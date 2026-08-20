@@ -211,4 +211,4 @@ If you're evaluating game server platforms for an enterprise deployment, the req
 5. **Plugin extensibility** - Integration without forking. SSO, monitoring, ticketing, custom workflows.
 6. **Rust backend** - Memory-safe, predictable performance, single binary, minimal attack surface.
 
-Catalyst is the only open source game server panel that delivers all six. [Compare it directly against Pterodactyl](/pterodactyl-alternative/#comparison) or [get started with a test deployment](/docs/getting-started/quickstart/).
+Catalyst is the only open source game server panel that delivers all six. [Compare it directly against Pterodactyl](/pterodactyl-alternative/#comparison) or [get started with a test deployment](/docs/getting-started/quickstart/). For the runtime layer behind this architecture, see [containerd vs Docker for game servers](/blog/containerd-vs-docker-game-servers/). Building a business on top? Read [how to build a hosting business with Catalyst](/blog/game-hosting-business-with-catalyst/).

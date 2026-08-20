@@ -216,6 +216,15 @@ const lookFor = [
     </div>
   </section>
 
+  <!-- AEO definition block -->
+  <section class="max-w-6xl mx-auto px-4 py-8" aria-label="What is Catalyst" data-speakable>
+    <div class="max-w-3xl rounded-xl border border-zinc-800/60 bg-surface-1/60 px-6 py-5" data-reveal>
+      <p class="text-sm sm:text-base text-zinc-300 leading-relaxed">
+        <strong class="text-foreground font-semibold">Catalyst</strong> is an open-source game server panel built with Rust and containerd — a drop-in Pterodactyl alternative with sub-10ms console streaming, a native plugin system, 20+ granular RBAC permissions, and a one-line install. It is free under GPLv3 and talks directly to containerd for lower memory overhead and faster startup than Docker-based panels.
+      </p>
+    </div>
+  </section>
+
   <!-- Reasons: featured + list, not equal 6-card grid -->
   <section class="max-w-6xl mx-auto px-4 py-16 sm:py-20" aria-label="Why Catalyst is the best alternative">
     <div class="mb-10 max-w-xl" data-reveal>
@@ -428,6 +437,33 @@ const lookFor = [
       </div>
     </div>
   </section>
+
+  <!-- AEO structured data: FAQPage + ItemList for comparison -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": lookFor.map((item) => ({
+      "@type": "Question",
+      "name": item.title,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": item.body,
+      },
+    })),
+  })} />
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "Pterodactyl alternative comparison",
+    "itemListElement": comparisons.flatMap((section) =>
+      section.rows.map((row, i) => ({
+        "@type": "ListItem",
+        "position": i + 1,
+        "name": `${section.category}: ${row.feature}`,
+        "description": `Catalyst: ${row.catalyst} vs Pterodactyl: ${row.pterodactyl}`,
+      }))
+    ),
+  })} />
 
   <div class="h-8"></div>
 </Layout>

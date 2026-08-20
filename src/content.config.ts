@@ -22,6 +22,9 @@ const blog = defineCollection({
     author: z.string().default('Catalyst Team'),
     audience: z.array(z.string()).optional(),
     keywords: z.array(z.string()).optional(),
+    ogImage: z.string().optional(),
+    category: z.string().optional(),
+    featured: z.boolean().optional(),
   }),
 });
 

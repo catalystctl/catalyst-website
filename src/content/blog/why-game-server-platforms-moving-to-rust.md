@@ -135,4 +135,4 @@ But if you're:
 
 Then the Rust advantage is real, measurable, and growing. Catalyst is the only game server panel built on Rust, and the performance numbers speak for themselves.
 
-[See the full comparison](/pterodactyl-alternative/#comparison) between Catalyst and Pterodactyl, or [try Catalyst yourself](/docs/getting-started/quickstart/) in under 60 seconds.
+[See the full comparison](/pterodactyl-alternative/#comparison) between Catalyst and Pterodactyl, or [try Catalyst yourself](/docs/getting-started/quickstart/) in under 60 seconds. For the container layer behind this, read [containerd vs Docker](/blog/containerd-vs-docker-game-servers/), and for the business case, [building a hosting business with Catalyst](/blog/game-hosting-business-with-catalyst/).

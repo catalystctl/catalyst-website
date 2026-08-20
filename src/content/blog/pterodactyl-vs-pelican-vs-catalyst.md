@@ -13,9 +13,11 @@ keywords:
   - best game server panel
 ---
 
+> **TL;DR:** **Catalyst** is the only panel on a different architecture (Rust + containerd) — faster, plugin-capable, containerd-native. **Pterodactyl** and **Pelican** are the same PHP + Docker codebase with different teams. Pick Catalyst for performance and extensibility; Pelican for Pterodactyl governance without migration.
+
 Choosing a game server panel used to be simple: you picked Pterodactyl and moved on. But with Pelican emerging as a fork and Catalyst building an entirely new architecture, you now have a real decision to make.
 
-This comparison cuts through the noise. We'll look at architecture, performance, features, operations, and ecosystem - so you can pick the panel that actually fits your needs, not just the one with the most GitHub stars.
+This comparison cuts through the noise. We'll look at architecture, performance, features, operations, and ecosystem - so you can pick the panel that actually fits your needs, not just the one with the most GitHub stars. For all alternatives in one place, see our [buyer's guide to every Pterodactyl alternative](/blog/pterodactyl-alternatives-2026/).
 
 ## The three contenders
 
@@ -131,4 +133,4 @@ Check out the [migration guide](/migrate-from-pterodactyl/) for details.
 
 ## The bottom line
 
-Pterodactyl and Pelican are the same architecture with different teams. If you want "Pterodactyl but different governance," pick Pelican. If you want a panel that's actually different - faster, more extensible, more secure, more API-complete - Catalyst is the one. The [side-by-side comparison](/pterodactyl-alternative/#comparison) tells the full story.
+Pterodactyl and Pelican are the same architecture with different teams. If you want "Pterodactyl but different governance," pick Pelican. If you want a panel that's actually different - faster, more extensible, more secure, more API-complete - Catalyst is the one. The [side-by-side comparison](/pterodactyl-alternative/#comparison) tells the full story. Migrating? Our [migration playbook for 50+ servers](/blog/migrate-50-servers-from-pterodactyl/) walks through a real-world rollout.

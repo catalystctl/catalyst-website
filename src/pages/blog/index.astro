@@ -1,4 +1,6 @@
 ---
+export const prerender = true;
+
 import Layout from "../../layouts/Layout.astro";
 import { getCollection } from "astro:content";
 
@@ -18,7 +20,11 @@ const featured = posts[0];
 const rest = posts.slice(1);
 ---
 
-<Layout title="Blog" description="Guides, comparisons, and tutorials for game server management with Catalyst. For hobbyists, hosting providers, and enterprises.">
+<Layout
+  title="Game Server Guides & Tutorials — Catalyst Blog"
+  description="Guides, comparisons, and tutorials for game server management with Catalyst. For hobbyists, hosting providers, and enterprises."
+  breadcrumbItems={[{ name: "Blog" }]}
+>
 
   <script>
     const observer = new IntersectionObserver((entries) => {
@@ -130,4 +136,16 @@ const rest = posts.slice(1);
       )}
     </div>
   </div>
+
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "Catalyst Blog",
+    "itemListElement": posts.map((post, i) => ({
+      "@type": "ListItem",
+      "position": i + 1,
+      "url": `https://catalystctl.com/blog/${post.id}/`,
+      "name": post.data.title,
+    })),
+  })} />
 </Layout>

@@ -187,4 +187,4 @@ The result is a game server panel that uses less RAM per server, starts containe
 
 Docker is a developer convenience tool that adds overhead for production workloads. containerd is a production runtime designed for scale. For game server management at any serious scale, containerd is the better choice - and Catalyst is the only panel that uses it natively.
 
-[See how Catalyst's performance compares](/pterodactyl-alternative/#comparison) to Docker-based panels, or [try it yourself](/docs/getting-started/quickstart/) with a one-line install.
+[See how Catalyst's performance compares](/pterodactyl-alternative/#comparison) to Docker-based panels, or [try it yourself](/docs/getting-started/quickstart/) with a one-line install. For the compliance and RBAC story that enterprises pair with this, see [enterprise management](/blog/enterprise-game-server-management/).

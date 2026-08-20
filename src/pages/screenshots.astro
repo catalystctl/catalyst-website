@@ -2,7 +2,7 @@
 export const prerender = true;
 
 import Layout from "../layouts/Layout.astro";
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import screenshotsData from "../data/screenshots.json";
 
 const B = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "") + "/";
@@ -23,16 +23,31 @@ function resolveScreenshot(publicPath: string) {
   return key ? screenshotImports[key].default : null;
 }
 
-const screenshotGroups = screenshotsData.groups.map((g) => ({
-  ...g,
-  screenshots: g.screenshots.map((s) => ({
-    ...s,
-    img: resolveScreenshot(s.path.startsWith("/") ? s.path : `/${s.path}`),
-  })),
-}));
+const screenshotGroups = await Promise.all(
+  screenshotsData.groups.map(async (g) => ({
+    ...g,
+    screenshots: await Promise.all(
+      g.screenshots.map(async (s) => {
+        const img = resolveScreenshot(s.path.startsWith("/") ? s.path : `/${s.path}`);
+        // Generate optimized lightbox image (larger, WebP) for modal display
+        let lightboxSrc: string | null = null;
+        if (img) {
+          const optimized = await getImage({ src: img, width: 1920, format: 'webp', quality: 80 });
+          lightboxSrc = optimized.src;
+        }
+        return { ...s, img, lightboxSrc };
+      })
+    ),
+  }))
+);
 
 const allShots = screenshotGroups.flatMap((g) =>
-  g.screenshots.map((s) => ({ ...s, group: g.title, publicPath: s.path.startsWith("/") ? s.path : `/${s.path}` }))
+  g.screenshots.map((s) => ({
+    ...s,
+    group: g.title,
+    publicPath: s.path.startsWith("/") ? s.path : `/${s.path}`,
+    lightboxSrc: (s as unknown as { lightboxSrc: string | null }).lightboxSrc,
+  }))
 );
 const total = screenshotsData.total;
 
@@ -43,7 +58,7 @@ const groupMeta = [
 ];
 ---
 
-<Layout title="Screenshots" description="Browse all Catalyst screenshots at 1080p: authentication, user panel, server console, admin dashboard, nodes, plugins, and more.">
+<Layout title="Catalyst Screenshots — Dashboard, Console & Admin Panel" description="Browse all Catalyst screenshots at 1080p: authentication, user panel, server console, admin dashboard, nodes, plugins, and more.">
 
   <script>
     const observer = new IntersectionObserver((entries) => {
@@ -109,6 +124,7 @@ const groupMeta = [
               type="button"
               data-lightbox
               data-src={shot.publicPath}
+              data-lightbox-src={shot.lightboxSrc || shot.publicPath}
               data-name={shot.name}
               data-group={group.title}
               class="group rounded-xl border border-zinc-800/60 bg-[#0c0c0e] overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-[0_0_40px_-12px_hsl(25_55%_58%/0.25)] text-left"
@@ -222,7 +238,7 @@ const groupMeta = [
         if (index < 0 || index >= shots.length) return;
         currentIndex = index;
         const shot = shots[index];
-        img.src = shot.publicPath;
+        img.src = shot.lightboxSrc || shot.publicPath;
         img.alt = shot.name;
         titleEl.textContent = shot.name + (shot.group ? ' - ' + shot.group : '');
         counterEl.textContent = (index + 1) + ' / ' + shots.length;

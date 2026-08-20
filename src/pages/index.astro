@@ -3,6 +3,7 @@ export const prerender = true;
 
 import Layout from "../layouts/Layout.astro";
 import { Image } from 'astro:assets';
+import '@fontsource-variable/jetbrains-mono';
 import githubStats from "../data/github-stats.json";
 import { formatCount } from "../lib/github-stats.mjs";
 import heroImg from "../assets/screenshots/user/dashboard.png";
@@ -134,7 +135,7 @@ const faqs = [
 ];
 ---
 
-<Layout title="Home" description="Catalyst is the modern Pterodactyl replacement. A fast, secure game server management platform built with Rust, TypeScript, and containerd. Deploy game servers in 60 seconds.">
+<Layout title="Home" description="Catalyst replaces Pterodactyl with a Rust backend, containerd runtime, and 60+ API endpoints. Deploy game servers in 60 seconds. Free, open source, GPLv3.">
 
   <script>
     const observer = new IntersectionObserver((entries) => {

@@ -211,6 +211,8 @@ You now have a game server running at home, managed through a web panel, accessi
 - Monitor resource usage through the dashboard
 - Set up automatic backups for peace of mind
 
+If you want to host something specific next, our [Minecraft at home guide](/blog/host-minecraft-server-at-home/) walks through that setup step by step. For a comparison of your panel options, see [open source panels compared](/blog/open-source-game-server-panels/).
+
 If you want to go deeper, the [Catalyst documentation](/docs/) covers everything from node management to the plugin system to the full API reference.
 
 [Get started now](/docs/getting-started/quickstart/) - your server is 60 seconds away.

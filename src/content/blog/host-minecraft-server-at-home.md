@@ -15,7 +15,7 @@ keywords:
 
 Running your own Minecraft server at home is one of the most rewarding things you can do as a gamer. You control the rules, the mods, the player limit, and the world - no more relying on someone else's server that disappears overnight.
 
-This guide walks you through setting up a Minecraft Java server at home using Catalyst, from hardware requirements to port forwarding to running multiple worlds.
+This guide walks you through setting up a Minecraft Java server at home using Catalyst, from hardware requirements to port forwarding to running multiple worlds. If you are new to panels, our [first game server beginner guide](/blog/first-game-server-beginner-guide/) covers the basics. For a broader view of your options, see [every Pterodactyl alternative compared](/blog/pterodactyl-alternatives-2026/).
 
 ## What you need before you start
 
@@ -163,5 +163,7 @@ If your server is lagging with lots of players:
 That's it - you now have a Minecraft server running at home, managed through Catalyst, accessible to your friends. No more paying for hosting, no more relying on someone else's server, no more arbitrary limits.
 
 If you outgrow your home setup, the same Catalyst panel can manage remote nodes too. Add a VPS as a second node, migrate your servers, and keep going - all from the same dashboard.
+
+Want to compare Catalyst before you commit? See [how Catalyst compares to Pterodactyl](/pterodactyl-alternative/#comparison). Existing Pterodactyl user? Our [migration guide](/migrate-from-pterodactyl/) walks through the import.
 
 Ready to get started? [Install Catalyst](/docs/getting-started/quickstart/) and have your server running in under five minutes.

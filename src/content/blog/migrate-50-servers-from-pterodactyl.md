@@ -174,8 +174,12 @@ Hosting providers who've migrated to Catalyst report:
 - **Customer impact:** None when using the phased approach - players don't notice the migration
 - **Post-migration benefits:** Lower memory usage per server (containerd is more efficient), faster API responses, and easier automation through Catalyst's plugin system
 
+## Related reading
+
+If you're weighing the switch, our [three-way panel comparison](/blog/pterodactyl-vs-pelican-vs-catalyst/) breaks down architecture before you commit. For the business side, see [building a hosting business with Catalyst](/blog/game-hosting-business-with-catalyst/).
+
 ## Ready to migrate?
 
-The [migration guide](/migrate-from-pterodactyl/) has step-by-step instructions for each phase. Catalyst's built-in migration tool handles the heavy lifting - you just need to plan the sequence and verify along the way.
+The [migration guide](/migrate-from-pterodactyl/) has step-by-step instructions for each phase. Catalyst's built-in migration tool handles the heavy lifting - you just need to plan the sequence and verify along the way. For why hosts pick Catalyst's runtime, read [containerd vs Docker deep-dive](/blog/containerd-vs-docker-game-servers/).
 
 For large migrations (100+ servers), consider reaching out to the Catalyst community on GitHub for advice from hosts who've done it at your scale.

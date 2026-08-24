@@ -1,24 +1,24 @@
 {
   "repo": "catalystctl/catalyst",
   "repoUrl": "https://github.com/catalystctl/catalyst",
-  "commits": 918,
-  "releases": 130,
+  "commits": 920,
+  "releases": 131,
   "contributors": 8,
   "stars": 23,
   "forks": 5,
-  "lastPushedAt": "2026-08-24T09:23:28Z",
+  "lastPushedAt": "2026-08-24T13:25:52Z",
   "latestRelease": {
-    "tag": "v1.23.5",
-    "publishedAt": "2026-08-24T00:52:58Z",
-    "url": "https://github.com/catalystctl/catalyst/releases/tag/v1.23.5"
+    "tag": "v1.23.6",
+    "publishedAt": "2026-08-24T13:26:03Z",
+    "url": "https://github.com/catalystctl/catalyst/releases/tag/v1.23.6"
   },
   "ci": {
     "state": "running",
     "label": "Running",
     "conclusion": "success",
-    "workflow": "npm_and_yarn in / for @commitlint/cli, @commitlint/config-conventional, globals, @types/react, eventsource, rollup-plugin-visualizer - Update #1538158287",
-    "finishedAt": "2026-08-24T09:23:26Z",
-    "url": "https://github.com/catalystctl/catalyst/actions/runs/32710819858"
+    "workflow": "Code Quality: Push on main",
+    "finishedAt": "2026-08-24T13:27:38Z",
+    "url": "https://github.com/catalystctl/catalyst/actions/runs/32732645012"
   },
-  "fetchedAt": "2026-08-24T13:07:18.810Z"
+  "fetchedAt": "2026-08-24T14:53:24.989Z"
 }

@@ -13,12 +13,12 @@
     "url": "https://github.com/catalystctl/catalyst/releases/tag/v1.23.5"
   },
   "ci": {
-    "state": "passing",
-    "label": "Passing",
+    "state": "running",
+    "label": "Running",
     "conclusion": "success",
     "workflow": "Code Quality: Push on main",
     "finishedAt": "2026-08-24T00:54:31Z",
     "url": "https://github.com/catalystctl/catalyst/actions/runs/32678023187"
   },
-  "fetchedAt": "2026-08-24T03:12:40.730Z"
+  "fetchedAt": "2026-08-24T04:56:01.847Z"
 }

@@ -6,7 +6,7 @@
   "contributors": 8,
   "stars": 23,
   "forks": 5,
-  "lastPushedAt": "2026-08-24T00:52:47Z",
+  "lastPushedAt": "2026-08-24T09:23:28Z",
   "latestRelease": {
     "tag": "v1.23.5",
     "publishedAt": "2026-08-24T00:52:58Z",
@@ -16,9 +16,9 @@
     "state": "running",
     "label": "Running",
     "conclusion": "success",
-    "workflow": "Code Quality: Push on main",
-    "finishedAt": "2026-08-24T00:54:31Z",
-    "url": "https://github.com/catalystctl/catalyst/actions/runs/32678023187"
+    "workflow": "npm_and_yarn in / for @commitlint/cli, @commitlint/config-conventional, globals, @types/react, eventsource, rollup-plugin-visualizer - Update #1538158287",
+    "finishedAt": "2026-08-24T09:23:26Z",
+    "url": "https://github.com/catalystctl/catalyst/actions/runs/32710819858"
   },
-  "fetchedAt": "2026-08-24T08:58:54.971Z"
+  "fetchedAt": "2026-08-24T09:57:46.608Z"
 }

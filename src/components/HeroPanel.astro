@@ -1,0 +1,700 @@
+---
+/**
+ * HeroPanel — faithful HTML recreation of the Catalyst dashboard
+ * (mirrors src/assets/screenshots/user/dashboard.png).
+ * Animates resource bars and activity timestamps; subtle parallax tilt.
+ * All motion is disabled under prefers-reduced-motion.
+ */
+const B = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "") + "/";
+
+const sideSections = [
+  "Administration",
+  "Infrastructure",
+  "Access Control",
+  "Configuration",
+  "Monitoring",
+  "Extensions",
+];
+
+const stats = [
+  { icon: "server", value: "2", label: "1 running", tone: "peach" },
+  { icon: "node", value: "2", label: "1 connected", tone: "peach" },
+  { icon: "alert", value: "5", label: "2 unacknowledged", tone: "amber" },
+];
+
+const actions = [
+  { title: "Create Server", sub: "Deploy a new game server", tone: "peach" },
+  { title: "Register Node", sub: "Add infrastructure", tone: "peach" },
+  { title: "View Alerts", sub: "2 need attention", tone: "red" },
+];
+
+const activity = [
+  { title: "Login Success", detail: "ip: 127.0.0.1 · session created", ago: 18 },
+  { title: "Login Success", detail: "ip: 127.0.0.1 · session created", ago: 34 },
+  { title: "Mod Manager Settings Update", detail: "curseforgeConfigured: true", ago: 41 },
+  { title: "Smtp Update", detail: "port 587 · secure enabled", ago: 55 },
+];
+---
+
+<div class="hp-scene" id="hp-scene">
+  <div class="hp-panel" id="hp-panel" role="img" aria-label="Animated preview of the Catalyst game server management dashboard">
+    <!-- Sidebar -->
+    <aside class="hp-side" aria-hidden="true">
+      <div class="hp-brand">
+        <img src={B + "logo-64.webp"} alt="" width="20" height="20" class="hp-brand-logo" />
+        <span class="hp-brand-name">Catalyst</span>
+      </div>
+
+      <nav class="hp-nav">
+        <span class="hp-nav-item hp-active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Dashboard
+        </span>
+        <span class="hp-nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="7" rx="2"/><rect x="2" y="13" width="20" height="7" rx="2"/><circle cx="6" cy="7.5" r="0.5" fill="currentColor"/><circle cx="6" cy="16.5" r="0.5" fill="currentColor"/></svg>
+          Servers
+        </span>
+      </nav>
+
+      <div class="hp-nav-sections">
+        {sideSections.map((s) => (
+          <span class="hp-nav-section">
+            {s}
+            <svg class="hp-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+          </span>
+        ))}
+      </div>
+
+      <div class="hp-user">
+        <span class="hp-avatar">AD</span>
+        <span class="hp-user-meta">
+          <span class="hp-user-name">admin</span>
+          <span class="hp-user-role">Administrator</span>
+        </span>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <div class="hp-main">
+      <!-- Top bar -->
+      <div class="hp-topbar">
+        <span class="hp-crumb">Dashboard <span class="hp-crumb-sep">›</span> <span class="hp-crumb-here">Dashboard</span></span>
+        <span class="hp-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+          Search
+          <kbd>⌘K</kbd>
+        </span>
+      </div>
+
+      <div class="hp-content">
+        <!-- Greeting card -->
+        <div class="hp-greet">
+          <div class="hp-greet-top">
+            <div>
+              <span class="hp-greet-eyebrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                Dashboard
+              </span>
+              <div class="hp-greet-title">Good afternoon, admin</div>
+              <div class="hp-greet-sub">Welcome back. Here's an overview of your infrastructure at a glance.</div>
+            </div>
+            <span class="hp-healthy"><span class="hp-dot"></span> System healthy</span>
+          </div>
+
+          <div class="hp-stat-cards">
+            {stats.map((s) => (
+              <div class="hp-stat-card">
+                <span class:list={["hp-stat-icon", `hp-stat-icon-${s.tone}`]}>
+                  {s.icon === "server" && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/></svg>
+                  )}
+                  {s.icon === "node" && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 12h16M12 4v16"/></svg>
+                  )}
+                  {s.icon === "alert" && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l10 18H2L12 3z"/><path d="M12 10v5"/><circle cx="12" cy="18" r="0.5" fill="currentColor"/></svg>
+                  )}
+                </span>
+                <span>
+                  <span class="hp-stat-value">{s.value}</span>
+                  <span class="hp-stat-label">{s.label}</span>
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <!-- Quick actions -->
+        <div class="hp-actions">
+          {actions.map((a) => (
+            <div class="hp-action">
+              <span class:list={["hp-action-icon", `hp-action-${a.tone}`]}>
+                {a.tone === "red"
+                  ? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/></svg>
+                  : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>}
+              </span>
+              <span class="hp-action-meta">
+                <span class="hp-action-title">{a.title}</span>
+                <span class="hp-action-sub">{a.sub}</span>
+              </span>
+              <svg class="hp-action-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14m-6-6l6 6-6 6"/></svg>
+            </div>
+          ))}
+        </div>
+
+        <!-- Utilization + activity -->
+        <div class="hp-cols">
+          <div class="hp-card">
+            <div class="hp-card-head">
+              <div>
+                <div class="hp-card-title">Resource Utilization</div>
+                <div class="hp-card-sub">Live metrics across all nodes</div>
+              </div>
+              <span class="hp-live"><span class="hp-dot"></span> Live</span>
+            </div>
+            <div class="hp-metrics">
+              <div class="hp-metric">
+                <span class="hp-metric-icon hp-metric-peach"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></svg></span>
+                <span class="hp-metric-name">CPU</span>
+                <div class="hp-metric-bar"><div class="hp-metric-fill" id="hp-cpu" style="width:24%"></div></div>
+                <span class="hp-metric-val" id="hp-cpu-val">24%</span>
+              </div>
+              <div class="hp-metric">
+                <span class="hp-metric-icon hp-metric-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/></svg></span>
+                <span class="hp-metric-name">Memory</span>
+                <div class="hp-metric-bar"><div class="hp-metric-fill hp-fill-green" id="hp-mem" style="width:36%"></div></div>
+                <span class="hp-metric-val" id="hp-mem-val">36%</span>
+              </div>
+              <div class="hp-metric">
+                <span class="hp-metric-icon hp-metric-amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="9"/></svg></span>
+                <span class="hp-metric-name">Network</span>
+                <div class="hp-metric-bar"><div class="hp-metric-fill hp-fill-amber" id="hp-net" style="width:5%"></div></div>
+                <span class="hp-metric-val" id="hp-net-val">5%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="hp-card">
+            <div class="hp-card-head">
+              <div class="hp-card-title">Recent Activity</div>
+              <span class="hp-viewall">View all →</span>
+            </div>
+            <ul class="hp-feed" id="hp-feed">
+              {activity.map((a) => (
+                <li class="hp-feed-item">
+                  <span class="hp-feed-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>
+                  <span class="hp-feed-meta">
+                    <span class="hp-feed-title">{a.title}</span>
+                    <span class="hp-feed-detail">{a.detail}</span>
+                  </span>
+                  <span class="hp-feed-ago" data-ago={a.ago}>{a.ago}s ago</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floor glow -->
+  <div class="hp-floor" aria-hidden="true"></div>
+</div>
+
+<style>
+  .hp-scene {
+    perspective: 1600px;
+  }
+
+  .hp-panel {
+    display: grid;
+    grid-template-columns: 148px 1fr;
+    border-radius: 0.75rem;
+    border: 1px solid hsl(33 15% 13%);
+    background: hsl(35 10% 4%);
+    overflow: hidden;
+    text-align: left;
+    box-shadow:
+      0 0 0 1px hsl(29 47% 56% / 0.12),
+      0 24px 60px -24px rgb(0 0 0 / 0.7),
+      0 0 80px -32px hsl(29 47% 56% / 0.25);
+    transition: transform 0.25s ease-out;
+    will-change: transform;
+    font-size: 11px;
+    min-height: 380px;
+  }
+  @media (max-width: 640px) {
+    .hp-panel { grid-template-columns: 1fr; }
+    .hp-side { display: none !important; }
+  }
+
+  /* ── Sidebar ── */
+  .hp-side {
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid hsl(33 15% 11%);
+    background: hsl(36 12% 3%);
+    padding: 0.7rem 0.6rem;
+  }
+  .hp-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.2rem 0.4rem 0.7rem;
+  }
+  .hp-brand-logo { width: 20px; height: 20px; border-radius: 5px; }
+  .hp-brand-name {
+    font-family: 'Outfit Variable', system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 12.5px;
+    color: hsl(var(--foreground));
+  }
+  .hp-nav { display: flex; flex-direction: column; gap: 2px; }
+  .hp-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.6rem;
+    border-radius: 0.4rem;
+    font-size: 11px;
+    font-weight: 500;
+    color: hsl(var(--zinc-400));
+  }
+  .hp-nav-item svg { width: 13px; height: 13px; }
+  .hp-nav-item.hp-active {
+    background: hsl(29 47% 56%);
+    color: hsl(30 45% 10%);
+    font-weight: 600;
+  }
+  .hp-nav-sections {
+    margin-top: 0.9rem;
+    padding-top: 0.7rem;
+    border-top: 1px solid hsl(33 15% 11%);
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .hp-nav-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.3rem 0.6rem;
+    font-size: 8.5px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: hsl(var(--zinc-600));
+  }
+  .hp-chev { width: 10px; height: 10px; opacity: 0.5; }
+  .hp-user {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.4rem 0.2rem;
+    border-top: 1px solid hsl(33 15% 11%);
+  }
+  .hp-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px; height: 22px;
+    border-radius: 9999px;
+    background: hsl(29 47% 56% / 0.2);
+    border: 1px solid hsl(29 47% 56% / 0.35);
+    font-size: 8px;
+    font-weight: 700;
+    color: hsl(var(--accent-peach-light));
+  }
+  .hp-user-meta { display: flex; flex-direction: column; line-height: 1.25; }
+  .hp-user-name { font-size: 10.5px; font-weight: 600; color: hsl(var(--zinc-200)); }
+  .hp-user-role { font-size: 8.5px; color: hsl(var(--zinc-600)); }
+
+  /* ── Main ── */
+  .hp-main { display: flex; flex-direction: column; min-width: 0; }
+  .hp-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.55rem 0.9rem;
+    border-bottom: 1px solid hsl(33 15% 10%);
+  }
+  .hp-crumb { font-size: 10.5px; color: hsl(var(--zinc-500)); }
+  .hp-crumb-sep { margin-inline: 0.25rem; color: hsl(var(--zinc-700)); }
+  .hp-crumb-here { color: hsl(var(--zinc-300)); font-weight: 500; }
+  .hp-search {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.25rem 0.55rem;
+    border-radius: 0.4rem;
+    border: 1px solid hsl(33 15% 12%);
+    background: hsl(36 11% 5%);
+    font-size: 9.5px;
+    color: hsl(var(--zinc-600));
+  }
+  .hp-search svg { width: 10px; height: 10px; }
+  .hp-search kbd {
+    font-family: 'JetBrains Mono Variable', monospace;
+    font-size: 8px;
+    padding: 1px 4px;
+    border-radius: 3px;
+    border: 1px solid hsl(33 15% 14%);
+    background: hsl(35 9% 7%);
+    color: hsl(var(--zinc-600));
+  }
+
+  .hp-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    padding: 0.7rem 0.9rem 0.9rem;
+    background:
+      radial-gradient(ellipse 90% 60% at 70% -10%, hsl(29 40% 40% / 0.14), transparent 60%),
+      hsl(35 10% 4%);
+  }
+
+  /* Greeting card */
+  .hp-greet {
+    border-radius: 0.6rem;
+    border: 1px solid hsl(28 30% 16%);
+    background: linear-gradient(120deg, hsl(28 38% 12%) 0%, hsl(26 32% 8%) 55%, hsl(30 20% 6%) 100%);
+    padding: 0.8rem 0.9rem;
+  }
+  .hp-greet-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .hp-greet-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 9px;
+    font-weight: 500;
+    color: hsl(var(--accent-peach-light));
+  }
+  .hp-greet-eyebrow svg { width: 11px; height: 11px; }
+  .hp-greet-title {
+    margin-top: 0.2rem;
+    font-family: 'Outfit Variable', system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: hsl(var(--foreground));
+    letter-spacing: -0.01em;
+  }
+  .hp-greet-sub { margin-top: 0.15rem; font-size: 9.5px; color: hsl(var(--zinc-500)); }
+  .hp-healthy {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+    padding: 0.25rem 0.6rem;
+    border-radius: 9999px;
+    border: 1px solid hsl(var(--success) / 0.25);
+    background: hsl(var(--success-muted));
+    font-size: 9px;
+    font-weight: 600;
+    color: hsl(var(--success));
+  }
+  .hp-dot {
+    width: 4px; height: 4px;
+    border-radius: 9999px;
+    background: hsl(var(--success));
+    box-shadow: 0 0 5px hsl(var(--success) / 0.6);
+  }
+
+  .hp-stat-cards {
+    margin-top: 0.7rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+  .hp-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 0.6rem;
+    border-radius: 0.5rem;
+    border: 1px solid hsl(28 25% 16%);
+    background: hsl(28 30% 8% / 0.6);
+  }
+  .hp-stat-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px; height: 20px;
+    border-radius: 0.35rem;
+    flex-shrink: 0;
+  }
+  .hp-stat-icon svg { width: 11px; height: 11px; }
+  .hp-stat-icon-peach { background: hsl(29 47% 56% / 0.2); color: hsl(var(--accent-peach-light)); }
+  .hp-stat-icon-amber { background: hsl(38 92% 50% / 0.16); color: hsl(38 92% 60%); }
+  .hp-stat-value {
+    display: block;
+    font-family: 'Outfit Variable', system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 1.1;
+    color: hsl(var(--foreground));
+  }
+  .hp-stat-label { display: block; font-size: 8.5px; color: hsl(var(--zinc-500)); }
+
+  /* Quick actions */
+  .hp-actions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+  @media (max-width: 640px) {
+    .hp-actions { grid-template-columns: 1fr; }
+    .hp-stat-cards { grid-template-columns: repeat(3, 1fr); }
+  }
+  .hp-action {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.5rem 0.65rem;
+    border-radius: 0.5rem;
+    border: 1px solid hsl(33 15% 12%);
+    background: hsl(35 9% 5%);
+    min-width: 0;
+  }
+  .hp-action-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px; height: 22px;
+    border-radius: 0.4rem;
+    flex-shrink: 0;
+  }
+  .hp-action-icon svg { width: 12px; height: 12px; }
+  .hp-action-peach { background: hsl(29 47% 56% / 0.2); color: hsl(var(--accent-peach-light)); }
+  .hp-action-red { background: hsl(0 70% 45% / 0.25); color: hsl(0 84% 65%); }
+  .hp-action-meta { min-width: 0; line-height: 1.3; }
+  .hp-action-title {
+    display: block;
+    font-size: 10px;
+    font-weight: 600;
+    color: hsl(var(--zinc-200));
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .hp-action-sub {
+    display: block;
+    font-size: 8.5px;
+    color: hsl(var(--zinc-600));
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .hp-action-arrow {
+    margin-left: auto;
+    width: 11px; height: 11px;
+    flex-shrink: 0;
+    color: hsl(var(--zinc-700));
+  }
+
+  /* Bottom cards */
+  .hp-cols {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 0.55rem;
+    flex: 1;
+  }
+  @media (max-width: 640px) {
+    .hp-cols { grid-template-columns: 1fr; }
+    .hp-feed-item:nth-child(n+3) { display: none !important; }
+  }
+  .hp-card {
+    border-radius: 0.6rem;
+    border: 1px solid hsl(33 15% 11%);
+    background: hsl(35 9% 5%);
+    padding: 0.7rem 0.8rem;
+    min-width: 0;
+  }
+  .hp-card-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.6rem;
+  }
+  .hp-card-title {
+    font-family: 'Outfit Variable', system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 11.5px;
+    color: hsl(var(--foreground));
+  }
+  .hp-card-sub { margin-top: 0.1rem; font-size: 8.5px; color: hsl(var(--zinc-600)); }
+  .hp-live {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 9999px;
+    border: 1px solid hsl(var(--success) / 0.25);
+    background: hsl(var(--success-muted));
+    font-size: 8.5px;
+    font-weight: 600;
+    color: hsl(var(--success));
+    white-space: nowrap;
+  }
+  .hp-viewall { font-size: 8.5px; font-weight: 500; color: hsl(var(--accent-peach-light)); white-space: nowrap; }
+
+  /* Metrics */
+  .hp-metrics { display: flex; flex-direction: column; gap: 0.55rem; }
+  .hp-metric { display: flex; align-items: center; gap: 0.5rem; }
+  .hp-metric-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px; height: 16px;
+    border-radius: 0.3rem;
+    flex-shrink: 0;
+  }
+  .hp-metric-icon svg { width: 9px; height: 9px; }
+  .hp-metric-peach { background: hsl(29 47% 56% / 0.18); color: hsl(var(--accent-peach-light)); }
+  .hp-metric-green { background: hsl(var(--success-muted)); color: hsl(var(--success)); }
+  .hp-metric-amber { background: hsl(38 92% 50% / 0.14); color: hsl(38 92% 60%); }
+  .hp-metric-name { width: 44px; font-size: 9.5px; color: hsl(var(--zinc-400)); flex-shrink: 0; }
+  .hp-metric-bar {
+    flex: 1;
+    height: 4px;
+    border-radius: 9999px;
+    background: hsl(33 12% 13%);
+    overflow: hidden;
+  }
+  .hp-metric-fill {
+    height: 100%;
+    border-radius: 9999px;
+    background: hsl(var(--primary));
+    transition: width 1.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .hp-fill-green { background: hsl(var(--success)); }
+  .hp-fill-amber { background: hsl(38 92% 50%); }
+  .hp-metric-val {
+    width: 28px;
+    text-align: right;
+    font-family: 'JetBrains Mono Variable', monospace;
+    font-size: 9px;
+    color: hsl(var(--zinc-400));
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+  }
+
+  /* Activity feed */
+  .hp-feed { list-style: none; margin: 0; padding: 0; }
+  .hp-feed-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.4rem 0;
+    border-top: 1px solid hsl(33 15% 9%);
+  }
+  .hp-feed-item:first-child { border-top: 0; }
+  .hp-feed-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px; height: 16px;
+    border-radius: 0.3rem;
+    background: hsl(33 12% 12%);
+    color: hsl(var(--zinc-500));
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .hp-feed-icon svg { width: 8px; height: 8px; }
+  .hp-feed-meta { min-width: 0; flex: 1; line-height: 1.35; }
+  .hp-feed-title {
+    display: block;
+    font-size: 9.5px;
+    font-weight: 600;
+    color: hsl(var(--zinc-200));
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .hp-feed-detail {
+    display: block;
+    font-family: 'JetBrains Mono Variable', monospace;
+    font-size: 8px;
+    color: hsl(var(--zinc-600));
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .hp-feed-ago {
+    font-size: 8px;
+    color: hsl(var(--zinc-600));
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hp-floor {
+    height: 4rem;
+    margin-top: -1.5rem;
+    background: radial-gradient(ellipse 50% 100% at 50% 0%, hsl(29 47% 56% / 0.14), transparent 70%);
+    filter: blur(6px);
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hp-panel { transition: none; }
+    .hp-metric-fill { transition: none; }
+  }
+</style>
+
+<script>
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ── Resource jitter (CPU / Memory / Network) ──
+  if (!reduceMotion) {
+    const el = (id: string) => document.getElementById(id);
+    const cpu = el('hp-cpu'), cpuVal = el('hp-cpu-val');
+    const mem = el('hp-mem'), memVal = el('hp-mem-val');
+    const net = el('hp-net'), netVal = el('hp-net-val');
+    setInterval(() => {
+      const c = 8 + Math.round(Math.random() * 40);
+      const m = 30 + Math.round(Math.random() * 14);
+      const n = 2 + Math.round(Math.random() * 16);
+      if (cpu) cpu.style.width = `${c}%`;
+      if (cpuVal) cpuVal.textContent = `${c}%`;
+      if (mem) mem.style.width = `${m}%`;
+      if (memVal) memVal.textContent = `${m}%`;
+      if (net) net.style.width = `${n}%`;
+      if (netVal) netVal.textContent = `${n}%`;
+    }, 2800);
+  }
+
+  // ── Activity timestamps tick ──
+  if (!reduceMotion) {
+    const agos = document.querySelectorAll<HTMLElement>('.hp-feed-ago');
+    setInterval(() => {
+      agos.forEach((el) => {
+        const next = parseInt(el.dataset.ago || '10', 10) + 5;
+        el.dataset.ago = String(next);
+        el.textContent = `${next}s ago`;
+      });
+    }, 5000);
+  }
+
+  // ── Parallax tilt ──
+  const scene = document.getElementById('hp-scene');
+  const panel = document.getElementById('hp-panel');
+  if (scene && panel && !reduceMotion && window.matchMedia('(pointer: fine)').matches) {
+    scene.addEventListener('pointermove', (e) => {
+      const rect = scene.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      panel.style.transform = `rotateX(${(-y * 2).toFixed(2)}deg) rotateY(${(x * 2).toFixed(2)}deg)`;
+    });
+    scene.addEventListener('pointerleave', () => {
+      panel.style.transform = '';
+    });
+  }
+</script>

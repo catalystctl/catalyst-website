@@ -11,10 +11,10 @@
    ═══════════════════════════════════════════════════════════ */
 
 :root {
-  /* ── Primary Accent (Warm Peach/Salmon) ── */
-  --accent-peach: 25 55% 58%;
-  --accent-peach-light: 25 60% 68%;
-  --accent-peach-muted: 25 55% 58% / 0.12;
+  /* ── Primary Accent (Warm Catalyst Orange) ── */
+  --accent-peach: 29 47% 56%;
+  --accent-peach-light: 29 52% 66%;
+  --accent-peach-muted: 29 47% 56% / 0.12;
 
   /* ── Success (Green) ── */
   --success: 142 71% 55%;
@@ -26,17 +26,17 @@
   --info: 174 80% 46%;
   --info-muted: 174 80% 46% / 0.12;
 
-  /* ── Dark Mode Tokens (Product Accurate) ── */
-  --background: 0 0% 4%;
-  --foreground: 0 0% 94%;
-  --muted: 0 0% 10%;
-  --muted-foreground: 0 0% 52%;
-  --popover: 0 0% 5%;
-  --popover-foreground: 0 0% 94%;
-  --card: 0 0% 6%;
-  --card-foreground: 0 0% 94%;
-  --border: 0 0% 13%;
-  --input: 0 0% 13%;
+  /* ── Dark Mode Tokens (Warm Charcoal) ── */
+  --background: 36 13% 3%;
+  --foreground: 41 20% 94%;
+  --muted: 35 9% 9%;
+  --muted-foreground: 37 8% 58%;
+  --popover: 36 12% 5%;
+  --popover-foreground: 41 20% 94%;
+  --card: 35 10% 6%;
+  --card-foreground: 41 20% 94%;
+  --border: 33 15% 13%;
+  --input: 33 15% 13%;
   --primary: var(--accent-peach);
   --primary-foreground: 0 0% 4%;
   --secondary: 0 0% 10%;
@@ -48,24 +48,24 @@
   --ring: var(--accent-peach);
   --radius: 0.625rem;
 
-  /* ── Zinc Scale ── */
-  --zinc-50: 0 0% 98%;
-  --zinc-100: 0 0% 96%;
-  --zinc-200: 0 0% 90%;
-  --zinc-300: 0 0% 83%;
-  --zinc-400: 0 0% 64%;
-  --zinc-500: 0 0% 46%;
-  --zinc-600: 0 0% 34%;
-  --zinc-700: 0 0% 24%;
-  --zinc-800: 0 0% 16%;
-  --zinc-900: 0 0% 10%;
-  --zinc-950: 0 0% 4%;
+  /* ── Zinc Scale (warm-tinted neutrals) ── */
+  --zinc-50: 40 6% 98%;
+  --zinc-100: 40 6% 96%;
+  --zinc-200: 38 7% 90%;
+  --zinc-300: 38 8% 83%;
+  --zinc-400: 37 7% 64%;
+  --zinc-500: 35 6% 46%;
+  --zinc-600: 34 7% 34%;
+  --zinc-700: 33 9% 24%;
+  --zinc-800: 32 10% 16%;
+  --zinc-900: 33 12% 10%;
+  --zinc-950: 36 13% 4%;
 
   /* ── Surface Elevation ── */
-  --surface-0: 0 0% 4%;
-  --surface-1: 0 0% 6%;
-  --surface-2: 0 0% 9%;
-  --surface-3: 0 0% 13%;
+  --surface-0: 36 11% 4%;
+  --surface-1: 35 9% 5%;
+  --surface-2: 32 10% 7%;
+  --surface-3: 31 11% 11%;
 
   /* ── Scrollbar ── */
   --scrollbar-track: transparent;
@@ -279,8 +279,8 @@ html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover, *::-we
 
 /* Terminal */
 .terminal {
-  background: hsl(0 0% 5%);
-  border: 1px solid hsl(0 0% 13%);
+  background: hsl(35 10% 4%);
+  border: 1px solid hsl(33 15% 13%);
   border-radius: 0.625rem;
   overflow: hidden;
 }
@@ -290,8 +290,8 @@ html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover, *::-we
   align-items: center;
   gap: 0.5rem;
   padding: 0.625rem 1rem;
-  border-bottom: 1px solid hsl(0 0% 13%);
-  background: hsl(0 0% 7%);
+  border-bottom: 1px solid hsl(33 15% 13%);
+  background: hsl(34 10% 6%);
 }
 
 .terminal-dot {
@@ -309,8 +309,8 @@ html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover, *::-we
 }
 
 .terminal-body .prompt { color: hsl(var(--primary)); }
-.terminal-body .cmd { color: hsl(0 0% 70%); }
-.terminal-body .comment { color: hsl(0 0% 30%); }
+.terminal-body .cmd { color: hsl(38 8% 72%); }
+.terminal-body .comment { color: hsl(36 6% 32%); }
 .terminal-body .success { color: hsl(var(--success)); }
 .terminal-body .url { color: hsl(var(--primary)); }
 
@@ -326,15 +326,15 @@ html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover, *::-we
   font-weight: 500;
   color: hsl(var(--zinc-500));
   background: transparent;
-  border: 1px solid hsl(0 0% 16%);
+  border: 1px solid hsl(33 12% 16%);
   cursor: pointer;
   transition: all 0.15s ease;
   min-height: 28px;
 }
 .copy-btn:hover {
   color: hsl(var(--zinc-300));
-  border-color: hsl(0 0% 22%);
-  background: hsl(0 0% 10%);
+  border-color: hsl(33 12% 24%);
+  background: hsl(35 9% 10%);
 }
 .copy-btn.copied {
   color: hsl(var(--success));
@@ -354,7 +354,7 @@ html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover, *::-we
 .progress-bar {
   height: 4px;
   border-radius: 9999px;
-  background: hsl(0 0% 14%);
+  background: hsl(33 12% 14%);
   overflow: hidden;
 }
 .progress-bar-fill {
@@ -446,13 +446,13 @@ html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover, *::-we
 .doc p { margin-top: 0; margin-bottom: 1.25rem; }
 
 .doc a {
-  color: hsl(25 55% 65%);
+  color: hsl(29 47% 66%);
   text-decoration: underline;
   text-underline-offset: 3px;
-  text-decoration-color: hsl(25 55% 58% / 0.3);
+  text-decoration-color: hsl(29 47% 56% / 0.3);
   transition: text-decoration-color 0.15s;
 }
-.doc a:hover { text-decoration-color: hsl(25 55% 58% / 0.8); }
+.doc a:hover { text-decoration-color: hsl(29 47% 56% / 0.8); }
 
 .doc ul {
   list-style-type: disc;
@@ -474,10 +474,10 @@ html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover, *::-we
   padding-left: 0.25rem;
 }
 
-.doc li::marker { color: hsl(25 55% 58% / 0.5); }
+.doc li::marker { color: hsl(29 47% 56% / 0.5); }
 
 .doc ol > li::marker {
-  color: hsl(25 55% 58%);
+  color: hsl(29 47% 56%);
   font-weight: 600;
 }
 
@@ -489,10 +489,10 @@ html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover, *::-we
 .doc :not(pre) > code {
   font-family: 'JetBrains Mono Variable', monospace;
   font-size: 0.85em;
-  background: hsl(0 0% 12% / 0.7);
+  background: hsl(35 9% 10% / 0.7);
   border-radius: 4px;
   padding: 0.15em 0.4em;
-  color: hsl(25 50% 72%);
+  color: hsl(29 45% 72%);
   font-weight: 500;
 }
 
@@ -500,13 +500,13 @@ html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover, *::-we
   font-family: 'JetBrains Mono Variable', monospace;
   font-size: 0.85rem;
   line-height: 1.7;
-  background: hsl(0 0% 3%) !important;
-  border: 1px solid hsl(0 0% 13% / 0.5);
+  background: hsl(36 13% 3%) !important;
+  border: 1px solid hsl(33 15% 13% / 0.5);
   border-radius: 10px;
   padding: 1.25rem 1.5rem;
   overflow-x: auto;
   margin: 1.25rem 0 2rem;
-  color: hsl(0 0% 80%) !important;
+  color: hsl(38 8% 80%) !important;
   position: relative;
 }
 
@@ -556,7 +556,7 @@ html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover, *::-we
 .doc blockquote {
   margin: 1.5rem 0;
   padding: 1rem 1.25rem;
-  border-left: 3px solid hsl(25 55% 58% / 0.4);
+  border-left: 3px solid hsl(29 47% 56% / 0.4);
   background: hsl(0 0% 10% / 0.3);
   border-radius: 0 8px 8px 0;
   color: hsl(0 0% 68%);
@@ -666,6 +666,92 @@ html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover, *::-we
 /* Text wrap helpers for display type */
 .text-balance { text-wrap: balance; }
 .text-pretty { text-wrap: pretty; }
+
+/* ═══════════════════════════════════════════════════════
+   SPOTLIGHT CARDS — cursor-tracked highlight + border lift.
+   Index page sets --mx/--my via one delegated listener.
+   ═══════════════════════════════════════════════════════ */
+
+.spotlight-card {
+  --mx: 50%;
+  --my: 50%;
+  position: relative;
+}
+.spotlight-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  background: radial-gradient(240px circle at var(--mx) var(--my), hsl(var(--primary) / 0.07), transparent 65%);
+}
+.spotlight-card::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  padding: 1px;
+  background: radial-gradient(200px circle at var(--mx) var(--my), hsl(var(--primary) / 0.55), transparent 70%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+.spotlight-card:hover::before,
+.spotlight-card:hover::after {
+  opacity: 1;
+}
+.spotlight-card > * {
+  position: relative;
+}
+
+/* Hero ambient lighting */
+.hero-glow {
+  background: radial-gradient(ellipse 60% 45% at 50% 0%, hsl(29 47% 56% / 0.10), transparent 70%);
+}
+
+/* ═══════════════════════════════════════════════════════
+   ARCHITECTURE FLOW — traveling packet on connector line
+   ═══════════════════════════════════════════════════════ */
+
+.flow-connector {
+  width: 1px;
+  height: 2.25rem;
+  margin-inline: auto;
+  background: linear-gradient(hsl(var(--primary) / 0.5), hsl(var(--primary) / 0.15));
+  overflow: visible;
+}
+.flow-packet {
+  display: block;
+  width: 5px;
+  height: 5px;
+  border-radius: 9999px;
+  background: hsl(var(--primary));
+  box-shadow: 0 0 8px hsl(var(--primary) / 0.9);
+  transform: translateX(-2px);
+  animation: flowDown 1.6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+@keyframes flowDown {
+  from { transform: translate(-2px, -3px); opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  to { transform: translate(-2px, calc(2.25rem + 3px)); opacity: 0; }
+}
+
+/* Fleet node card pulse */
+@keyframes nodePing {
+  0%, 100% { box-shadow: 0 0 0 0 hsl(var(--success) / 0.35); }
+  60% { box-shadow: 0 0 0 4px hsl(var(--success) / 0); }
+}
+.node-dot-live {
+  animation: nodePing 2.4s ease-out infinite;
+}
+
 
 /* Skip link: visible on keyboard focus only */
 .skip-link {

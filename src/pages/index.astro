@@ -6,7 +6,7 @@ import { Image } from 'astro:assets';
 import '@fontsource-variable/jetbrains-mono';
 import githubStats from "../data/github-stats.json";
 import { formatCount } from "../lib/github-stats.mjs";
-import heroImg from "../assets/screenshots/user/dashboard.png";
+import HeroPanel from "../components/HeroPanel.astro";
 import shot1 from "../assets/screenshots/user/dashboard.png";
 import shot2 from "../assets/screenshots/user/profile.png";
 import shot3 from "../assets/screenshots/user/server-test.png";
@@ -24,16 +24,50 @@ const previewShots = [
   { img: shot4, alt: "Catalyst servers list with status and resources" },
 ];
 
+const steps = [
+  {
+    n: "01",
+    title: "Install the panel.",
+    body: "One script brings up the full stack: panel, database, reverse proxy. Auto-generated secrets, TLS-ready defaults.",
+    code: "$ curl -fsSL … | bash",
+  },
+  {
+    n: "02",
+    title: "Add a node.",
+    body: "Point it at any Linux box with containerd. The agent is a single lightweight Rust binary — no daemon maze.",
+    code: "agent ▸ registered · rtt 4ms",
+  },
+  {
+    n: "03",
+    title: "Deploy from a template.",
+    body: "Minecraft, CS2, ARK, Terraria — anything that runs in a Linux container. Console streams before you finish reading this.",
+    code: "> Done (3.72s)! Server listening :25565",
+  },
+];
+
+const bigStats = [
+  { value: "<10ms", label: "WebSocket console round-trip", hint: "Native Rust layer. No Node hop in the middle.", live: true },
+  { value: "<60s", label: "Bare server to running panel", hint: "One script. Docker Compose included." },
+  { value: "60+", label: "REST API endpoints", hint: "Automate everything. RBAC-aware down to the route." },
+  { value: "~50MB", label: "Panel footprint at rest", hint: "Rust core. One core and half a gig of RAM for small fleets." },
+];
+
+const fleetNodes = [
+  { name: "eu-west-1", kind: "bare-metal", ping: 4 },
+  { name: "eu-west-2", kind: "bare-metal", ping: 5 },
+  { name: "us-east-1", kind: "kvm", ping: 12 },
+  { name: "us-east-2", kind: "kvm", ping: 14 },
+  { name: "ap-south-1", kind: "kvm", ping: 38 },
+  { name: "ap-northeast-1", kind: "bare-metal", ping: 52 },
+  { name: "sa-east-1", kind: "kvm", ping: 44 },
+  { name: "edge-hel-01", kind: "container", ping: 9 },
+];
+
 const features = [
   {
     title: "Create Server",
     description: "Deploy from a template in seconds with automatic environment provisioning.",
     icon: `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>`,
-  },
-  {
-    title: "Real-Time Console",
-    description: "Live log streaming via WebSocket with zero-latency bidirectional I/O.",
-    icon: `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 011.06 0z" /></svg>`,
   },
   {
     title: "Enterprise Security",
@@ -65,13 +99,6 @@ const comparison = [
   { feature: "Plugin system", catalyst: "Native hooks", pterodactyl: "None" },
   { feature: "RBAC permissions", catalyst: "20+ granular", pterodactyl: "Basic" },
   { feature: "Install", catalyst: "Single script", pterodactyl: "Manual + Wings" },
-];
-
-const metrics = [
-  { value: "60+", label: "REST endpoints" },
-  { value: "<10ms", label: "Console latency" },
-  { value: "60s", label: "Typical install" },
-  { value: "GPLv3", label: "Open source" },
 ];
 
 const gh = githubStats;
@@ -133,217 +160,240 @@ const faqs = [
     a: "Any Linux server with Docker and Docker Compose. The panel needs about one CPU core and 512MB RAM for small fleets. Nodes need containerd and the Catalyst agent.",
   },
 ];
+
+const archLayers = [
+  { name: "Your game server", detail: "Minecraft · CS2 · ARK · anything", tone: "dim" },
+  { name: "Catalyst", detail: "Panel · console · scheduling · RBAC", tone: "hl" },
+  { name: "containerd", detail: "Native runtime. No Docker daemon.", tone: "" },
+  { name: "Linux", detail: "Any distro with kernel ≥ 5.x", tone: "dim" },
+];
 ---
 
 <Layout title="Home" description="Catalyst replaces Pterodactyl with a Rust backend, containerd runtime, and 60+ API endpoints. Deploy game servers in 60 seconds. Free, open source, GPLv3.">
 
-  <script>
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('revealed');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
-    document.querySelectorAll('[data-reveal], [data-reveal-stagger]').forEach((el) => observer.observe(el));
-
-    document.querySelectorAll('.copy-btn').forEach((btn) => {
-      btn.addEventListener('click', async () => {
-        const text = btn.getAttribute('data-copy') || '';
-        await navigator.clipboard.writeText(text);
-        const original = btn.innerHTML;
-        btn.innerHTML = '<svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg> Copied';
-        btn.classList.add('copied');
-        setTimeout(() => { btn.innerHTML = original; btn.classList.remove('copied'); }, 2000);
-      });
-    });
-  </script>
-
-  <!-- HERO: asymmetric split, conversion-first -->
+  <!-- ═══ HERO ═══ -->
   <section class="relative overflow-hidden" aria-label="Catalyst overview">
     <div class="pointer-events-none absolute inset-0" aria-hidden="true">
-      <div class="absolute -top-32 -left-24 h-[28rem] w-[28rem] rounded-full bg-primary/[0.09] blur-3xl"></div>
-      <div class="absolute top-1/3 right-0 h-72 w-72 rounded-full bg-primary/[0.04] blur-3xl"></div>
-      <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,hsl(25_55%_58%/0.08),transparent_55%)]"></div>
+      <div class="absolute inset-x-0 top-0 h-[36rem] hero-glow"></div>
+      <div class="absolute -top-24 left-1/2 -translate-x-1/2 h-[26rem] w-[46rem] rounded-full bg-primary/[0.07] blur-3xl"></div>
     </div>
 
-    <div class="relative max-w-6xl mx-auto px-4 pt-10 pb-8 sm:pt-14 sm:pb-12 lg:pt-16">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
-        <div class="lg:col-span-5" data-reveal>
-          <div class="inline-flex items-center gap-2 rounded-full border border-success/20 bg-success/[0.08] px-3 py-1 text-xs font-medium text-success mb-5">
-            <span class="status-dot status-dot-success"></span>
-            Open source · early testing
-          </div>
-
-          <h1 class="font-display font-bold text-foreground tracking-tight text-balance leading-[1.08]" style="font-size: clamp(2.15rem, 5.2vw, 3.65rem);">
-            Game servers that feel instant.
-            <span class="text-primary"> Built in Rust.</span>
-          </h1>
-
-          <p class="mt-4 max-w-[36ch] text-base sm:text-lg text-zinc-400 leading-relaxed text-pretty">
-            Drop-in Pterodactyl alternative with sub-10ms console streaming and a one-line install.
-          </p>
-
-          <div class="mt-7 flex flex-wrap items-center gap-3">
-            <a href="#install" class="cta-primary inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary-600 active:scale-[0.98] min-h-11 shadow-[0_0_0_1px_hsl(25_55%_50%/0.3),0_8px_28px_-8px_hsl(25_55%_58%/0.45)]">
-              Install in 60s
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3" /></svg>
-            </a>
-            <a href={B + "screenshots/"} class="inline-flex items-center gap-2 rounded-lg border border-zinc-700/80 bg-surface-1/60 px-5 py-3 text-sm font-medium text-zinc-200 transition-all duration-200 hover:bg-surface-2 hover:border-zinc-600 active:scale-[0.98] min-h-11">
-              See the panel
-            </a>
-          </div>
-        </div>
-
-        <div class="lg:col-span-7 relative" data-reveal>
-          <div class="relative rounded-xl border border-zinc-800/80 bg-[#0c0c0e] overflow-hidden shadow-2xl shadow-black/50 ring-1 ring-primary/10">
-            <div class="flex items-center gap-2 px-4 py-2.5 border-b border-zinc-800/60 bg-[#111113]">
-              <div class="w-2.5 h-2.5 rounded-full bg-[#ec6b5e]"></div>
-              <div class="w-2.5 h-2.5 rounded-full bg-[#f3bf4f]"></div>
-              <div class="w-2.5 h-2.5 rounded-full bg-[#61c253]"></div>
-              <div class="ml-3 flex-1 max-w-xs">
-                <div class="h-5 rounded bg-zinc-800/80 flex items-center px-2.5">
-                  <span class="text-[10px] text-zinc-600 font-mono">localhost/dashboard</span>
-                </div>
-              </div>
-            </div>
-            <Image
-              src={heroImg}
-              alt="Catalyst game server management dashboard showing server list and real-time console"
-              class="w-full object-cover object-top max-h-[220px] sm:max-h-[340px] lg:max-h-[420px]"
-              loading="eager"
-              fetchpriority="high"
-            />
-          </div>
-          <div class="absolute -bottom-6 left-8 right-8 h-16 bg-primary/[0.12] blur-3xl rounded-full pointer-events-none" aria-hidden="true"></div>
-        </div>
+    <div class="relative max-w-5xl mx-auto px-4 pt-20 pb-6 sm:pt-28 lg:pt-32 text-center">
+      <div class="inline-flex items-center gap-2 rounded-full border border-success/20 bg-success/[0.08] px-3 py-1 text-xs font-medium text-success mb-8" data-reveal>
+        <span class="status-dot status-dot-success"></span>
+        Open source · GPLv3 · no feature gates
       </div>
+
+      <h1 class="font-display font-bold text-foreground tracking-tight leading-[1.04]" style="font-size: clamp(2.75rem, 7.5vw, 5rem);" data-reveal>
+        Game servers<br />
+        that feel <span class="text-primary">instant.</span>
+      </h1>
+
+      <p class="mt-6 mx-auto max-w-xl text-base sm:text-lg text-zinc-400 leading-relaxed text-balance" data-reveal>
+        The modern open-source alternative to Pterodactyl. Rust core, native containerd runtime, sub-10ms console streaming — installed by a single command.
+      </p>
+
+      <div class="mt-9 flex flex-wrap items-center justify-center gap-3" data-reveal>
+        <a href="#install" class="cta-primary inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary-600 active:scale-[0.98] min-h-11 shadow-[0_0_0_1px_hsl(29_47%_50%/0.3),0_8px_28px_-8px_hsl(29_47%_56%/0.45)]">
+          Install Catalyst
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3" /></svg>
+        </a>
+        <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-lg border border-zinc-700/80 bg-surface-1/60 px-6 py-3 text-sm font-medium text-zinc-200 transition-all duration-200 hover:bg-surface-2 hover:border-zinc-600 active:scale-[0.98] min-h-11">
+          GitHub
+          <svg class="w-3.5 h-3.5 text-zinc-400" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        </a>
+      </div>
+
+      <!-- Inline install chip -->
+      <div class="mt-6 inline-flex max-w-full items-center gap-3 rounded-lg border border-zinc-800/70 bg-surface-1/70 pl-4 pr-1.5 py-1.5 font-mono text-xs sm:text-[13px]" data-reveal>
+        <span class="text-primary select-none shrink-0">$</span>
+        <code class="text-zinc-300 truncate">{INSTALL_CMD}</code>
+        <button class="copy-btn shrink-0" data-copy={INSTALL_CMD} aria-label="Copy install command">
+          Copy
+        </button>
+      </div>
+
+      <div class="mt-2 font-mono text-xs text-zinc-600 tracking-wide" data-reveal>
+        rust <span class="text-zinc-700">→</span> containerd <span class="text-zinc-700">→</span> <span class="text-primary/80">&lt;10ms</span>
+      </div>
+    </div>
+
+    <!-- Live panel demo -->
+    <div class="relative max-w-5xl mx-auto px-4 mt-10 sm:mt-14" data-reveal>
+      <HeroPanel />
     </div>
   </section>
 
-  <!-- GITHUB STATS strip (layout family: live OSS activity) -->
-  <section class="max-w-6xl mx-auto px-4 pt-6 pb-2" aria-label="Repository activity" data-reveal>
-    <div id="github-stats" class="rounded-xl border border-zinc-800/60 bg-surface-1/80 backdrop-blur-sm px-4 sm:px-6 py-4">
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {repoStats.map((s) => (
-          <a
-            href={s.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="group flex flex-col items-center sm:items-start transition-colors hover:opacity-80"
-            data-stat-key={s.key}
-          >
-            <div class="flex items-center gap-2 mb-1">
-              {s.key === "ci" && (
-                <span
-                  class:list={[
-                    "inline-block w-2 h-2 rounded-full",
-                    s.state === "passing" ? "bg-success" : s.state === "failing" ? "bg-danger" : "bg-zinc-600",
-                  ]}
-                  data-ci-dot
-                  aria-hidden="true"
-                />
-              )}
-              <span class="text-xs text-zinc-500">{s.label}</span>
-            </div>
-            <div
-              class="font-display text-xl sm:text-2xl font-bold text-foreground tracking-tight tabular-nums"
-              data-stat-value={s.key}
-            >
-              {s.value}
-            </div>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
+  <!-- ═══ ZERO TO RUNNING ═══ -->
+  <section class="max-w-6xl mx-auto px-4 py-24 sm:py-28" aria-label="Getting started">
+    <h2 class="font-display text-sm font-semibold tracking-[0.18em] uppercase text-zinc-500 text-center" data-reveal>From zero to running</h2>
 
-  <!-- METRICS strip (layout family: tight horizontal stats) -->
-  <section class="max-w-6xl mx-auto px-4 pt-6 pb-4" aria-label="Key metrics" data-reveal>
-    <div class="rounded-xl border border-zinc-800/60 bg-surface-1/80 backdrop-blur-sm px-4 sm:px-6 py-5 grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-4">
-      {metrics.map((m) => (
-        <div class="text-center sm:text-left sm:border-r sm:border-zinc-800/60 sm:last:border-0 sm:pr-4">
-          <div class="font-display text-2xl sm:text-3xl font-bold text-foreground tracking-tight tabular-nums">{m.value}</div>
-          <div class="mt-1 text-xs text-zinc-500">{m.label}</div>
+    <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-3" data-reveal-stagger>
+      {steps.map((s) => (
+        <div class="spotlight-card group rounded-xl border border-zinc-800/60 bg-surface-1/50 p-6 sm:p-7 transition-colors duration-200 hover:border-zinc-700">
+          <div class="font-mono text-xs text-primary">{s.n}</div>
+          <h3 class="mt-3 font-display text-lg font-semibold text-foreground">{s.title}</h3>
+          <p class="mt-2 text-sm text-zinc-500 leading-relaxed">{s.body}</p>
+          <div class="mt-5 font-mono text-xs text-zinc-600 truncate transition-colors duration-200 group-hover:text-zinc-400">{s.code}</div>
         </div>
       ))}
     </div>
   </section>
 
-  <!-- INSTALL: conversion block (layout family: terminal-first) -->
-  <section id="install" class="max-w-6xl mx-auto px-4 py-20 scroll-mt-20" aria-label="Quick start">
-    <div class="relative rounded-2xl border border-zinc-800/70 overflow-hidden" data-reveal>
-      <div class="absolute inset-0 bg-gradient-to-br from-[#1a1510]/70 via-surface-1 to-surface-0 pointer-events-none"></div>
-      <div class="absolute -top-20 -right-16 h-64 w-64 rounded-full bg-primary/[0.07] blur-3xl pointer-events-none"></div>
+  <!-- ═══ BUILT TO FEEL FAST (big-type restraint) ═══ -->
+  <section class="max-w-6xl mx-auto px-4 py-24 sm:py-28" aria-label="Performance">
+    <h2 class="font-display text-sm font-semibold tracking-[0.18em] uppercase text-zinc-500" data-reveal>Built to feel fast</h2>
 
-      <div class="relative grid grid-cols-1 lg:grid-cols-5 gap-0">
-        <div class="lg:col-span-2 p-6 sm:p-8 lg:p-10 flex flex-col justify-center border-b lg:border-b-0 lg:border-r border-zinc-800/60">
-          <h2 class="font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight text-balance">
-            One command. Sixty seconds.
-          </h2>
-          <p class="mt-3 text-sm sm:text-base text-zinc-400 leading-relaxed max-w-sm">
-            No Wings daemon. No dependency maze. Clone, set PUBLIC_URL, bring the stack up.
-          </p>
-          <ul class="mt-6 space-y-2.5">
-            {["Docker Compose included", "Auto-generated secrets", "TLS-ready defaults", "Works on bare Linux"].map((t) => (
-              <li class="flex items-center gap-2.5 text-sm text-zinc-300">
-                <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-primary/15 text-primary">
-                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+    <div class="mt-8">
+      {bigStats.map((s, i) => (
+        <div class:list={[
+          "stat-row group grid grid-cols-1 sm:grid-cols-[minmax(0,auto)_1fr] lg:grid-cols-[minmax(0,20rem)_1fr] items-center gap-x-8 lg:gap-x-14 gap-y-3 py-10 sm:py-12 border-t border-zinc-800/50",
+          i === bigStats.length - 1 && "border-b",
+        ]} data-reveal>
+          <div class="stat-value font-display font-bold tracking-tighter tabular-nums leading-none whitespace-nowrap bg-clip-text text-transparent bg-gradient-to-br from-foreground via-foreground to-zinc-600 transition-all duration-500 group-hover:via-primary-200 group-hover:to-primary-600" style="font-size: clamp(3.25rem, 8vw, 6.5rem);">
+            {s.value}
+          </div>
+          <div class="lg:max-w-sm lg:justify-self-end">
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+              <span class="text-base sm:text-lg font-medium text-zinc-200 leading-snug">{s.label}</span>
+              {s.live && (
+                <span class="live-ms inline-flex items-center gap-1.5 rounded-full border border-success/25 bg-success/[0.08] px-2.5 py-0.5 font-mono text-[11px] font-medium text-success tabular-nums" title="Simulated live latency">
+                  <span class="status-dot status-dot-success"></span>
+                  <span data-live-ms>6.4ms</span>
                 </span>
-                {t}
-              </li>
-            ))}
-          </ul>
+              )}
+            </div>
+            <p class="mt-2 text-sm text-zinc-500 leading-relaxed">{s.hint}</p>
+          </div>
         </div>
+      ))}
+    </div>
+  </section>
 
-        <div class="lg:col-span-3 p-4 sm:p-6 lg:p-8 flex flex-col justify-center">
-          <div class="terminal overflow-x-auto shadow-elevated-dark">
-            <div class="terminal-header">
-              <div class="terminal-dot" style="background:#ec6b5e;"></div>
-              <div class="terminal-dot" style="background:#f3bf4f;"></div>
-              <div class="terminal-dot" style="background:#61c253;"></div>
-              <span class="text-[11px] text-zinc-600 font-mono ml-2">install.sh</span>
-              <button class="copy-btn" data-copy={INSTALL_CMD} aria-label="Copy install command">
-                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5"/></svg>
-                Copy
-              </button>
+  <!-- ═══ YOUR ENTIRE FLEET ═══ -->
+  <section class="max-w-6xl mx-auto px-4 py-24 sm:py-28" aria-label="Fleet management">
+    <div class="mb-12 max-w-xl" data-reveal>
+      <h2 class="font-display text-3xl sm:text-4xl font-semibold text-foreground tracking-tight text-balance">
+        Your entire fleet. One screen.
+      </h2>
+      <p class="mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed">
+        Every node, every server, every heartbeat — streamed live across regions with per-second health telemetry.
+      </p>
+    </div>
+
+    <div class="rounded-xl border border-zinc-800/70 overflow-hidden" data-reveal>
+      <div class="flex items-center justify-between px-4 py-2.5 border-b border-zinc-800/60 bg-surface-1/70">
+        <span class="font-mono text-[11px] text-zinc-500">nodes · fleet overview</span>
+        <span class="inline-flex items-center gap-1.5 text-[11px] text-success font-medium">
+          <span class="status-dot status-dot-success"></span> 8 online
+        </span>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-px bg-zinc-800/40">
+        {fleetNodes.map((n, i) => (
+          <div class:list={["bg-surface-1/90 px-4 py-5 sm:py-6", i % 2 === 0 && "bg-surface-0/40"]}>
+            <div class="flex items-center gap-2">
+              <span class="status-dot status-dot-success node-dot-live"></span>
+              <span class="font-mono text-xs text-zinc-200 truncate">{n.name}</span>
             </div>
-            <div class="terminal-body whitespace-pre-wrap sm:whitespace-normal text-[13px] sm:text-sm">
-              <div><span class="prompt">$</span> <span class="cmd">curl -fsSL https://raw.githubusercontent.com/</span></div>
-              <div class="pl-[1.1rem]"><span class="cmd">catalystctl/catalyst/main/install.sh | bash</span></div>
-              <div class="mt-1.5"><span class="prompt">$</span> <span class="cmd">cd catalyst-docker && nano .env</span></div>
-              <div class="comment"># Set PUBLIC_URL at minimum</div>
-              <div class="mt-1.5"><span class="prompt">$</span> <span class="cmd">docker compose up -d</span></div>
-              <div class="mt-2.5"><span class="success">✓</span> <span class="cmd">Panel live at</span> <span class="url">http://localhost</span></div>
+            <div class="mt-2.5 flex items-baseline justify-between">
+              <span class="text-[10px] uppercase tracking-wider text-zinc-600">{n.kind}</span>
+              <span class="fleet-ping font-mono text-xs text-zinc-500 tabular-nums" data-ping={n.ping}>{n.ping}ms</span>
             </div>
           </div>
-          <div class="mt-4 flex flex-wrap items-center gap-3">
-            <a href={B + "docs/"} class="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary-400 transition-colors py-1">
-              Read the docs
-              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-            </a>
-            <span class="text-zinc-700">·</span>
-            <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-500 hover:text-zinc-300 transition-colors py-1">
-              Source on GitHub
-            </a>
-            <span class="text-zinc-700">·</span>
-            <a href={DISCORD_URL} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-500 hover:text-zinc-300 transition-colors py-1">
-              Discord
-            </a>
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   </section>
 
-  <!-- COMPARISON (layout family: highlighted data table) -->
-  <section class="max-w-6xl mx-auto px-4 py-16 sm:py-20" aria-label="Comparison with Pterodactyl">
+  <!-- ═══ CONTAINERS WITHOUT DOCKER ═══ -->
+  <section class="max-w-6xl mx-auto px-4 py-24 sm:py-28" aria-label="Architecture">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <div data-reveal>
+        <h2 class="font-display text-sm font-semibold tracking-[0.18em] uppercase text-zinc-500">Stack</h2>
+        <h3 class="mt-4 font-display text-3xl sm:text-4xl font-semibold text-foreground tracking-tight text-balance">
+          Containers, without Docker.
+        </h3>
+        <p class="mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed max-w-md">
+          Catalyst talks to containerd directly — the same battle-tested runtime powering Kubernetes. No layered overlays, no daemon tax, no image-format surprises.
+        </p>
+        <p class="mt-3 font-mono text-xs text-zinc-600">image pulls ~2× faster · ~30% less memory per server</p>
+      </div>
+
+      <div class="flex flex-col items-stretch max-w-sm w-full mx-auto" data-reveal>
+        {archLayers.map((layer, i) => (
+          <>
+            {i > 0 && (
+              <div class="flow-connector my-2" aria-hidden="true">
+                <span class="flow-packet"></span>
+              </div>
+            )}
+            <div class:list={[
+              "rounded-lg border px-5 py-4 text-center",
+              layer.tone === "hl"
+                ? "border-primary/35 bg-primary/[0.07] shadow-[0_0_28px_-10px_hsl(29_47%_56%/0.4)]"
+                : "border-zinc-800/70 bg-surface-1/60",
+              layer.tone === "dim" && "opacity-80",
+            ]}>
+              <div class:list={[
+                "font-mono text-sm",
+                layer.tone === "hl" ? "text-primary" : "text-zinc-300",
+              ]}>{layer.name}</div>
+              <div class="mt-1 text-xs text-zinc-600">{layer.detail}</div>
+            </div>
+          </>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ BUILT FOR HOSTS (bento) ═══ -->
+  <section class="max-w-6xl mx-auto px-4 py-24 sm:py-28" aria-label="Features">
+    <div class="mb-10 max-w-lg" data-reveal>
+      <h2 class="font-display text-sm font-semibold tracking-[0.18em] uppercase text-zinc-500">Built for hosts</h2>
+      <h3 class="mt-4 font-display text-3xl sm:text-4xl font-semibold text-foreground tracking-tight text-balance">
+        Everything a hosting operation needs.
+      </h3>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3" data-reveal-stagger>
+      <div class="md:col-span-2 group relative rounded-xl border border-primary/25 overflow-hidden p-6 sm:p-8 flex flex-col justify-between min-h-[280px] transition-all duration-300 hover:border-primary/40">
+        <div class="absolute inset-0 bg-gradient-to-br from-primary/[0.14] via-surface-1 to-surface-0 pointer-events-none"></div>
+        <div class="absolute bottom-0 right-0 w-48 h-48 bg-primary/[0.08] rounded-full blur-3xl pointer-events-none"></div>
+        <div class="relative">
+          <div class="flex h-11 w-11 items-center justify-center rounded-lg bg-primary/20 text-primary">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 011.06 0z" /></svg>
+          </div>
+          <h3 class="mt-5 font-display text-2xl font-semibold text-foreground text-balance">Real-time console, zero latency theatre.</h3>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed max-w-md">
+            Live logs over a native Rust WebSocket layer. Sub-10ms round-trip, bidirectional I/O, no Node hop in the middle.
+          </p>
+        </div>
+        <div class="relative mt-8 font-mono text-[11px] text-zinc-600 space-y-1 hidden sm:block">
+          <div><span class="text-primary">ws</span> · console stream active</div>
+          <div class="text-zinc-700">rtt 6.2ms · frames 120/s</div>
+        </div>
+      </div>
+
+      {features.map((f) => (
+        <div class="spotlight-card group rounded-xl border border-zinc-800/60 bg-surface-1 p-5 transition-colors duration-200 hover:border-zinc-700">
+          <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-800/80 text-zinc-400 transition-all duration-200 group-hover:text-primary group-hover:bg-primary/15 group-hover:-translate-y-0.5">
+            <Fragment set:html={f.icon} />
+          </div>
+          <h3 class="mt-4 font-semibold text-foreground text-[15px]">{f.title}</h3>
+          <p class="mt-1.5 text-sm text-zinc-500 leading-relaxed">{f.description}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- ═══ COMPARISON ═══ -->
+  <section class="max-w-6xl mx-auto px-4 py-24 sm:py-28" aria-label="Comparison with Pterodactyl">
     <div class="mb-8 max-w-xl" data-reveal>
-      <h2 class="font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight text-balance">
+      <h2 class="font-display text-sm font-semibold tracking-[0.18em] uppercase text-zinc-500">Migration path</h2>
+      <h3 class="mt-4 font-display text-3xl sm:text-4xl font-semibold text-foreground tracking-tight text-balance">
         Why hosts switch from Pterodactyl.
-      </h2>
-      <p class="mt-3 text-sm sm:text-base text-zinc-400 leading-relaxed">
+      </h3>
+      <p class="mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed">
         Same job, modern stack. Rust where it hurts, containerd where Docker layers drag you down.
       </p>
     </div>
@@ -397,50 +447,43 @@ const faqs = [
     </div>
   </section>
 
-  <!-- FEATURES bento (layout family: asymmetric feature mosaic) -->
-  <section class="max-w-6xl mx-auto px-4 py-16 sm:py-20" aria-label="Features">
-    <div class="mb-10 max-w-lg" data-reveal>
-      <h2 class="font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight text-balance">
-        Everything you need to run a fleet.
+  <!-- ═══ INSTALL: ANIMATED TERMINAL ═══ -->
+  <section id="install" class="max-w-4xl mx-auto px-4 py-24 sm:py-28 scroll-mt-20" aria-label="Quick start">
+    <div class="text-center mb-10" data-reveal>
+      <h2 class="font-display text-3xl sm:text-4xl font-semibold text-foreground tracking-tight text-balance">
+        One command. Done.
       </h2>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-3" data-reveal-stagger>
-      <div class="md:col-span-2 md:row-span-2 group relative rounded-xl border border-primary/25 overflow-hidden p-6 sm:p-8 flex flex-col justify-between min-h-[280px] transition-all duration-300 hover:border-primary/40">
-        <div class="absolute inset-0 bg-gradient-to-br from-primary/[0.14] via-surface-1 to-surface-0 pointer-events-none"></div>
-        <div class="absolute bottom-0 right-0 w-48 h-48 bg-primary/[0.08] rounded-full blur-3xl pointer-events-none"></div>
-        <div class="relative">
-          <div class="flex h-11 w-11 items-center justify-center rounded-lg bg-primary/20 text-primary">
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 011.06 0z" /></svg>
-          </div>
-          <h3 class="mt-5 font-display text-2xl font-semibold text-foreground text-balance">Real-time console, zero latency theatre.</h3>
-          <p class="mt-3 text-sm text-zinc-400 leading-relaxed max-w-md">
-            Live logs over a native Rust WebSocket layer. Sub-10ms round-trip, bidirectional I/O, no Node hop in the middle.
-          </p>
-        </div>
-        <div class="relative mt-8 font-mono text-[11px] text-zinc-600 space-y-1 hidden sm:block">
-          <div><span class="text-primary">ws</span> · console stream active</div>
-          <div class="text-zinc-700">rtt 6.2ms · frames 120/s</div>
-        </div>
+    <div class="terminal shadow-elevated-dark" id="install-term" data-reveal>
+      <div class="terminal-header">
+        <div class="terminal-dot" style="background:#ec6b5e;"></div>
+        <div class="terminal-dot" style="background:#f3bf4f;"></div>
+        <div class="terminal-dot" style="background:#61c253;"></div>
+        <span class="text-[11px] text-zinc-600 font-mono ml-2">catalyst — installation</span>
+        <button class="copy-btn" data-copy={INSTALL_CMD} aria-label="Copy install command">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5"/></svg>
+          Copy
+        </button>
       </div>
-
-      {features.filter((f) => f.title !== "Real-Time Console").map((f, i) => (
-        <div class:list={[
-          "group rounded-xl border border-zinc-800/60 p-5 transition-all duration-200 hover:border-zinc-700 hover:bg-surface-2",
-          i === 0 ? "bg-surface-2/80" : i === 2 ? "bg-gradient-to-b from-surface-1 to-[#12100e]" : "bg-surface-1",
-        ]}>
-          <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-800/80 text-zinc-400 transition-colors group-hover:text-primary group-hover:bg-primary/15">
-            <Fragment set:html={f.icon} />
-          </div>
-          <h3 class="mt-4 font-semibold text-foreground text-[15px]">{f.title}</h3>
-          <p class="mt-1.5 text-sm text-zinc-500 leading-relaxed">{f.description}</p>
-        </div>
-      ))}
+      <div class="terminal-body whitespace-pre-wrap sm:whitespace-normal">
+        <p class="inst-line"><span class="prompt">$</span> <span class="cmd break-all">{INSTALL_CMD}</span></p>
+        <p class="inst-line"><span class="success">✓</span> <span class="cmd">Checking system requirements</span></p>
+        <p class="inst-line"><span class="success">✓</span> <span class="cmd">Installing Catalyst panel</span></p>
+        <p class="inst-line"><span class="success">✓</span> <span class="cmd">Configuring containerd runtime</span></p>
+        <p class="inst-line"><span class="success">✓</span> <span class="cmd">Creating database and generating secrets</span></p>
+        <p class="inst-line"><span class="success">✓</span> <span class="cmd">Starting services</span></p>
+        <p class="inst-line inst-done"><span class="prompt">●</span> <span class="cmd">Catalyst is running →</span> <span class="url">https://panel.example.com</span></p>
+      </div>
     </div>
+
+    <p class="mt-5 text-center text-sm text-zinc-600" data-reveal>
+      Typical install takes about sixty seconds. No Wings daemon, no dependency maze.
+    </p>
   </section>
 
-  <!-- SCREENSHOTS (layout family: horizontal scroll-snap) -->
-  <section class="py-16 sm:py-20 overflow-hidden" aria-label="Screenshots preview">
+  <!-- ═══ SCREENSHOTS ═══ -->
+  <section class="py-8 overflow-hidden" aria-label="Screenshots preview">
     <div class="max-w-6xl mx-auto px-4 mb-8 flex flex-wrap items-end justify-between gap-4" data-reveal>
       <h2 class="font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight">
         See it in action.
@@ -456,9 +499,9 @@ const faqs = [
         {previewShots.map((shot) => (
           <a
             href={B + "screenshots/"}
-            class="group snap-start shrink-0 w-[85%] sm:w-[55%] lg:w-[42%] block rounded-xl border border-zinc-800/60 overflow-hidden bg-[#0c0c0e] transition-all duration-300 hover:border-primary/30 hover:shadow-[0_0_40px_-12px_hsl(25_55%_58%/0.25)]"
+            class="group snap-start shrink-0 w-[85%] sm:w-[55%] lg:w-[42%] block rounded-xl border border-zinc-800/60 overflow-hidden bg-[#0d0b09] transition-all duration-300 hover:border-primary/30 hover:shadow-[0_0_40px_-12px_hsl(29_47%_56%/0.25)]"
           >
-            <div class="flex items-center gap-1.5 px-3 py-2 bg-[#111113] border-b border-zinc-800/60">
+            <div class="flex items-center gap-1.5 px-3 py-2 bg-surface-2/80 border-b border-zinc-800/60">
               <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
               <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
               <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
@@ -477,29 +520,8 @@ const faqs = [
     </div>
   </section>
 
-  <!-- PATHS (layout family: three destination tiles, different from feature cards) -->
-  <section class="max-w-6xl mx-auto px-4 py-12" aria-label="Related pages">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-px rounded-xl border border-zinc-800/60 overflow-hidden bg-zinc-800/60" data-reveal-stagger>
-      <a href={B + "pterodactyl-alternative/#comparison"} class="group bg-surface-1 p-6 sm:p-7 transition-colors hover:bg-surface-2">
-        <h3 class="font-semibold text-foreground text-[15px] group-hover:text-primary transition-colors">Catalyst vs Pterodactyl</h3>
-        <p class="mt-2 text-sm text-zinc-500 leading-relaxed">Architecture, performance, and ops compared side by side.</p>
-        <span class="mt-4 inline-flex text-xs font-medium text-zinc-600 group-hover:text-primary transition-colors">Open comparison</span>
-      </a>
-      <a href={B + "migrate-from-pterodactyl/"} class="group bg-surface-1 p-6 sm:p-7 transition-colors hover:bg-surface-2">
-        <h3 class="font-semibold text-foreground text-[15px] group-hover:text-primary transition-colors">Migrate from Pterodactyl</h3>
-        <p class="mt-2 text-sm text-zinc-500 leading-relaxed">Move servers, eggs, and users without starting from scratch.</p>
-        <span class="mt-4 inline-flex text-xs font-medium text-zinc-600 group-hover:text-primary transition-colors">Open migration guide</span>
-      </a>
-      <a href={B + "docs/"} class="group bg-surface-1 p-6 sm:p-7 transition-colors hover:bg-surface-2">
-        <h3 class="font-semibold text-foreground text-[15px] group-hover:text-primary transition-colors">Documentation</h3>
-        <p class="mt-2 text-sm text-zinc-500 leading-relaxed">Install, configure nodes, and wire up the API in one place.</p>
-        <span class="mt-4 inline-flex text-xs font-medium text-zinc-600 group-hover:text-primary transition-colors">Read the docs</span>
-      </a>
-    </div>
-  </section>
-
-  <!-- FAQ (layout family: definition list, no card grid) -->
-  <section class="max-w-6xl mx-auto px-4 py-16 sm:py-20" aria-label="Frequently asked questions">
+  <!-- ═══ FAQ ═══ -->
+  <section class="max-w-6xl mx-auto px-4 py-24 sm:py-28" aria-label="Frequently asked questions">
     <div class="mb-10 max-w-lg" data-reveal>
       <h2 class="font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight text-balance">
         Common questions, plain answers.
@@ -534,10 +556,68 @@ const faqs = [
     })} />
   </section>
 
-  <!-- FINAL CTA -->
-  <section class="max-w-6xl mx-auto px-4 py-16 sm:py-20" aria-label="Call to action">
+  <!-- ═══ PATHS ═══ -->
+  <section class="max-w-6xl mx-auto px-4 py-12" aria-label="Related pages">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-px rounded-xl border border-zinc-800/60 overflow-hidden bg-zinc-800/60" data-reveal-stagger>
+      <a href={B + "pterodactyl-alternative/#comparison"} class="group bg-surface-1 p-6 sm:p-7 transition-colors hover:bg-surface-2">
+        <h3 class="font-semibold text-foreground text-[15px] group-hover:text-primary transition-colors">Catalyst vs Pterodactyl</h3>
+        <p class="mt-2 text-sm text-zinc-500 leading-relaxed">Architecture, performance, and ops compared side by side.</p>
+        <span class="mt-4 inline-flex text-xs font-medium text-zinc-600 group-hover:text-primary transition-colors">Open comparison</span>
+      </a>
+      <a href={B + "migrate-from-pterodactyl/"} class="group bg-surface-1 p-6 sm:p-7 transition-colors hover:bg-surface-2">
+        <h3 class="font-semibold text-foreground text-[15px] group-hover:text-primary transition-colors">Migrate from Pterodactyl</h3>
+        <p class="mt-2 text-sm text-zinc-500 leading-relaxed">Move servers, eggs, and users without starting from scratch.</p>
+        <span class="mt-4 inline-flex text-xs font-medium text-zinc-600 group-hover:text-primary transition-colors">Open migration guide</span>
+      </a>
+      <a href={B + "docs/"} class="group bg-surface-1 p-6 sm:p-7 transition-colors hover:bg-surface-2">
+        <h3 class="font-semibold text-foreground text-[15px] group-hover:text-primary transition-colors">Documentation</h3>
+        <p class="mt-2 text-sm text-zinc-500 leading-relaxed">Install, configure nodes, and wire up the API in one place.</p>
+        <span class="mt-4 inline-flex text-xs font-medium text-zinc-600 group-hover:text-primary transition-colors">Read the docs</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ═══ GITHUB STATS ═══ -->
+  <section class="max-w-6xl mx-auto px-4 pt-16 pb-4" aria-label="Repository activity" data-reveal>
+    <div id="github-stats" class="rounded-xl border border-zinc-800/60 bg-surface-1/80 backdrop-blur-sm px-4 sm:px-6 py-4">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {repoStats.map((s) => (
+          <a
+            href={s.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="group flex flex-col items-center sm:items-start transition-colors hover:opacity-80"
+            data-stat-key={s.key}
+          >
+            <div class="flex items-center gap-2 mb-1">
+              {s.key === "ci" && (
+                <span
+                  class:list={[
+                    "inline-block w-2 h-2 rounded-full",
+                    s.state === "passing" ? "bg-success" : s.state === "failing" ? "bg-danger" : "bg-zinc-600",
+                  ]}
+                  data-ci-dot
+                  aria-hidden="true"
+                />
+              )}
+              <span class="text-xs text-zinc-500">{s.label}</span>
+            </div>
+            <div
+              class="font-display text-xl sm:text-2xl font-bold text-foreground tracking-tight tabular-nums"
+              data-stat-value={s.key}
+            >
+              {s.value}
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FINAL CTA ═══ -->
+  <section class="max-w-6xl mx-auto px-4 pt-16 pb-8" aria-label="Call to action">
     <div class="relative rounded-2xl border border-primary/20 overflow-hidden p-8 sm:p-12 lg:p-14" data-reveal>
-      <div class="absolute inset-0 bg-gradient-to-br from-[#1a1510] via-surface-1 to-surface-0 pointer-events-none"></div>
+      <div class="absolute inset-0 bg-gradient-to-br from-primary/[0.09] via-surface-1 to-surface-0 pointer-events-none"></div>
       <div class="absolute top-0 right-0 w-80 h-80 bg-primary/[0.12] rounded-full blur-3xl pointer-events-none"></div>
       <div class="absolute bottom-0 left-0 w-56 h-56 bg-primary/[0.05] rounded-full blur-3xl pointer-events-none"></div>
 
@@ -546,22 +626,116 @@ const faqs = [
           Spin up a panel tonight.
         </h2>
         <p class="mt-3 text-base text-zinc-400 max-w-md">
-          Free, GPLv3, no feature gates. Copy the install command and be live before the coffee cools.
+          Free, GPLv3, no feature gates. Copy the command above and be live before the coffee cools.
         </p>
         <div class="mt-8 flex flex-wrap items-center gap-3">
-          <a href="#install" class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary-600 active:scale-[0.98] min-h-11 shadow-[0_0_0_1px_hsl(25_55%_50%/0.3),0_8px_28px_-8px_hsl(25_55%_58%/0.45)]">
-            Install in 60s
-          </a>
-          <a href={B + "docs/"} class="inline-flex items-center gap-2 rounded-lg border border-zinc-700/80 px-5 py-3 text-sm font-medium text-zinc-300 transition-all duration-200 hover:bg-surface-2 hover:text-zinc-100 active:scale-[0.98] min-h-11">
-            Read the docs
+          <a href="#install" class="cta-primary inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary-600 active:scale-[0.98] min-h-11 shadow-[0_0_0_1px_hsl(29_47%_50%/0.3),0_8px_28px_-8px_hsl(29_47%_56%/0.45)]">
+            Get the install command
           </a>
           <a href={DISCORD_URL} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-lg border border-zinc-700/80 px-5 py-3 text-sm font-medium text-zinc-300 transition-all duration-200 hover:bg-surface-2 hover:text-zinc-100 active:scale-[0.98] min-h-11">
             Join Discord
+          </a>
+          <a href={B + "docs/"} class="inline-flex items-center gap-2 rounded-lg border border-zinc-700/80 px-5 py-3 text-sm font-medium text-zinc-300 transition-all duration-200 hover:bg-surface-2 hover:text-zinc-100 active:scale-[0.98] min-h-11">
+            Read the docs
           </a>
         </div>
       </div>
     </div>
   </section>
+
+  <script>
+    // ── Scroll reveal ──
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('[data-reveal], [data-reveal-stagger]').forEach((el) => observer.observe(el));
+
+    // ── Copy buttons ──
+    document.querySelectorAll('.copy-btn').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const text = btn.getAttribute('data-copy') || '';
+        await navigator.clipboard.writeText(text);
+        const original = btn.innerHTML;
+        btn.innerHTML = '<svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg> Copied';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.innerHTML = original; btn.classList.remove('copied'); }, 2000);
+      });
+    });
+
+    // ── Spotlight cards: one delegated listener drives --mx/--my ──
+    document.addEventListener('pointermove', (e) => {
+      const card = (e.target as Element).closest?.('.spotlight-card');
+      if (!card) return;
+      const rect = card.getBoundingClientRect();
+      card.style.setProperty('--mx', `${e.clientX - rect.left}px`);
+      card.style.setProperty('--my', `${e.clientY - rect.top}px`);
+    }, { passive: true });
+
+    // ── Install terminal: arm, then stagger lines when scrolled into view ──
+    const term = document.getElementById('install-term');
+    if (term && !reduceMotion) {
+      const lines = term.querySelectorAll('.inst-line');
+      term.classList.add('term-armed');
+      const termObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          lines.forEach((line, i) => {
+            (line as HTMLElement).style.transitionDelay = `${i * 320}ms`;
+          });
+          term.classList.add('term-play');
+          termObserver.disconnect();
+        });
+      }, { threshold: 0.35 });
+      termObserver.observe(term);
+    }
+
+    // ── Fleet ping jitter ──
+    if (!reduceMotion) {
+      const pings = document.querySelectorAll<HTMLElement>('.fleet-ping');
+      setInterval(() => {
+        pings.forEach((el) => {
+          const base = parseInt(el.dataset.ping || '10', 10);
+          const next = Math.max(1, base + Math.round((Math.random() - 0.5) * 6));
+          el.textContent = `${next}ms`;
+        });
+      }, 2600);
+
+      // ── "Built to feel fast": simulated live console latency ──
+      const liveMs = document.querySelector('[data-live-ms]');
+      if (liveMs) {
+        setInterval(() => {
+          liveMs.textContent = `${(3.2 + Math.random() * 6.2).toFixed(1)}ms`;
+        }, 1400);
+      }
+    }
+  </script>
+
+  <style>
+    /* Install terminal staged animation.
+       Hidden state only applies once JS arms the terminal (.term-armed),
+       so no-JS visitors and crawlers still see the full static output. */
+    #install-term.term-armed .inst-line {
+      opacity: 0;
+      transform: translateY(5px);
+    }
+    #install-term.term-armed.term-play .inst-line {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    #install-term .inst-done {
+      margin-top: 0.4rem;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #install-term .inst-line { transition: none !important; }
+    }
+  </style>
 
   <div class="h-8"></div>
 </Layout>

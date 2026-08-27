@@ -16,9 +16,9 @@
     "state": "passing",
     "label": "Passing",
     "conclusion": "success",
-    "workflow": "cargo in /catalyst-agent for russh - Update #1542109758",
-    "finishedAt": "2026-08-26T20:29:24Z",
-    "url": "https://github.com/catalystctl/catalyst/actions/runs/33010571124"
+    "workflow": "Label #237 [1zr6g]",
+    "finishedAt": "2026-08-27T14:03:15Z",
+    "url": "https://github.com/catalystctl/catalyst/actions/runs/33079942520"
   },
-  "fetchedAt": "2026-08-27T09:28:19.463Z"
+  "fetchedAt": "2026-08-27T20:19:15.165Z"
 }

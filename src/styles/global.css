@@ -752,6 +752,28 @@ html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover, *::-we
   animation: nodePing 2.4s ease-out infinite;
 }
 
+/* Fleet node CPU micro-bar: gentle scaleX breathing */
+.fleet-cpu-bar {
+  height: 3px;
+  border-radius: 9999px;
+  background: hsl(33 12% 13%);
+  overflow: hidden;
+}
+.fleet-cpu-fill {
+  height: 100%;
+  border-radius: 9999px;
+  background: hsl(var(--primary) / 0.75);
+  transform-origin: left;
+  animation: fleetCpu ease-in-out infinite alternate;
+}
+@keyframes fleetCpu {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0.62); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fleet-cpu-fill { animation: none !important; }
+}
+
 
 /* Skip link: visible on keyboard focus only */
 .skip-link {

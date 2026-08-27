@@ -108,37 +108,6 @@ const comparison = [
 ];
 
 const gh = githubStats;
-const ciState = gh.ci?.state ?? "unknown";
-const ciLabel = gh.ci?.label ?? "Unknown";
-
-// Build-time seed; the client refreshes these from /api/github-stats.json hourly.
-const repoStats = [
-  {
-    key: "commits",
-    label: "Commits",
-    value: formatCount(gh.commits) ?? "?",
-    href: `${gh.repoUrl}/commits/main`,
-  },
-  {
-    key: "releases",
-    label: "Releases",
-    value: formatCount(gh.releases) ?? "?",
-    href: `${gh.repoUrl}/releases`,
-  },
-  {
-    key: "ci",
-    label: "CI Status",
-    value: ciLabel,
-    state: ciState,
-    href: gh.ci?.url ?? `${gh.repoUrl}/actions`,
-  },
-  {
-    key: "contributors",
-    label: "Contributors",
-    value: formatCount(gh.contributors) ?? "?",
-    href: `${gh.repoUrl}/graphs/contributors`,
-  },
-];
 
 const faqs = [
   {
@@ -221,6 +190,20 @@ const archLayers = [
 
       <div class="mt-2 font-mono text-xs text-zinc-600 tracking-wide" data-reveal>
         rust <span class="text-zinc-700">→</span> containerd <span class="text-zinc-700">→</span> <span class="text-primary/80">&lt;10ms</span>
+      </div>
+
+      <!-- Social proof strip (live from GitHub) -->
+      <div class="mt-7 flex flex-wrap items-center justify-center gap-x-1 gap-y-1.5 font-mono text-[11px] text-zinc-500 tabular-nums" data-reveal>
+        <a href={`${gh.repoUrl}/commits/main`} target="_blank" rel="noopener noreferrer" class="px-1.5 py-0.5 rounded transition-colors hover:text-zinc-200 hover:bg-surface-2">{formatCount(gh.commits) ?? "?"} commits</a>
+        <span class="text-zinc-800">·</span>
+        <a href={`${gh.repoUrl}/releases`} target="_blank" rel="noopener noreferrer" class="px-1.5 py-0.5 rounded transition-colors hover:text-zinc-200 hover:bg-surface-2">{formatCount(gh.releases) ?? "?"} releases</a>
+        <span class="text-zinc-800">·</span>
+        <a href={gh.ci?.url ?? `${gh.repoUrl}/actions`} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-1.5 py-0.5 rounded transition-colors hover:text-zinc-200 hover:bg-surface-2">
+          <span class:list={["inline-block w-1.5 h-1.5 rounded-full", gh.ci?.state === "passing" ? "bg-success" : gh.ci?.state === "failing" ? "bg-danger" : "bg-zinc-600"]}></span>
+          CI {gh.ci?.label ?? "unknown"}
+        </a>
+        <span class="text-zinc-800">·</span>
+        <a href={`${gh.repoUrl}/graphs/contributors`} target="_blank" rel="noopener noreferrer" class="px-1.5 py-0.5 rounded transition-colors hover:text-zinc-200 hover:bg-surface-2">{formatCount(gh.contributors) ?? "?"} contributors</a>
       </div>
     </div>
 
@@ -633,43 +616,6 @@ const archLayers = [
           <svg class="w-3 h-3 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
         </span>
       </a>
-    </div>
-  </section>
-
-  <!-- ═══ GITHUB STATS ═══ -->
-  <section class="max-w-6xl mx-auto px-4 pt-16 pb-4" aria-label="Repository activity" data-reveal>
-    <div id="github-stats" class="rounded-xl border border-zinc-800/60 bg-surface-1/80 backdrop-blur-sm px-4 sm:px-6 py-4">
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {repoStats.map((s) => (
-          <a
-            href={s.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="group flex flex-col items-center sm:items-start transition-colors hover:opacity-80"
-            data-stat-key={s.key}
-          >
-            <div class="flex items-center gap-2 mb-1">
-              {s.key === "ci" && (
-                <span
-                  class:list={[
-                    "inline-block w-2 h-2 rounded-full",
-                    s.state === "passing" ? "bg-success" : s.state === "failing" ? "bg-danger" : "bg-zinc-600",
-                  ]}
-                  data-ci-dot
-                  aria-hidden="true"
-                />
-              )}
-              <span class="text-xs text-zinc-500">{s.label}</span>
-            </div>
-            <div
-              class="font-display text-xl sm:text-2xl font-bold tracking-tight tabular-nums bg-clip-text text-transparent bg-gradient-to-br from-foreground via-foreground to-zinc-500"
-              data-stat-value={s.key}
-            >
-              {s.value}
-            </div>
-          </a>
-        ))}
-      </div>
     </div>
   </section>
 

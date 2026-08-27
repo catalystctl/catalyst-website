@@ -8,6 +8,7 @@ import screenshotsData from "../data/screenshots.json";
 const B = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "") + "/";
 const GITHUB_URL = "https://github.com/catalystctl/catalyst";
 const DISCORD_URL = "https://discord.gg/mybxhmru3y";
+const INSTALL_CMD = "curl -fsSL https://raw.githubusercontent.com/catalystctl/catalyst/main/install.sh | bash";
 
 // Import all screenshot images via glob for Astro's image optimization
 const screenshotImports = import.meta.glob<{ default: ImageMetadata }>(
@@ -17,10 +18,14 @@ const screenshotImports = import.meta.glob<{ default: ImageMetadata }>(
 
 // Helper: resolve an image from its public-style path (e.g. "/img/screenshots/user/dashboard.png")
 function resolveScreenshot(publicPath: string) {
-  // Convert "/img/screenshots/user/dashboard.png" → "../assets/screenshots/user/dashboard.png"
   const assetPath = `../assets/${publicPath.replace(/^\/img\//, '')}`;
   const key = Object.keys(screenshotImports).find(k => k === assetPath);
   return key ? screenshotImports[key].default : null;
+}
+
+// Path → faux in-app URL for the browser-chrome pill
+function fauxUrl(publicPath: string) {
+  return 'panel.catalystctl.com/' + publicPath.replace(/^\/img\/screenshots\//, '').replace(/\.png$/, '');
 }
 
 const screenshotGroups = await Promise.all(
@@ -28,14 +33,14 @@ const screenshotGroups = await Promise.all(
     ...g,
     screenshots: await Promise.all(
       g.screenshots.map(async (s) => {
-        const img = resolveScreenshot(s.path.startsWith("/") ? s.path : `/${s.path}`);
-        // Generate optimized lightbox image (larger, WebP) for modal display
+        const publicPath = s.path.startsWith("/") ? s.path : `/${s.path}`;
+        const img = resolveScreenshot(publicPath);
         let lightboxSrc: string | null = null;
         if (img) {
           const optimized = await getImage({ src: img, width: 1920, format: 'webp', quality: 80 });
           lightboxSrc = optimized.src;
         }
-        return { ...s, img, lightboxSrc };
+        return { ...s, img, lightboxSrc, url: fauxUrl(publicPath), publicPath };
       })
     ),
   }))
@@ -54,7 +59,7 @@ const total = screenshotsData.total;
 const groupMeta = [
   { key: "auth", label: "Authentication", icon: `<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" /></svg>` },
   { key: "user", label: "User Panel", icon: `<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>` },
-  { key: "admin", label: "Admin Panel", icon: `<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>` },
+  { key: "admin", label: "Admin Panel", icon: `<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>` },
 ];
 ---
 
@@ -70,25 +75,39 @@ const groupMeta = [
       });
     }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
     document.querySelectorAll('[data-reveal], [data-reveal-stagger]').forEach((el) => observer.observe(el));
+
+    // Spotlight cards
+    document.addEventListener('pointermove', (e) => {
+      const card = (e.target as Element).closest?.('.spotlight-card');
+      if (!card) return;
+      const rect = card.getBoundingClientRect();
+      card.style.setProperty('--mx', `${e.clientX - rect.left}px`);
+      card.style.setProperty('--my', `${e.clientY - rect.top}px`);
+    }, { passive: true });
   </script>
 
+  <!-- ═══ HERO ═══ -->
   <section class="relative overflow-hidden" aria-label="Screenshots overview">
-    <div class="pointer-events-none absolute -top-20 left-1/3 h-64 w-64 rounded-full bg-primary/[0.07] blur-3xl" aria-hidden="true"></div>
-    <div class="relative max-w-6xl mx-auto px-4 pt-12 pb-8 sm:pt-16 sm:pb-10">
-      <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6" data-reveal>
-        <div class="max-w-xl">
-          <h1 class="font-display font-bold text-foreground tracking-tight text-balance" style="font-size: clamp(2.1rem, 5vw, 3.5rem);">
-            Every screen, 1080p.
+    <div class="pointer-events-none absolute inset-x-0 top-0 h-[30rem] hero-glow" aria-hidden="true"></div>
+    <div class="relative max-w-6xl mx-auto px-4 pt-14 pb-10 sm:pt-20 sm:pb-12">
+      <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-8" data-reveal>
+        <div class="max-w-2xl">
+          <h2 class="font-display text-sm font-semibold tracking-[0.18em] uppercase text-zinc-500">Product tour</h2>
+          <h1 class="mt-4 font-display font-bold text-foreground tracking-tight text-balance" style="font-size: clamp(2.5rem, 6vw, 4.25rem);">
+            Every screen,<br />at full size.
           </h1>
-          <p class="mt-3 text-base text-zinc-400 max-w-md text-pretty">
-            {total} pages captured with Playwright, from auth to admin. Click any frame to open the lightbox.
+          <p class="mt-4 text-base text-zinc-400 max-w-lg leading-relaxed text-pretty">
+            {total} pages captured with Playwright, from auth to admin. Click any frame to open it fullscreen — arrow keys to move through the tour.
           </p>
+          <div class="mt-5 font-mono text-xs text-zinc-600 tracking-wide">
+            playwright <span class="text-zinc-700">→</span> 1920×1080 <span class="text-zinc-700">→</span> <span class="text-primary/80">webp @ 80q</span>
+          </div>
         </div>
         <div class="flex flex-wrap items-center gap-2">
           {screenshotGroups.map((group, i) => (
             <a
               href={`#group-${i}`}
-              class="inline-flex items-center gap-1.5 rounded-full border border-zinc-800/80 bg-surface-1/80 text-xs font-medium text-zinc-400 px-3 py-1.5 transition-all hover:border-primary/30 hover:text-zinc-200 hover:bg-primary/5"
+              class="inline-flex items-center gap-1.5 rounded-full border border-zinc-800/80 bg-surface-1/80 text-xs font-medium text-zinc-400 px-3.5 py-1.5 transition-all hover:border-primary/30 hover:text-zinc-200 hover:bg-primary/5"
             >
               {group.title}
               <span class="text-[10px] text-zinc-600 font-mono tabular-nums">{group.screenshots.length}</span>
@@ -106,16 +125,16 @@ const groupMeta = [
     {screenshotGroups.map((group, i) => (
       <section id={`group-${i}`} class="scroll-mt-24" aria-label={group.title}>
         <div class="flex items-center gap-4 mb-6" data-reveal>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2.5">
             {groupMeta.find(m => m.label === group.title)?.icon && (
-              <div class="flex h-7 w-7 items-center justify-center rounded-md bg-zinc-800 text-zinc-400">
+              <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/15 text-primary border border-primary/20">
                 <Fragment set:html={groupMeta.find(m => m.label === group.title)?.icon || ''} />
               </div>
             )}
             <h2 class="font-display text-lg font-semibold text-foreground">{group.title}</h2>
           </div>
           <div class="h-px flex-1 bg-zinc-800/60"></div>
-          <span class="text-xs text-zinc-600 font-mono">{group.screenshots.length}</span>
+          <span class="text-xs text-zinc-600 font-mono tabular-nums">{String(group.screenshots.length).padStart(2, '0')}</span>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" data-reveal-stagger>
@@ -127,23 +146,28 @@ const groupMeta = [
               data-lightbox-src={shot.lightboxSrc || shot.publicPath}
               data-name={shot.name}
               data-group={group.title}
-              class="group rounded-xl border border-zinc-800/60 bg-[#0c0c0e] overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-[0_0_40px_-12px_hsl(25_55%_58%/0.25)] text-left"
+              class="spotlight-card group rounded-xl border border-zinc-800/60 bg-surface-0 overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-[0_0_40px_-12px_hsl(29_47%_56%/0.25)] text-left cursor-zoom-in"
             >
-              <div class="aspect-video overflow-hidden">
-                <div class="flex items-center gap-1.5 px-3 py-2 bg-[#111113] border-b border-zinc-800/60">
+              <div class="aspect-video overflow-hidden flex flex-col">
+                <div class="flex items-center gap-1.5 px-3 py-2 bg-surface-2/80 border-b border-zinc-800/60 shrink-0">
                   <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
                   <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
                   <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
-                  <span class="ml-2 text-[10px] text-zinc-600 font-mono truncate flex-1 text-center">{shot.name}</span>
-                  <div class="w-8"></div>
+                  <div class="ml-2 flex-1 min-w-0">
+                    <div class="h-4.5 rounded bg-surface-3/80 flex items-center px-2">
+                      <span class="text-[9px] font-mono text-zinc-500 truncate">{shot.url}</span>
+                    </div>
+                  </div>
                 </div>
-                {shot.img ? (
-                  <Image src={shot.img} alt={`Catalyst ${shot.name}, ${group.title}`} class="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]" loading="lazy" />
-                ) : (
-                  <img src={shot.path} alt={`Catalyst ${shot.name}, ${group.title}`} class="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]" loading="lazy" width="600" height="338" />
-                )}
+                <div class="flex-1 overflow-hidden">
+                  {shot.img ? (
+                    <Image src={shot.img} alt={`Catalyst ${shot.name}, ${group.title}`} class="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]" loading="lazy" />
+                  ) : (
+                    <img src={shot.path} alt={`Catalyst ${shot.name}, ${group.title}`} class="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]" loading="lazy" width="600" height="338" />
+                  )}
+                </div>
               </div>
-              <div class="px-4 py-3 flex items-center justify-between">
+              <div class="px-4 py-3 flex items-center justify-between border-t border-zinc-800/50 bg-surface-1/60">
                 <span class="text-sm font-medium text-zinc-300">{shot.name}</span>
                 <svg class="w-4 h-4 text-zinc-600 opacity-0 transition-all group-hover:opacity-100 group-hover:text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L15 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
@@ -159,13 +183,16 @@ const groupMeta = [
          CTA
          ═══════════════════════════════════════════════ -->
     <div class="relative rounded-2xl border border-primary/20 overflow-hidden p-8 sm:p-12" data-reveal>
-      <div class="absolute inset-0 bg-gradient-to-br from-[#1a1510] via-surface-1 to-surface-0 pointer-events-none"></div>
-      <div class="absolute top-0 right-0 w-64 h-64 bg-primary/[0.1] rounded-full blur-3xl pointer-events-none"></div>
+      <div class="pointer-events-none absolute inset-0" aria-hidden="true">
+        <div class="absolute inset-x-0 top-0 h-48 hero-glow"></div>
+        <div class="absolute top-0 right-0 w-64 h-64 bg-primary/[0.1] rounded-full blur-3xl"></div>
+      </div>
       <div class="relative max-w-xl">
-        <h2 class="font-display text-2xl sm:text-3xl font-bold text-foreground tracking-tight text-balance">Like what you see?</h2>
+        <h2 class="font-display text-sm font-semibold tracking-[0.18em] uppercase text-zinc-500">Get started</h2>
+        <h3 class="mt-4 font-display text-2xl sm:text-3xl font-bold text-foreground tracking-tight text-balance">Like what you see?</h3>
         <p class="mt-2 text-base text-zinc-400">These frames regenerate on every commit. Install the panel and run the real thing.</p>
-        <div class="mt-6 flex flex-wrap gap-3">
-          <a href={B + "#install"} class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary-600 active:scale-[0.98]">
+        <div class="mt-6 flex flex-wrap items-center gap-3">
+          <a href={B + "#install"} class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary-600 active:scale-[0.98] shadow-[0_0_0_1px_hsl(29_47%_50%/0.3),0_8px_28px_-8px_hsl(29_47%_56%/0.45)]">
             Install in 60s
           </a>
           <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-lg border border-zinc-700/80 px-5 py-2.5 text-sm font-medium text-zinc-300 transition-all duration-200 hover:bg-surface-2 hover:text-zinc-100 active:scale-[0.98]">
@@ -175,47 +202,70 @@ const groupMeta = [
             Join Discord
           </a>
         </div>
+        <div class="mt-5 inline-flex max-w-full items-center gap-3 rounded-lg border border-zinc-800/70 bg-surface-0/80 pl-4 pr-1.5 py-1.5 font-mono text-xs">
+          <span class="text-primary select-none shrink-0">$</span>
+          <code class="text-zinc-300 truncate">{INSTALL_CMD}</code>
+          <button class="copy-btn shrink-0" data-copy={INSTALL_CMD} aria-label="Copy install command">
+            Copy
+          </button>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- ═══════════════════════════════════════════════
-       LIGHTBOX
+       FULLSCREEN LIGHTBOX
        ═══════════════════════════════════════════════ -->
   <div id="lightbox" class="fixed inset-0 z-[100] hidden" role="dialog" aria-modal="true" aria-label="Screenshot viewer">
-    <div id="lightbox-backdrop" class="absolute inset-0 bg-black/90 backdrop-blur-sm transition-opacity opacity-0"></div>
+    <div id="lightbox-backdrop" class="absolute inset-0 bg-black/95 backdrop-blur-md transition-opacity duration-200 opacity-0"></div>
 
-    <button id="lightbox-close" type="button" class="absolute top-3 right-3 z-20 p-3 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 transition-colors min-h-11 min-w-11 flex items-center justify-center" aria-label="Close">
-      <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-      </svg>
-    </button>
-
-    <div class="absolute top-0 left-0 right-0 z-10 flex items-center justify-center px-16 py-3 pointer-events-none">
-      <div class="text-center">
-        <div id="lightbox-title" class="text-sm font-medium text-zinc-200"></div>
-        <div id="lightbox-counter" class="text-xs text-zinc-500 font-mono mt-0.5"></div>
+    <!-- Modal chrome bar -->
+    <div class="absolute top-0 left-0 right-0 z-20 flex items-center gap-3 px-4 py-3 pointer-events-none">
+      <div class="flex items-center gap-1.5 pointer-events-auto" aria-hidden="true">
+        <div class="w-2.5 h-2.5 rounded-full bg-zinc-700"></div>
+        <div class="w-2.5 h-2.5 rounded-full bg-zinc-700"></div>
+        <div class="w-2.5 h-2.5 rounded-full bg-zinc-700"></div>
+      </div>
+      <div class="flex-1 flex justify-center min-w-0 pointer-events-auto">
+        <div class="max-w-md w-full sm:w-auto sm:min-w-64 h-7 rounded-md bg-white/[0.06] border border-white/[0.08] flex items-center px-3">
+          <span id="lightbox-url" class="text-[11px] font-mono text-zinc-400 truncate mx-auto"></span>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 pointer-events-auto">
+        <span id="lightbox-counter" class="font-mono text-[11px] text-zinc-500 tabular-nums"></span>
+        <button id="lightbox-fs" type="button" class="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 transition-colors min-h-9 min-w-9 flex items-center justify-center" aria-label="Toggle fullscreen">
+          <svg id="lightbox-fs-enter" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L15 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" /></svg>
+          <svg id="lightbox-fs-exit" class="w-4 h-4 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25" /></svg>
+        </button>
+        <button id="lightbox-download" type="button" class="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 transition-colors min-h-9 min-w-9 flex items-center justify-center" aria-label="Download full-size screenshot">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+        </button>
+        <button id="lightbox-close" type="button" class="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 transition-colors min-h-9 min-w-9 flex items-center justify-center" aria-label="Close">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
     </div>
 
-    <div class="relative z-10 flex items-center justify-center h-full px-4 sm:px-12 py-12 sm:py-16">
-      <img id="lightbox-img" class="max-w-full max-h-[70vh] sm:max-h-[80vh] rounded-lg sm:rounded-xl shadow-2xl border border-zinc-800 object-contain transition-transform duration-200" alt="" />
+    <div class="relative z-10 flex items-center justify-center h-full px-4 sm:px-20 py-16 sm:py-20">
+      <img id="lightbox-img" class="max-w-full max-h-[calc(100vh-9rem)] sm:max-h-[calc(100vh-10rem)] rounded-lg sm:rounded-xl shadow-2xl shadow-black/60 ring-1 ring-white/10 object-contain transition-[opacity,transform] duration-200 opacity-0 scale-[0.97]" alt="" />
     </div>
 
-    <button id="lightbox-prev" type="button" class="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-xl bg-zinc-900/80 border border-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-800 hover:border-zinc-700 transition-all min-h-11 min-w-11 flex items-center justify-center" aria-label="Previous screenshot">
+    <button id="lightbox-prev" type="button" class="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-xl bg-white/[0.06] border border-white/10 text-zinc-300 hover:text-white hover:bg-white/[0.12] hover:border-white/20 backdrop-blur transition-all min-h-11 min-w-11 flex items-center justify-center" aria-label="Previous screenshot">
       <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
       </svg>
     </button>
 
-    <button id="lightbox-next" type="button" class="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-xl bg-zinc-900/80 border border-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-800 hover:border-zinc-700 transition-all min-h-11 min-w-11 flex items-center justify-center" aria-label="Next screenshot">
+    <button id="lightbox-next" type="button" class="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-xl bg-white/[0.06] border border-white/10 text-zinc-300 hover:text-white hover:bg-white/[0.12] hover:border-white/20 backdrop-blur transition-all min-h-11 min-w-11 flex items-center justify-center" aria-label="Next screenshot">
       <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
         <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
       </svg>
     </button>
 
-    <div class="absolute bottom-3 left-0 right-0 z-10 text-center">
-      <span class="text-[11px] text-zinc-600">Arrow keys to navigate · ESC to close</span>
+    <div class="absolute bottom-3 left-0 right-0 z-10 text-center pointer-events-none">
+      <span class="text-[11px] text-zinc-600 font-mono">← → navigate · F fullscreen · ESC close</span>
     </div>
   </div>
 
@@ -224,11 +274,15 @@ const groupMeta = [
       const lightbox = document.getElementById('lightbox');
       const backdrop = document.getElementById('lightbox-backdrop');
       const img = document.getElementById('lightbox-img');
-      const titleEl = document.getElementById('lightbox-title');
+      const urlEl = document.getElementById('lightbox-url');
       const counterEl = document.getElementById('lightbox-counter');
       const closeBtn = document.getElementById('lightbox-close');
       const prevBtn = document.getElementById('lightbox-prev');
       const nextBtn = document.getElementById('lightbox-next');
+      const fsBtn = document.getElementById('lightbox-fs');
+      const fsEnter = document.getElementById('lightbox-fs-enter');
+      const fsExit = document.getElementById('lightbox-fs-exit');
+      const dlBtn = document.getElementById('lightbox-download');
 
       const triggers = Array.from(document.querySelectorAll('[data-lightbox]'));
       let currentIndex = -1;
@@ -239,9 +293,10 @@ const groupMeta = [
         currentIndex = index;
         const shot = shots[index];
         img.src = shot.lightboxSrc || shot.publicPath;
-        img.alt = shot.name;
-        titleEl.textContent = shot.name + (shot.group ? ' - ' + shot.group : '');
+        img.alt = 'Catalyst ' + shot.name + (shot.group ? ' — ' + shot.group : '');
+        urlEl.textContent = shot.url || shot.name;
         counterEl.textContent = (index + 1) + ' / ' + shots.length;
+        dlBtn.onclick = function () { download(shot); };
 
         scrollY = window.scrollY;
         document.body.style.top = '-' + scrollY + 'px';
@@ -252,12 +307,30 @@ const groupMeta = [
         lightbox.classList.remove('hidden');
         requestAnimationFrame(() => {
           backdrop.classList.remove('opacity-0');
+          img.classList.remove('opacity-0', 'scale-[0.97]');
         });
+
+        // Preload neighbours for instant nav
+        [index - 1, index + 1].forEach((i) => {
+          const n = shots[(i + shots.length) % shots.length];
+          if (n) { const pre = new Image(); pre.src = n.lightboxSrc || n.publicPath; }
+        });
+      }
+
+      function download(shot) {
+        const a = document.createElement('a');
+        a.href = shot.publicPath;
+        a.download = shot.publicPath.split('/').pop() || 'screenshot.png';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
       }
 
       function close() {
         backdrop.classList.add('opacity-0');
+        img.classList.add('opacity-0', 'scale-[0.97]');
         setTimeout(() => {
+          if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
           lightbox.classList.add('hidden');
           img.src = '';
           document.body.style.position = '';
@@ -269,13 +342,18 @@ const groupMeta = [
       }
 
       function prev() {
-        if (currentIndex > 0) open(currentIndex - 1);
-        else open(shots.length - 1);
+        open(currentIndex > 0 ? currentIndex - 1 : shots.length - 1);
+      }
+      function next() {
+        open(currentIndex < shots.length - 1 ? currentIndex + 1 : 0);
       }
 
-      function next() {
-        if (currentIndex < shots.length - 1) open(currentIndex + 1);
-        else open(0);
+      function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+          (lightbox.requestFullscreen ? lightbox.requestFullscreen() : Promise.reject()).catch(() => {});
+        } else {
+          document.exitFullscreen().catch(() => {});
+        }
       }
 
       triggers.forEach((btn) => {
@@ -289,14 +367,37 @@ const groupMeta = [
       closeBtn.addEventListener('click', close);
       prevBtn.addEventListener('click', (e) => { e.stopPropagation(); prev(); });
       nextBtn.addEventListener('click', (e) => { e.stopPropagation(); next(); });
+      fsBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleFullscreen(); });
       backdrop.addEventListener('click', close);
+
+      document.addEventListener('fullscreenchange', () => {
+        const fs = !!document.fullscreenElement;
+        lightbox.classList.toggle('is-fs', fs);
+        fsEnter.classList.toggle('hidden', fs);
+        fsExit.classList.toggle('hidden', !fs);
+      });
 
       document.addEventListener('keydown', (e) => {
         if (lightbox.classList.contains('hidden')) return;
-        if (e.key === 'Escape') { e.preventDefault(); close(); }
+        if (e.key === 'Escape') {
+          // If in browser fullscreen, the first ESC only exits fullscreen
+          if (document.fullscreenElement) { document.exitFullscreen().catch(() => {}); return; }
+          e.preventDefault(); close();
+        }
         else if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
         else if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
+        else if (e.key === 'f' || e.key === 'F') { e.preventDefault(); toggleFullscreen(); }
       });
     })();
   </script>
+
+  <style>
+    /* Fullscreen mode: let the image breathe edge-to-edge */
+    #lightbox.is-fs img#lightbox-img {
+      max-height: calc(100vh - 8rem);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #lightbox-img { transition: none !important; }
+    }
+  </style>
 </Layout>

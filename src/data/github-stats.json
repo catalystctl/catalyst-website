@@ -1,24 +1,24 @@
 {
   "repo": "catalystctl/catalyst",
   "repoUrl": "https://github.com/catalystctl/catalyst",
-  "commits": 935,
-  "releases": 137,
+  "commits": 943,
+  "releases": 138,
   "contributors": 8,
   "stars": 23,
   "forks": 5,
-  "lastPushedAt": "2026-08-26T20:29:22Z",
+  "lastPushedAt": "2026-08-28T03:30:26Z",
   "latestRelease": {
-    "tag": "v1.23.12",
-    "publishedAt": "2026-08-26T20:27:24Z",
-    "url": "https://github.com/catalystctl/catalyst/releases/tag/v1.23.12"
+    "tag": "v1.24.0",
+    "publishedAt": "2026-08-28T03:20:15Z",
+    "url": "https://github.com/catalystctl/catalyst/releases/tag/v1.24.0"
   },
   "ci": {
     "state": "passing",
     "label": "Passing",
     "conclusion": "success",
-    "workflow": "Label #237 [1zr6g]",
-    "finishedAt": "2026-08-27T14:03:15Z",
-    "url": "https://github.com/catalystctl/catalyst/actions/runs/33079942520"
+    "workflow": "npm_and_yarn in / for @fastify/helmet, @fastify/multipart, mysql2, uuid, framer-motion, zustand - Update #1543740902",
+    "finishedAt": "2026-08-28T03:25:55Z",
+    "url": "https://github.com/catalystctl/catalyst/actions/runs/33138636713"
   },
-  "fetchedAt": "2026-08-28T02:29:57.717Z"
+  "fetchedAt": "2026-08-28T05:18:09.548Z"
 }

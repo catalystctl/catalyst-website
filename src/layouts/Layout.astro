@@ -204,7 +204,7 @@ const breadcrumbLd = breadcrumbItems && breadcrumbItems.length > 0
     <link rel="icon" type="image/png" sizes="192x192" href={B + "favicon-192.png"} />
     <link rel="apple-touch-icon" href={B + "apple-touch-icon.png"} />
     <link rel="manifest" href={B + "site.webmanifest"} />
-    <meta name="theme-color" content="#0a0a0a" />
+    <meta name="theme-color" content="#0b0a08" />
 
     <meta property="og:type" content={type} />
     <meta property="og:url" content={fullUrl} />
@@ -267,7 +267,7 @@ const breadcrumbLd = breadcrumbItems && breadcrumbItems.length > 0
         <div class="flex items-center gap-2">
           <a
             href={B + "#install"}
-            class="hidden sm:inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-2 text-xs font-semibold text-primary-foreground shadow-[0_0_0_1px_hsl(25_55%_50%/0.25),0_6px_20px_-8px_hsl(25_55%_58%/0.4)] transition-all duration-200 hover:bg-primary-600 active:scale-[0.98]"
+            class="hidden sm:inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-2 text-xs font-semibold text-primary-foreground shadow-[0_0_0_1px_hsl(29_47%_50%/0.25),0_6px_20px_-8px_hsl(29_47%_56%/0.4)] transition-all duration-200 hover:bg-primary-600 active:scale-[0.98]"
           >
             Install in 60s
           </a>
@@ -275,7 +275,7 @@ const breadcrumbLd = breadcrumbItems && breadcrumbItems.length > 0
             href={DISCORD_URL}
             target="_blank"
             rel="noopener noreferrer"
-            class="hidden md:inline-flex items-center justify-center rounded-lg border border-zinc-800 p-2 text-zinc-400 transition-colors hover:text-zinc-100 hover:bg-surface-2 hover:border-zinc-700"
+            class="hidden md:inline-flex items-center justify-center rounded-lg border border-zinc-800 p-2 text-zinc-400 transition-colors h-9 hover:text-zinc-100 hover:bg-surface-2 hover:border-zinc-700"
             aria-label="Join Catalyst on Discord"
           >
             <Fragment set:html={discordIcon} />
@@ -284,7 +284,7 @@ const breadcrumbLd = breadcrumbItems && breadcrumbItems.length > 0
             href={githubStats.latestRelease?.url ?? GITHUB_URL + "/releases"}
             target="_blank"
             rel="noopener noreferrer"
-            class="hidden md:inline-flex items-center gap-1.5 rounded-lg border border-zinc-800 px-2.5 py-1.5 text-zinc-400 transition-colors hover:text-zinc-100 hover:bg-surface-2 hover:border-zinc-700"
+            class="hidden md:inline-flex h-9 items-center justify-center gap-1.5 rounded-lg border border-zinc-800 px-2.5 py-1.5 text-zinc-400 transition-colors hover:text-zinc-100 hover:bg-surface-2 hover:border-zinc-700"
             aria-label={`Latest release ${githubStats.latestRelease?.tag ?? ""} on GitHub`}
             title="Latest release"
           >

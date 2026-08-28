@@ -45,7 +45,7 @@ const updatedFormattedDate = entry.data.updatedDate?.toLocaleDateString('en-US',
   breadcrumbItems={[{ name: "Blog", href: "blog/" }, { name: entry.data.title }]}
 >
   <article class="relative">
-    <div class="pointer-events-none absolute inset-x-0 top-0 h-64 bg-[radial-gradient(ellipse_at_top,hsl(25_55%_58%/0.07),transparent_60%)]" aria-hidden="true"></div>
+    <div class="pointer-events-none absolute inset-x-0 top-0 h-64 bg-[radial-gradient(ellipse_at_top,hsl(29_47%_56%/0.07),transparent_60%)]" aria-hidden="true"></div>
 
     <div class="relative max-w-3xl mx-auto px-4 sm:px-8 pt-10 sm:pt-14 pb-16 sm:pb-20">
       <nav class="text-xs text-zinc-600 mb-8" aria-label="Breadcrumb">
@@ -99,13 +99,16 @@ const updatedFormattedDate = entry.data.updatedDate?.toLocaleDateString('en-US',
       </div>
 
       <div class="mt-16 relative rounded-2xl border border-primary/20 overflow-hidden p-6 sm:p-8">
-        <div class="absolute inset-0 bg-gradient-to-br from-[#1a1510] via-surface-1 to-surface-0 pointer-events-none"></div>
-        <div class="absolute top-0 right-0 w-48 h-48 bg-primary/[0.1] rounded-full blur-3xl pointer-events-none"></div>
+        <div class="pointer-events-none absolute inset-0" aria-hidden="true">
+          <div class="absolute inset-x-0 top-0 h-48 hero-glow"></div>
+          <div class="absolute top-0 right-0 w-64 h-64 bg-primary/[0.12] rounded-full blur-3xl"></div>
+          <div class="absolute bottom-0 left-0 w-48 h-48 bg-primary/[0.05] rounded-full blur-3xl"></div>
+        </div>
         <div class="relative">
           <h2 class="font-display text-lg sm:text-xl font-semibold text-foreground">Spin up a panel tonight.</h2>
           <p class="mt-2 text-sm text-zinc-400 max-w-md">Free, GPLv3, no feature gates. One command and you are live.</p>
           <div class="mt-5 flex flex-wrap gap-3">
-            <a href={B + "#install"} class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary-600 active:scale-[0.98]">
+            <a href={B + "#install"} class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary-600 active:scale-[0.98] shadow-[0_0_0_1px_hsl(29_47%_50%/0.3),0_8px_28px_-8px_hsl(29_47%_56%/0.45)]">
               Install in 60s
             </a>
             <a href={DISCORD_URL} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-lg border border-zinc-700/80 px-4 py-2.5 text-sm font-medium text-zinc-300 transition-all hover:bg-surface-2 hover:text-zinc-100 active:scale-[0.98]">

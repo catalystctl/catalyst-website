@@ -162,7 +162,7 @@ const compatibility = [
             Built-in auto-migration imports nodes, users, eggs, servers, and files from the admin panel. No hand-rolled scripts.
           </p>
           <div class="mt-7 flex flex-wrap gap-3">
-            <a href={B + "#install"} class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary-600 active:scale-[0.98] min-h-11 shadow-[0_0_0_1px_hsl(25_55%_50%/0.3),0_8px_28px_-8px_hsl(25_55%_58%/0.45)]">
+            <a href={B + "#install"} class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary-600 active:scale-[0.98] min-h-11 shadow-[0_0_0_1px_hsl(29_47%_50%/0.3),0_8px_28px_-8px_hsl(29_47%_56%/0.45)]">
               Install in 60s
             </a>
             <a href={B + "pterodactyl-alternative/#comparison"} class="inline-flex items-center gap-2 rounded-lg border border-zinc-700/80 px-5 py-3 text-sm font-medium text-zinc-200 transition-all duration-200 hover:bg-surface-2 active:scale-[0.98] min-h-11">
@@ -341,8 +341,11 @@ const compatibility = [
   <!-- CTA -->
   <section class="max-w-6xl mx-auto px-4 py-16" aria-label="Call to action">
     <div class="relative rounded-2xl border border-primary/20 overflow-hidden p-8 sm:p-12" data-reveal>
-      <div class="absolute inset-0 bg-gradient-to-br from-[#1a1510] via-surface-1 to-surface-0 pointer-events-none"></div>
-      <div class="absolute bottom-0 left-0 w-64 h-64 bg-primary/[0.1] rounded-full blur-3xl pointer-events-none"></div>
+      <div class="pointer-events-none absolute inset-0" aria-hidden="true">
+        <div class="absolute inset-x-0 top-0 h-56 hero-glow"></div>
+        <div class="absolute top-0 right-0 w-80 h-80 bg-primary/[0.12] rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-56 h-56 bg-primary/[0.05] rounded-full blur-3xl"></div>
+      </div>
       <div class="relative max-w-xl">
         <h2 class="font-display text-2xl sm:text-3xl font-bold text-foreground tracking-tight text-balance">
           Start the migration tonight.
@@ -351,7 +354,7 @@ const compatibility = [
           Deploy Catalyst in a minute, then import your Pterodactyl data from the admin panel.
         </p>
         <div class="mt-7 flex flex-wrap gap-3">
-          <a href={B + "#install"} class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary-600 active:scale-[0.98] min-h-11 shadow-[0_0_0_1px_hsl(25_55%_50%/0.3),0_8px_28px_-8px_hsl(25_55%_58%/0.45)]">
+          <a href={B + "#install"} class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary-600 active:scale-[0.98] min-h-11 shadow-[0_0_0_1px_hsl(29_47%_50%/0.3),0_8px_28px_-8px_hsl(29_47%_56%/0.45)]">
             Install in 60s
           </a>
           <a href={B + "docs/"} class="inline-flex items-center gap-2 rounded-lg border border-zinc-700/80 px-5 py-3 text-sm font-medium text-zinc-300 transition-all duration-200 hover:bg-surface-2 hover:text-zinc-100 active:scale-[0.98] min-h-11">

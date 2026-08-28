@@ -715,6 +715,14 @@ html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover, *::-we
   background: radial-gradient(ellipse 60% 45% at 50% 0%, hsl(29 47% 56% / 0.10), transparent 70%);
 }
 
+/* Ambient glow. Unlike `blur-3xl` (filter spreads paint past the box, so
+   overflow-hidden containers clip it mid-glow and leave hard edges), this
+   fades to transparent at its own edge — clipping only removes empty pixels.
+   Set intensity via text color, e.g. class="glow-orb text-primary/[0.05]". */
+.glow-orb {
+  background: radial-gradient(closest-side, currentColor, transparent);
+}
+
 /* ═══════════════════════════════════════════════════════
    ARCHITECTURE FLOW — traveling packet on connector line
    ═══════════════════════════════════════════════════════ */

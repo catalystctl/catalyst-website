@@ -1,24 +1,24 @@
 {
   "repo": "catalystctl/catalyst",
   "repoUrl": "https://github.com/catalystctl/catalyst",
-  "commits": 943,
-  "releases": 138,
+  "commits": 949,
+  "releases": 139,
   "contributors": 8,
   "stars": 23,
   "forks": 5,
-  "lastPushedAt": "2026-08-28T03:30:26Z",
+  "lastPushedAt": "2026-08-29T02:12:35Z",
   "latestRelease": {
-    "tag": "v1.24.0",
-    "publishedAt": "2026-08-28T03:20:15Z",
-    "url": "https://github.com/catalystctl/catalyst/releases/tag/v1.24.0"
+    "tag": "v1.24.1",
+    "publishedAt": "2026-08-29T02:10:39Z",
+    "url": "https://github.com/catalystctl/catalyst/releases/tag/v1.24.1"
   },
   "ci": {
     "state": "passing",
     "label": "Passing",
     "conclusion": "success",
-    "workflow": "Code Quality: Scheduled",
-    "finishedAt": "2026-08-28T20:42:18Z",
-    "url": "https://github.com/catalystctl/catalyst/actions/runs/33209246981"
+    "workflow": "cargo in /catalyst-agent for russh - Update #1544855559",
+    "finishedAt": "2026-08-29T02:12:37Z",
+    "url": "https://github.com/catalystctl/catalyst/actions/runs/33228331667"
   },
-  "fetchedAt": "2026-08-29T02:05:40.968Z"
+  "fetchedAt": "2026-08-29T09:57:52.112Z"
 }

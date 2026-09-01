@@ -6,19 +6,19 @@
   "contributors": 8,
   "stars": 23,
   "forks": 6,
-  "lastPushedAt": "2026-08-31T20:44:20Z",
+  "lastPushedAt": "2026-09-01T02:49:13Z",
   "latestRelease": {
     "tag": "v1.28.0",
     "publishedAt": "2026-08-31T20:44:33Z",
     "url": "https://github.com/catalystctl/catalyst/releases/tag/v1.28.0"
   },
   "ci": {
-    "state": "passing",
-    "label": "Passing",
-    "conclusion": "success",
-    "workflow": "Push on main",
-    "finishedAt": "2026-08-31T20:50:39Z",
-    "url": "https://github.com/catalystctl/catalyst/actions/runs/33437656059"
+    "state": "failing",
+    "label": "Failing",
+    "conclusion": "failure",
+    "workflow": "Review #245 [9wfn6]",
+    "finishedAt": "2026-09-01T02:50:32Z",
+    "url": "https://github.com/catalystctl/catalyst/actions/runs/33463988153"
   },
-  "fetchedAt": "2026-08-31T23:45:16.617Z"
+  "fetchedAt": "2026-09-01T04:56:25.721Z"
 }

@@ -1,24 +1,24 @@
 {
   "repo": "catalystctl/catalyst",
   "repoUrl": "https://github.com/catalystctl/catalyst",
-  "commits": 1021,
-  "releases": 165,
+  "commits": 1031,
+  "releases": 168,
   "contributors": 8,
   "stars": 23,
   "forks": 6,
-  "lastPushedAt": "2026-09-02T20:56:03Z",
+  "lastPushedAt": "2026-09-03T03:09:17Z",
   "latestRelease": {
-    "tag": "v1.32.5",
-    "publishedAt": "2026-09-02T20:56:15Z",
-    "url": "https://github.com/catalystctl/catalyst/releases/tag/v1.32.5"
+    "tag": "v1.34.0",
+    "publishedAt": "2026-09-03T03:07:47Z",
+    "url": "https://github.com/catalystctl/catalyst/releases/tag/v1.34.0"
   },
   "ci": {
     "state": "passing",
     "label": "Passing",
     "conclusion": "success",
-    "workflow": "Push on main",
-    "finishedAt": "2026-09-02T21:02:24Z",
-    "url": "https://github.com/catalystctl/catalyst/actions/runs/33682221516"
+    "workflow": "cargo in /catalyst-agent for uuid - Update #1553823098",
+    "finishedAt": "2026-09-03T03:09:20Z",
+    "url": "https://github.com/catalystctl/catalyst/actions/runs/33710255217"
   },
-  "fetchedAt": "2026-09-03T00:05:02.121Z"
+  "fetchedAt": "2026-09-03T04:17:31.405Z"
 }

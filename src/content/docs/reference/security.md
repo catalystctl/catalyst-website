@@ -241,7 +241,7 @@ When vulnerabilities are disclosed, they will be listed here with:
 
 ## Additional Resources
 
-- **GPLv3 License**: [LICENSE](LICENSE)
+- **GPLv3 License**: [LICENSE](https://github.com/catalystctl/catalyst/blob/main/LICENSE)
 - **GNU GPL FAQ**: https://www.gnu.org/licenses/gpl-faq.html
 - **FSF Security Guidelines**: https://www.fsf.org/
 - [OWASP Top 10](https://owasp.org/www-project-top-ten/)

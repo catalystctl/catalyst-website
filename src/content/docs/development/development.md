@@ -1075,10 +1075,10 @@ chore: update dependencies
 
 ## Cross-References
 
-- [Architecture Overview](./architecture.md) — System design, data flow, and component responsibilities
-- [API Reference](./api-reference.md) — Complete REST API endpoint reference for integration
-- [Plugin System Analysis](./plugin-system-analysis.md) — Internal plugin system internals (deep dive)
-- [Automation Guide](./automation.md) — API integration examples (WHMCS, Python, Node.js)
+- [Architecture Overview](/docs/reference/architecture/) — System design, data flow, and component responsibilities
+- [API Reference](/docs/api-reference/api-reference/) — Complete REST API endpoint reference for integration
+- Plugin System Analysis — Internal plugin system internals (deep dive)
+- [Automation Guide](/docs/automation/automation/) — API integration examples (WHMCS, Python, Node.js)
 
 ---
 

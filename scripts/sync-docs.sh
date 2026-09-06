@@ -144,3 +144,89 @@ done <<< "$MAPPINGS"
 
 echo ""
 echo "Synced $synced doc$( [ "$synced" -ne 1 ] && echo "s" ), skipped $skipped"
+
+# Rewrite repo-relative Markdown links (./foo.md, QUICKSTART.md, docs/SECURITY.md)
+# to site routes (/docs/...). Without this, in-doc links resolve to
+# /docs/<section>/<file>.md which has no route and returns the 404 page.
+python3 - "$DEST" <<'PY'
+import re
+import sys
+from pathlib import Path
+
+dest = Path(sys.argv[1])
+
+ROUTES = {
+    "quickstart.md": "/docs/getting-started/quickstart/",
+    "getting-started.md": "/docs/getting-started/getting-started/",
+    "installation.md": "/docs/getting-started/installation/",
+    "installation_detailed.md": "/docs/getting-started/installation-detailed/",
+    "docker-setup.md": "/docs/getting-started/docker-setup/",
+    "admin-guide.md": "/docs/admin-guide/admin-guide/",
+    "user-guide.md": "/docs/user-guide/user-guide/",
+    "agent.md": "/docs/nodes/agent/",
+    "api-reference.md": "/docs/api-reference/api-reference/",
+    "automation.md": "/docs/automation/automation/",
+    "plugins.md": "/docs/plugins/plugins/",
+    "environment-variables.md": "/docs/reference/environment-variables/",
+    "architecture.md": "/docs/reference/architecture/",
+    "troubleshooting.md": "/docs/reference/troubleshooting/",
+    "usage-examples.md": "/docs/reference/usage-examples/",
+    "security.md": "/docs/reference/security/",
+    "development.md": "/docs/development/development/",
+    "readme.md": "/docs/",
+}
+
+GITHUB = "https://github.com/catalystctl/catalyst/blob/main"
+EXTERNAL_FALLBACKS = {
+    "license": f"{GITHUB}/LICENSE",
+    "contributing.md": f"{GITHUB}/CONTRIBUTING.md",
+}
+
+LINK_RE = re.compile(r'(?<!\!)\[([^\]]+)\]\(([^)\s]+)(\s+"[^"]*")?\)')
+
+def rewrite_url(url: str) -> str | None:
+    if not url or url.startswith(("#", "/", "http://", "https://", "mailto:", "tel:")):
+        return None
+    path, sep, anchor = url.partition("#")
+    base = path.rsplit("/", 1)[-1].strip()
+    if not base:
+        return None
+    key = base.lower()
+    if key in ROUTES:
+        return ROUTES[key] + (sep + anchor if sep else "")
+    if key in EXTERNAL_FALLBACKS:
+        return EXTERNAL_FALLBACKS[key]
+    if key.endswith(".md"):
+        return ""  # unknown doc: drop link target so it renders as text
+    return None
+
+rewritten = 0
+for md in sorted(dest.rglob("*.md")):
+    text = md.read_text(encoding="utf-8")
+    state = {"changed": False}
+
+    def sub(m: re.Match) -> str:
+        label, url, title = m.group(1), m.group(2), m.group(3) or ""
+        new_url = rewrite_url(url)
+        if new_url is None:
+            return m.group(0)
+        state["changed"] = True
+        global rewritten
+        rewritten += 1
+        if new_url == "":
+            return label
+        # Clean labels that were raw filenames (automation.md, docs/SECURITY.md)
+        # so the rendered text does not show a file extension.
+        if label.strip().lower().endswith(".md"):
+            clean = label.strip().rsplit("/", 1)[-1]
+            clean = clean[: -len(".md")]
+            label = clean or label
+        return f"[{label}]({new_url}{title})"
+
+    new_text = LINK_RE.sub(sub, text)
+    if state["changed"]:
+        md.write_text(new_text, encoding="utf-8")
+        print(f"links rewritten in {md.relative_to(dest)}")
+
+print(f"Rewrote {rewritten} doc link(s)")
+PY

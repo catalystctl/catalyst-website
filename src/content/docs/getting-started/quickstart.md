@@ -107,11 +107,11 @@ Your panel is running, but you need a **node** (a machine to run game servers on
 
 | What you want | Where to go |
 |---|---|
-| Set up a node and deploy the agent | [Getting Started → Step 3](getting-started.md#step-3-create-a-node) |
-| Create your first game server | [Getting Started → Step 7](getting-started.md#step-7-create-your-first-server) |
-| Enable HTTPS / TLS | [Docker Setup → TLS](docker-setup.md#tls--https-setup) |
-| Understand every config option | [Environment Variables](environment-variables.md) |
-| Fix something that went wrong | [Troubleshooting](troubleshooting.md) |
+| Set up a node and deploy the agent | [Getting Started → Step 3](/docs/getting-started/getting-started/#step-3-create-a-node) |
+| Create your first game server | [Getting Started → Step 7](/docs/getting-started/getting-started/#step-7-create-your-first-server) |
+| Enable HTTPS / TLS | [Docker Setup → TLS](/docs/getting-started/docker-setup/#tls--https-setup) |
+| Understand every config option | [Environment Variables](/docs/reference/environment-variables/) |
+| Fix something that went wrong | [Troubleshooting](/docs/reference/troubleshooting/) |
 
 ---
 
@@ -166,6 +166,6 @@ Make sure `PUBLIC_URL` exactly matches the URL in your browser. Mismatches cause
 
 ## 🎉 That's It!
 
-You now have a fully functional Catalyst panel. The next step is adding a node and creating your first server — head over to the [Getting Started Guide](getting-started.md) for the full walkthrough.
+You now have a fully functional Catalyst panel. The next step is adding a node and creating your first server — head over to the [Getting Started Guide](/docs/getting-started/getting-started/) for the full walkthrough.
 
 *Need help?* Open an issue on [GitHub](https://github.com/catalystctl/catalyst/issues) with the `documentation` label.

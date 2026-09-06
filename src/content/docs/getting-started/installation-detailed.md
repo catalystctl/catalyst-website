@@ -13,7 +13,7 @@ keywords:
 >
 > This document explains every option, every configuration variable, and every edge case. If you want to understand *everything* before deploying, start here.
 >
-> **Short on time?** → [Quick Start](QUICKSTART.md) (5-minute setup)
+> **Short on time?** → [Quick Start](/docs/getting-started/quickstart/) (5-minute setup)
 
 ---
 

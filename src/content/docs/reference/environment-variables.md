@@ -669,12 +669,12 @@ openssl rand -base64 32
 
 ## Cross-References
 
-- → [Installation](./installation.md) — Required variables during setup
-- → [Docker Setup](./docker-setup.md) — Docker-specific environment injection
-- → [Admin Guide](./admin-guide.md) — Settings that can be configured via the web UI instead
-- → [Architecture](./architecture.md) — How these settings affect system design
-- → [Troubleshooting](./troubleshooting.md) — Config-related error solutions
-- → [API Reference](./api-reference.md) — Rate limit settings (`RATE_LIMIT_*`)
+- → [Installation](/docs/getting-started/installation/) — Required variables during setup
+- → [Docker Setup](/docs/getting-started/docker-setup/) — Docker-specific environment injection
+- → [Admin Guide](/docs/admin-guide/admin-guide/) — Settings that can be configured via the web UI instead
+- → [Architecture](/docs/reference/architecture/) — How these settings affect system design
+- → [Troubleshooting](/docs/reference/troubleshooting/) — Config-related error solutions
+- → [API Reference](/docs/api-reference/api-reference/) — Rate limit settings (`RATE_LIMIT_*`)
 
 ---
 

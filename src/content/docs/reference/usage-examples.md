@@ -9,7 +9,7 @@ keywords:
   - server operations
 ---
 
-Quick-start copy-paste examples for common Catalyst operations. For deep-dive guides, see [automation.md](./automation.md).
+Quick-start copy-paste examples for common Catalyst operations. For deep-dive guides, see [automation](/docs/automation/automation/).
 
 ---
 
@@ -57,7 +57,7 @@ curl -X POST http://localhost:3000/api/agent/report \
   -d '{"nodeId":"node_abc","status":"online","cpu":45.2}'
 ```
 
-For full agent details, see [agent.md](./agent.md).
+For full agent details, see [agent](/docs/nodes/agent/).
 
 ---
 
@@ -187,7 +187,7 @@ data: {"type":"output","data":"[12:00:01] [Server thread/INFO]: Preparing level 
 data: {"type":"output","data":"[12:00:05] [Server thread/INFO]: Done (5.123s)!\n"}
 ```
 
-For WebSocket-based console, see [api-reference.md](./api-reference.md).
+For WebSocket-based console, see [api-reference](/docs/api-reference/api-reference/).
 
 ### WebSocket Console
 
@@ -248,7 +248,7 @@ curl -X DELETE http://localhost:3000/api/servers/srv_xyz789/backups/bkp_abc \
   -H "Authorization: Bearer catalyst_A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6"
 ```
 
-For scheduled backup tasks, see [automation.md](./automation.md).
+For scheduled backup tasks, see [automation](/docs/automation/automation/).
 
 ---
 
@@ -273,7 +273,7 @@ sftp> put my-custom-config.yml
 sftp> mput *.yml plugins/
 ```
 
-SFTP credentials are available per-server in the admin panel or via the API. For SFTP configuration details, see [admin-guide.md](./admin-guide.md).
+SFTP credentials are available per-server in the admin panel or via the API. For SFTP configuration details, see [admin-guide](/docs/admin-guide/admin-guide/).
 
 ---
 
@@ -303,7 +303,7 @@ curl -X POST http://localhost:3000/api/servers/srv_xyz789/tasks \
   }'
 ```
 
-For more examples and supported actions, see [automation.md](./automation.md).
+For more examples and supported actions, see [automation](/docs/automation/automation/).
 
 ---
 
@@ -419,7 +419,7 @@ app.post('/webhook', (req, res) => {
 app.listen(8080);
 ```
 
-All available webhook events: `server.created`, `server.deleted`, `server.suspended`, `server.unsuspended`, `server.bulk_suspended`, `server.bulk_deleted`, `user.deleted`. For the full event payload schema, see [api-reference.md](./api-reference.md).
+All available webhook events: `server.created`, `server.deleted`, `server.suspended`, `server.unsuspended`, `server.bulk_suspended`, `server.bulk_deleted`, `user.deleted`. For the full event payload schema, see [api-reference](/docs/api-reference/api-reference/).
 
 ---
 
@@ -461,7 +461,7 @@ curl http://localhost:3000/api/servers/srv_xyz789/files/list \
 
 ## Admin Operations
 
-> **Scope:** Admin-only endpoints require `admin` role or the `allPermissions` flag. See [admin-guide.md](./admin-guide.md).
+> **Scope:** Admin-only endpoints require `admin` role or the `allPermissions` flag. See [admin-guide](/docs/admin-guide/admin-guide/).
 
 ### List Users
 
@@ -737,7 +737,7 @@ X-RateLimit-Remaining: 27
 X-RateLimit-Reset: 1712000060
 ```
 
-For complete API details and all endpoints, see [api-reference.md](./api-reference.md).
+For complete API details and all endpoints, see [api-reference](/docs/api-reference/api-reference/).
 
 ---
 
@@ -1042,4 +1042,4 @@ await harness.unload();
 
 ---
 
-> **See also:** [automation.md](./automation.md) for deep-dive automation, webhook patterns, and bulk operations. [plugins.md](./plugins.md) for comprehensive plugin documentation. For initial server setup, see [getting-started.md](./getting-started.md).
+> **See also:** [automation](/docs/automation/automation/) for deep-dive automation, webhook patterns, and bulk operations. [plugins](/docs/plugins/plugins/) for comprehensive plugin documentation. For initial server setup, see [getting-started](/docs/getting-started/getting-started/).

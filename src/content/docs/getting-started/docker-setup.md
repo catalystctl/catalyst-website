@@ -12,7 +12,7 @@ keywords:
 
 > Complete reference for deploying Catalyst with Docker Compose — services, volumes, networking, TLS, health checks, updating, and production hardening.
 >
-> **New to Catalyst?** Start with the [Quick Start](QUICKSTART.md) for a 5-minute setup, then come back here for the full reference.
+> **New to Catalyst?** Start with the [Quick Start](/docs/getting-started/quickstart/) for a 5-minute setup, then come back here for the full reference.
 
 ---
 
@@ -57,7 +57,7 @@ curl http://localhost:3000/health
 
 That's it. Open your `PUBLIC_URL` in a browser. The first user to register becomes admin.
 
-> **Want more detail?** Read the full [Installation Guide](installation.md) or continue below for the complete Docker reference.
+> **Want more detail?** Read the full [Installation Guide](/docs/getting-started/installation/) or continue below for the complete Docker reference.
 
 ---
 
@@ -652,7 +652,7 @@ docker compose up -d postgres
 | Can't bind port 80 | Use `FRONTEND_PORT=0.0.0.0:8080` |
 | `podman compose up` hangs | Normal — it waits for healthchecks. Check `podman ps` in another terminal. |
 | Permission denied on volumes | Rootless Podman maps your UID. Ensure files are owned by your user. |
-| Can't access containerd socket | The agent needs root or the `containerd` group. See the [Agent Guide](agent.md). |
+| Can't access containerd socket | The agent needs root or the `containerd` group. See the [Agent Guide](/docs/nodes/agent/). |
 
 ### 4. SFTP Host Key Issues
 

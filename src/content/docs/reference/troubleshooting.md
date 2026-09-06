@@ -1643,8 +1643,8 @@ sudo ctr -n catalyst images pull docker.io/your-image:tag
 
 For security vulnerabilities, **do not** open a public GitHub issue. Instead:
 
-- Read [docs/SECURITY.md](./SECURITY.md) for the full security policy
-- Read [docs/SECURITY_QUICK_REFERENCE.md](./SECURITY_QUICK_REFERENCE.md) for the quick guide
+- Read [SECURITY](/docs/reference/security/) for the full security policy
+- Read docs/SECURITY_QUICK_REFERENCE.md for the quick guide
 - Report via the channel specified in the security policy
 
 ---
@@ -1668,5 +1668,5 @@ The following are known limitations that are not bugs but may affect your deploy
 | **Rate limits are per-node** | Rate limiting applies per backend instance | Add more backend instances with external LB for high traffic |
 
 ::: tip Contributing
-If you find a bug or have a feature request, please open a GitHub issue. For documentation improvements, submit a pull request. See [development.md](./development.md) for contribution guidelines.
+If you find a bug or have a feature request, please open a GitHub issue. For documentation improvements, submit a pull request. See [development](/docs/development/development/) for contribution guidelines.
 :::

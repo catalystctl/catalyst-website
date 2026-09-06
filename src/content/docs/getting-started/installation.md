@@ -11,8 +11,8 @@ keywords:
 
 > **🐳 Docker is the only supported way to run Catalyst.** All production deployments use Docker Compose or Podman Compose.
 
-> **📚 Looking for the 5-minute version?** → [Quick Start](QUICKSTART.md)  
-> **📖 Want every option explained in depth?** → [Detailed Installation](INSTALLATION_DETAILED.md)
+> **📚 Looking for the 5-minute version?** → [Quick Start](/docs/getting-started/quickstart/)  
+> **📖 Want every option explained in depth?** → [Detailed Installation](/docs/getting-started/installation-detailed/)
 
 Complete instructions for deploying **Catalyst** with Docker Compose. This guide covers everything you need to get the panel running, configured, and secured.
 
@@ -55,11 +55,11 @@ docker compose up -d
 
 > **Tip:** The **first user to register** automatically becomes the administrator. No seeding required.
 >
-> After installation, follow [Getting Started](./getting-started.md) for your first admin setup.
+> After installation, follow [Getting Started](/docs/getting-started/getting-started/) for your first admin setup.
 
 For Podman, use `podman compose up -d` instead of `docker compose up -d`.
 
-📖 See [Detailed Installation](INSTALLATION_DETAILED.md) for a breakdown of everything the install script does, Podman quirks, and LAN exposure settings.
+📖 See [Detailed Installation](/docs/getting-started/installation-detailed/) for a breakdown of everything the install script does, Podman quirks, and LAN exposure settings.
 
 ---
 
@@ -112,7 +112,7 @@ SFTP_PORT=0.0.0.0:2022
 
 Find your LAN IP with `hostname -I | awk '{print $1}'`.
 
-📖 Full Docker service reference, volume management, and production hardening: [Docker Setup](./docker-setup.md).
+📖 Full Docker service reference, volume management, and production hardening: [Docker Setup](/docs/getting-started/docker-setup/).
 
 ---
 
@@ -151,7 +151,7 @@ cd ..         # back to repo root
 pnpm run dev   # backend + frontend with hot reload
 ```
 
-> **See also:** [Development Guide](./development.md) for the complete developer guide including testing, plugin development, and PR process.
+> **See also:** [Development Guide](/docs/development/development/) for the complete developer guide including testing, plugin development, and PR process.
 
 ---
 
@@ -201,8 +201,8 @@ The backend's `/health` endpoint returns `200 OK` when ready.
 
 All config lives in `.env` inside `catalyst-docker/`. Copy `.env.example` as a starting point.
 
-📖 For the full 60+ variable reference with defaults and security recommendations, see [Environment Variables](./environment-variables.md).  
-📖 For Docker service architecture, volume management, and production hardening, see [Docker Setup](./docker-setup.md).
+📖 For the full 60+ variable reference with defaults and security recommendations, see [Environment Variables](/docs/reference/environment-variables/).  
+📖 For Docker service architecture, volume management, and production hardening, see [Docker Setup](/docs/getting-started/docker-setup/).
 
 ### Required Variables
 
@@ -380,7 +380,7 @@ WebAuthn/Passkey requires `PASSKEY_RP_ID` to exactly match your domain:
 
 No protocol, no port — bare hostname or IP only.
 
-📖 For full TLS configuration details, certificate automation, and reverse-proxy examples: [Detailed Installation](INSTALLATION_DETAILED.md).
+📖 For full TLS configuration details, certificate automation, and reverse-proxy examples: [Detailed Installation](/docs/getting-started/installation-detailed/).
 
 ---
 
@@ -411,7 +411,7 @@ pnpm run dev:agent        # Rust agent locally (needs root)
 | `pnpm run test` | Run Vitest test suite |
 | `pnpm run lint` | Run ESLint on all packages |
 
-> **See also:** [Development Guide](./development.md) for the complete developer guide.
+> **See also:** [Development Guide](/docs/development/development/) for the complete developer guide.
 
 ---
 
@@ -455,5 +455,5 @@ curl -fsSL https://raw.githubusercontent.com/catalystctl/catalyst/main/install.s
 | Port already in use | `ss -tlnp \| grep :3000` then change in `.env` |
 | Backend crash loop | Check `BETTER_AUTH_SECRET` and `DATABASE_URL` are set. Check `docker compose logs -f backend`. |
 
-📖 For comprehensive troubleshooting — debug logging, agent issues, CORS errors, plugin failures, and performance tuning: [Troubleshooting](./troubleshooting.md).  
-📖 For deep-dive environment variable explanations and config issue matrix: [Detailed Installation](INSTALLATION_DETAILED.md).
+📖 For comprehensive troubleshooting — debug logging, agent issues, CORS errors, plugin failures, and performance tuning: [Troubleshooting](/docs/reference/troubleshooting/).  
+📖 For deep-dive environment variable explanations and config issue matrix: [Detailed Installation](/docs/getting-started/installation-detailed/).

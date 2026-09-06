@@ -3,6 +3,7 @@ import '@fontsource-variable/dm-sans';
 import '@fontsource-variable/outfit';
 import '../styles/global.css';
 import githubStats from "../data/github-stats.json";
+import ConsentBanner from "../components/ConsentBanner.astro";
 
 export interface Props {
   title: string;
@@ -206,6 +207,35 @@ const breadcrumbLd = breadcrumbItems && breadcrumbItems.length > 0
     <link rel="manifest" href={B + "site.webmanifest"} />
     <meta name="theme-color" content="#0b0a08" />
 
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
+      window.gtag("consent", "default", {
+        ad_storage: "denied",
+        ad_user_data: "denied",
+        ad_personalization: "denied",
+        analytics_storage: "denied",
+        functionality_storage: "denied",
+        personalization_storage: "denied",
+        security_storage: "granted",
+        wait_for_update: 500,
+      });
+      window.gtag("set", "url_passthrough", true);
+      window.gtag("set", "ads_data_redaction", true);
+    </script>
+    <script is:inline>
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+        var f = d.getElementsByTagName(s)[0];
+        var j = d.createElement(s);
+        j.async = true;
+        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, "script", "dataLayer", "GTM-M225FTLQ");
+    </script>
+
     <meta property="og:type" content={type} />
     <meta property="og:url" content={fullUrl} />
     <meta property="og:title" content={fullTitle} />
@@ -233,6 +263,7 @@ const breadcrumbLd = breadcrumbItems && breadcrumbItems.length > 0
   </head>
 
   <body class="min-h-screen flex flex-col bg-background text-foreground">
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M225FTLQ" height="0" width="0" style="display:none;visibility:hidden" title="Google Tag Manager"></iframe></noscript>
     <a href="#main-content" class="skip-link">Skip to content</a>
 
     <header class="sticky top-0 z-50 border-b border-zinc-800/80 bg-surface-1/70 backdrop-blur-xl">
@@ -442,6 +473,9 @@ const breadcrumbLd = breadcrumbItems && breadcrumbItems.length > 0
             Free and open source under GPLv3.
           </p>
           <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <button type="button" data-cookie-settings class="text-xs text-zinc-600 hover:text-zinc-300 transition-colors">
+              Cookie settings
+            </button>
             <a href={DISCORD_URL} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs text-zinc-600 hover:text-zinc-300 transition-colors">
               <span class="opacity-70"><Fragment set:html={discordIcon} /></span>
               Discord
@@ -453,5 +487,36 @@ const breadcrumbLd = breadcrumbItems && breadcrumbItems.length > 0
         </div>
       </div>
     </footer>
+    <ConsentBanner />
+    <script is:inline>
+      (function () {
+        document.querySelector("[data-cookie-settings]")?.addEventListener("click", function () {
+          if (typeof window.catalystShowCookieSettings === "function") {
+            window.catalystShowCookieSettings();
+          }
+        });
+
+        document.addEventListener("click", function (e) {
+          var el = e.target instanceof Element ? e.target.closest("a, button") : null;
+          if (!el) return;
+          window.dataLayer = window.dataLayer || [];
+          if (el.tagName === "A") {
+            var href = el.getAttribute("href") || "";
+            var text = (el.textContent || "").trim().slice(0, 80);
+            var isOutbound = /^https?:\/\//i.test(href) && href.indexOf("catalystctl.com") === -1;
+            var isInstall = href.indexOf("#install") !== -1;
+            window.dataLayer.push({
+              event: isInstall ? "install_click" : "link_click",
+              link_url: href,
+              link_text: text,
+              outbound: isOutbound,
+            });
+          } else {
+            var label = el.getAttribute("aria-label") || (el.textContent || "").trim().slice(0, 80);
+            if (label) window.dataLayer.push({ event: "button_click", button_label: label });
+          }
+        });
+      })();
+    </script>
   </body>
 </html>

@@ -1,0 +1,181 @@
+---
+---
+<div
+  id="consent-banner"
+  class="fixed inset-x-4 bottom-4 z-[70] hidden"
+  role="dialog"
+  aria-live="polite"
+  aria-label="Cookie consent"
+>
+  <div class="max-w-2xl mx-auto rounded-xl border border-zinc-800 bg-surface-1/95 backdrop-blur-xl shadow-2xl shadow-black/50 p-5 sm:p-6">
+    <h2 class="font-display text-sm font-semibold text-zinc-100">We use cookies</h2>
+    <p class="mt-1.5 text-sm text-zinc-400 leading-relaxed">
+      We use cookies to measure traffic and improve the docs. Choose Accept to allow
+      analytics and marketing cookies, or Reject to continue with necessary-only cookies.
+    </p>
+    <div id="consent-prefs" class="mt-4 hidden space-y-2.5 border-t border-zinc-800/60 pt-4">
+      <label class="flex items-center justify-between gap-4 text-sm">
+        <span class="text-zinc-300">Necessary <span class="text-zinc-600">— always on</span></span>
+        <input type="checkbox" checked disabled class="h-4 w-4 accent-zinc-500" aria-label="Necessary cookies, always on" />
+      </label>
+      <label class="flex items-center justify-between gap-4 text-sm">
+        <span class="text-zinc-300">Analytics</span>
+        <input id="consent-toggle-analytics" type="checkbox" checked class="h-4 w-4 accent-orange-400" />
+      </label>
+      <label class="flex items-center justify-between gap-4 text-sm">
+        <span class="text-zinc-300">Advertising</span>
+        <input id="consent-toggle-ads" type="checkbox" checked class="h-4 w-4 accent-orange-400" />
+      </label>
+      <label class="flex items-center justify-between gap-4 text-sm">
+        <span class="text-zinc-300">Functional</span>
+        <input id="consent-toggle-functional" type="checkbox" checked class="h-4 w-4 accent-orange-400" />
+      </label>
+    </div>
+    <div class="mt-4 flex flex-col sm:flex-row sm:items-center gap-2">
+      <button
+        id="consent-accept"
+        type="button"
+        class="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary-600 active:scale-[0.98]"
+      >
+        Accept all
+      </button>
+      <button
+        id="consent-reject"
+        type="button"
+        class="inline-flex items-center justify-center rounded-lg border border-zinc-700 px-4 py-2.5 text-sm font-medium text-zinc-300 transition-colors hover:bg-surface-2 hover:text-zinc-100"
+      >
+        Reject
+      </button>
+      <button
+        id="consent-customize"
+        type="button"
+        class="inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-200"
+        aria-expanded="false"
+      >
+        Customize
+      </button>
+      <button
+        id="consent-save"
+        type="button"
+        class="hidden inline-flex items-center justify-center rounded-lg border border-zinc-700 px-4 py-2.5 text-sm font-medium text-zinc-200 transition-colors hover:bg-surface-2"
+      >
+        Save choices
+      </button>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+(function () {
+  var KEY = "catalyst-consent-v1";
+  var banner = document.getElementById("consent-banner");
+  var prefs = document.getElementById("consent-prefs");
+  var customizeBtn = document.getElementById("consent-customize");
+  var saveBtn = document.getElementById("consent-save");
+  if (!banner) return;
+
+  function read() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function write(state) {
+    try {
+      localStorage.setItem(KEY, JSON.stringify(state));
+    } catch {
+      /* storage unavailable — banner simply reappears next visit */
+    }
+    try {
+      document.cookie =
+        "catalyst-consent=" +
+        encodeURIComponent(state.analytics ? "granted" : "denied") +
+        "; Max-Age=15552000; Path=/; SameSite=Lax; Secure";
+    } catch {
+      /* cookies blocked — consent still enforced via defaults */
+    }
+  }
+
+  function pushConsent(state) {
+    window.dataLayer = window.dataLayer || [];
+    var granted = function (v) {
+      return v ? "granted" : "denied";
+    };
+    var update = {
+      ad_storage: granted(state.ads),
+      ad_user_data: granted(state.ads),
+      ad_personalization: granted(state.ads),
+      analytics_storage: granted(state.analytics),
+      functionality_storage: granted(state.functional),
+      personalization_storage: granted(state.functional),
+      security_storage: "granted",
+    };
+    if (typeof window.gtag === "function") {
+      window.gtag("consent", "update", update);
+    } else {
+      window.dataLayer.push({ event: "consent_update", consent: update });
+    }
+    window.dataLayer.push({
+      event: "consent_choice",
+      consent_analytics: state.analytics,
+      consent_ads: state.ads,
+      consent_functional: state.functional,
+    });
+  }
+
+  function hide() {
+    banner.classList.add("hidden");
+  }
+
+  function show() {
+    banner.classList.remove("hidden");
+  }
+
+  function choose(state) {
+    var full = {
+      necessary: true,
+      analytics: !!state.analytics,
+      ads: !!state.ads,
+      functional: !!state.functional,
+      ts: new Date().toISOString(),
+    };
+    write(full);
+    pushConsent(full);
+    hide();
+  }
+
+  document.getElementById("consent-accept")?.addEventListener("click", function () {
+    choose({ analytics: true, ads: true, functional: true });
+  });
+  document.getElementById("consent-reject")?.addEventListener("click", function () {
+    choose({ analytics: false, ads: false, functional: false });
+  });
+  customizeBtn?.addEventListener("click", function () {
+    var open = prefs?.classList.toggle("hidden") === false;
+    customizeBtn.setAttribute("aria-expanded", open ? "true" : "false");
+    customizeBtn.textContent = open ? "Hide options" : "Customize";
+    saveBtn?.classList.toggle("hidden", !open);
+  });
+  saveBtn?.addEventListener("click", function () {
+    choose({
+      analytics: document.getElementById("consent-toggle-analytics")?.checked ?? false,
+      ads: document.getElementById("consent-toggle-ads")?.checked ?? false,
+      functional: document.getElementById("consent-toggle-functional")?.checked ?? false,
+    });
+  });
+
+  window.catalystShowCookieSettings = function () {
+    show();
+  };
+
+  var stored = read();
+  if (stored) {
+    pushConsent(stored);
+  } else {
+    window.setTimeout(show, 600);
+  }
+})();
+</script>

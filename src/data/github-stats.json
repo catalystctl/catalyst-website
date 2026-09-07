@@ -1,24 +1,24 @@
 {
   "repo": "catalystctl/catalyst",
   "repoUrl": "https://github.com/catalystctl/catalyst",
-  "commits": 1076,
-  "releases": 190,
+  "commits": 1078,
+  "releases": 191,
   "contributors": 8,
   "stars": 24,
   "forks": 6,
-  "lastPushedAt": "2026-09-07T09:26:25Z",
+  "lastPushedAt": "2026-09-07T16:20:10Z",
   "latestRelease": {
-    "tag": "v1.41.1",
-    "publishedAt": "2026-09-05T04:16:04Z",
-    "url": "https://github.com/catalystctl/catalyst/releases/tag/v1.41.1"
+    "tag": "v1.41.2",
+    "publishedAt": "2026-09-07T16:23:17Z",
+    "url": "https://github.com/catalystctl/catalyst/releases/tag/v1.41.2"
   },
   "ci": {
     "state": "running",
     "label": "Running",
     "conclusion": "success",
-    "workflow": "npm_and_yarn in / for @commitlint/cli, @commitlint/config-conventional, @typescript-eslint/eslint-plugin, @typescript-eslint/parser, @vitest/coverage-v8, eslint, globals, vitest, @testing-library/react, @types/react, @types/react-dom, @vitejs/plugin-react, eslint-plugin-react-refresh, eventsource, rollup-plugin-visualizer, typescript-eslint, vite - Update #1561215702",
-    "finishedAt": "2026-09-07T09:26:30Z",
-    "url": "https://github.com/catalystctl/catalyst/actions/runs/34105267989"
+    "workflow": "Code Quality: Push on main",
+    "finishedAt": "2026-09-07T16:21:40Z",
+    "url": "https://github.com/catalystctl/catalyst/actions/runs/34142774559"
   },
-  "fetchedAt": "2026-09-07T10:09:34.104Z"
+  "fetchedAt": "2026-09-07T16:24:04.036Z"
 }

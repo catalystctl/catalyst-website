@@ -13,12 +13,12 @@
     "url": "https://github.com/catalystctl/catalyst/releases/tag/v1.43.1"
   },
   "ci": {
-    "state": "passing",
-    "label": "Passing",
-    "conclusion": "success",
-    "workflow": "Code Quality: Push on main",
-    "finishedAt": "2026-09-08T03:32:50Z",
-    "url": "https://github.com/catalystctl/catalyst/actions/runs/34183775157"
+    "state": "failing",
+    "label": "Failing",
+    "conclusion": "failure",
+    "workflow": "Label #251 [3fsuw]",
+    "finishedAt": "2026-09-08T07:30:01Z",
+    "url": "https://github.com/catalystctl/catalyst/actions/runs/34199570145"
   },
-  "fetchedAt": "2026-09-08T04:24:21.422Z"
+  "fetchedAt": "2026-09-08T09:33:12.488Z"
 }

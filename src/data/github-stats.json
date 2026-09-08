@@ -16,9 +16,9 @@
     "state": "passing",
     "label": "Passing",
     "conclusion": "success",
-    "workflow": "Discord Notify",
-    "finishedAt": "2026-09-08T12:59:27Z",
-    "url": "https://github.com/catalystctl/catalyst/actions/runs/34228802750"
+    "workflow": "Auto Version",
+    "finishedAt": "2026-09-08T12:55:09Z",
+    "url": "https://github.com/catalystctl/catalyst/actions/runs/34228802465"
   },
-  "fetchedAt": "2026-09-08T14:24:38.217Z"
+  "fetchedAt": "2026-09-08T18:33:04.607Z"
 }

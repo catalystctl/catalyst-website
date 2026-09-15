@@ -95,9 +95,9 @@ For organizations subject to GDPR:
 
 While Catalyst itself isn't SOC 2 certified (it's open source software), its architecture supports SOC 2 control objectives:
 
-- **CC6.1 (Logical Access):** RBAC with 20+ granular permissions, scoped API keys
+- **CC6.1 (Logical Access):** RBAC with 50+ granular permissions, scoped API keys
 - **CC6.2 (Authentication):** Secure password hashing, session management, optional 2FA
-- **CC7.1 (Detection):** Built-in audit logging, crash detection, resource monitoring
+- **CC7.1 (Detection):** Built-in audit logging, alerts, and resource monitoring
 - **CC7.2 (Incident Response):** Real-time alerts via plugins, API-driven automation for incident response
 
 ## Role-Based Access Control (RBAC)
@@ -107,7 +107,7 @@ While Catalyst itself isn't SOC 2 certified (it's open source software), its arc
 Pterodactyl and Pelican offer essentially two permission levels: admin and user. For a hobbyist, that's fine. For an enterprise, it's a compliance failure.
 
 Consider these scenarios:
-- A support technician needs to restart crashed servers but shouldn't be able to delete them
+- A support technician needs to restart servers but shouldn't be able to delete them
 - A billing administrator needs to see server allocations but shouldn't access server consoles
 - A node operator should manage their assigned nodes but not others
 - An auditor needs read-only access to logs without any modification rights
@@ -116,7 +116,7 @@ None of these are possible with binary admin/user permissions.
 
 ### Catalyst's granular RBAC
 
-Catalyst ships with 20+ individual permissions that can be combined into custom roles:
+Catalyst ships with 50+ individual permissions that can be combined into custom roles:
 
 | Permission | Description |
 |-----------|-------------|
@@ -156,7 +156,7 @@ Enterprises don't manage servers by clicking buttons in a web interface. They au
 
 ### Catalyst's API coverage
 
-With 60+ REST endpoints, Catalyst's API covers:
+With 200+ API route handlers, Catalyst's API covers:
 
 - **Server lifecycle:** Create, start, stop, restart, suspend, delete
 - **Resource management:** Allocate and reallocate CPU, memory, disk, ports
@@ -177,7 +177,7 @@ Common enterprise integration patterns:
 - **CI/CD pipeline:** Automatically provision test servers for game development
 - **Monitoring integration:** Export metrics to Prometheus/Grafana via plugin
 - **SSO integration:** Connect to SAML/OIDC identity providers via plugin hooks
-- **Ticketing integration:** Auto-create support tickets when servers crash repeatedly
+- **Ticketing integration:** Auto-create support tickets on repeated alerts via webhooks/plugins
 
 ## Disaster recovery
 
@@ -204,11 +204,11 @@ Backup schedules are configurable per server, and restore operations are availab
 
 If you're evaluating game server platforms for an enterprise deployment, the requirements go beyond "can it run a Minecraft server." You need:
 
-1. **Granular RBAC** - Not admin/user. 20+ permissions that map to your organizational structure.
+1. **Granular RBAC** - 50+ permissions that map to your organizational structure.
 2. **Audit logging** - Built-in, comprehensive, exportable. Not a third-party afterthought.
 3. **Containerd runtime** - Kubernetes-grade isolation, no Docker daemon risk.
-4. **API coverage** - 60+ endpoints for automation, not ~40 with gaps.
+4. **API coverage** - 200+ route handlers for automation with RBAC.
 5. **Plugin extensibility** - Integration without forking. SSO, monitoring, ticketing, custom workflows.
-6. **Rust backend** - Memory-safe, predictable performance, single binary, minimal attack surface.
+6. **Split stack** - TypeScript panel (Fastify/PostgreSQL/Redis) with a static Rust agent on nodes, minimal daemon on game hosts.
 
 Catalyst is the only open source game server panel that delivers all six. [Compare it directly against Pterodactyl](/pterodactyl-alternative/#comparison) or [get started with a test deployment](/docs/getting-started/quickstart/). For the runtime layer behind this architecture, see [containerd vs Docker for game servers](/blog/containerd-vs-docker-game-servers/). Building a business on top? Read [how to build a hosting business with Catalyst](/blog/game-hosting-business-with-catalyst/).

@@ -48,7 +48,7 @@ As you grow, you add more nodes and distribute the load:
 - **Phase 2 (100-500 servers):** Separate the database onto its own server. Add nodes in multiple regions. Set up a load balancer in front of the panel.
 - **Phase 3 (500+ servers):** Run multiple panel instances behind a load balancer. Use managed PostgreSQL. Consider bare-metal nodes for cost efficiency at scale.
 
-Catalyst's containerd runtime is more memory-efficient than Docker, which means you can fit more servers per node - directly impacting your profit margin.
+Catalyst game nodes run directly on containerd (panel ships via Docker Compose). Test node density with your games — do not budget on efficiency headlines.
 
 ## Setting up billing
 
@@ -62,7 +62,7 @@ With Catalyst, you have two better options:
 
 ### Option 1: Official API integration
 
-Catalyst's 60+ REST API endpoints cover everything a billing system needs:
+Catalyst's 200+ API route handlers cover everything a billing system needs:
 
 - **Create server:** `POST /api/servers` - allocate resources, assign a template, start the server
 - **Suspend server:** `POST /api/servers/{id}/suspend` - stop the server without deleting data
@@ -144,7 +144,7 @@ Catalyst helps you handle them efficiently:
 
 The admin panel shows you:
 - Server resource usage (CPU, memory, disk) over time
-- Real-time console output with <10ms latency
+- Live console via panel gateway to the Rust agent
 - Server status (running, stopped, crashed, installing)
 - Node health and capacity
 
@@ -152,7 +152,7 @@ When a customer says "my server is lagging," you can check their resource graphs
 
 ### RBAC for support staff
 
-With Catalyst's 20+ granular permissions, you can create a "support" role that lets staff:
+With Catalyst's 50+ granular permissions, you can create a "support" role that lets staff:
 - View server consoles (but not delete servers)
 - Restart servers (but not modify allocations)
 - View file manager (but not edit configuration files)
@@ -188,7 +188,7 @@ When a customer places an order:
 3. Server starts with the selected template
 4. Customer receives credentials via email
 
-This should take under 60 seconds from order to playing.
+Panel install is one command; provisioning time depends on images, node capacity, and your automation.
 
 ### Resource monitoring
 
@@ -236,10 +236,10 @@ Configure Catalyst to back up every server daily to S3-compatible storage. This 
 
 If you're building a hosting business, the differences matter:
 
-- **API coverage:** 60+ endpoints vs ~40 means more automation and fewer workarounds
+- **API coverage:** 200+ route handlers with RBAC means more automation and fewer workarounds
 - **Plugin system:** Build custom integrations without forking the panel
 - **RBAC:** Hire support staff with limited access instead of giving everyone admin
-- **Performance:** containerd uses less RAM per server, meaning more servers per node and better margins
+- **Ops fit:** containerd-native nodes align with Kubernetes tooling; measure density with your workload
 - **Migration tool:** Import your existing Pterodactyl installation automatically
 
 Migrating from Pterodactyl? Our [migration guide for 50+ servers](/blog/migrate-50-servers-from-pterodactyl/) and the [automated import walkthrough](/migrate-from-pterodactyl/) cover the full cutover.

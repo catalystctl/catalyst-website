@@ -1,12 +1,12 @@
 ---
-title: Installation
-description: Complete instructions for deploying Catalyst.
-order: 2
+title: "Installation"
+description: "Complete instructions for deploying Catalyst."
+order: 4
 keywords:
-  - catalyst install
-  - docker compose
-  - game server panel install
-  - catalyst deployment
+  - "catalyst install"
+  - "docker compose"
+  - "game server panel install"
+  - "catalyst deployment"
 ---
 
 > **🐳 Docker is the only supported way to run Catalyst.** All production deployments use Docker Compose or Podman Compose.
@@ -53,7 +53,7 @@ nano .env          # Set PUBLIC_URL at minimum
 docker compose up -d
 ```
 
-> **Tip:** The **first user to register** automatically becomes the administrator. No seeding required.
+> **Tip:** Complete the **Setup** wizard on first visit to create the administrator. No seeding required. Open registration is disabled after setup.
 >
 > After installation, follow [Getting Started](/docs/getting-started/getting-started/) for your first admin setup.
 
@@ -107,7 +107,6 @@ PUBLIC_URL=http://<YOUR_LAN_IP>:8080
 PASSKEY_RP_ID=<YOUR_LAN_IP>
 FRONTEND_PORT=0.0.0.0:8080
 BACKEND_PORT=0.0.0.0:3000
-SFTP_PORT=0.0.0.0:2022
 ```
 
 Find your LAN IP with `hostname -I | awk '{print $1}'`.
@@ -162,7 +161,7 @@ pnpm run dev   # backend + frontend with hot reload
 When you first visit your Catalyst URL:
 
 1. The wizard detects no users exist
-2. Register your first account — it becomes the **admin** automatically
+2. Complete the **Setup** wizard — the admin account you create becomes the administrator
 3. Optionally configure SMTP, panel branding, and OAuth from the admin panel
 
 > **Seed alternative:** Run `docker exec -e NODE_ENV=development catalyst-backend pnpm run db:seed` to create a default admin (`admin@example.com` / `admin123`). **Change this password immediately.**
@@ -229,20 +228,14 @@ All config lives in `.env` inside `catalyst-docker/`. Copy `.env.example` as a s
 | `REDIS_PORT` | `127.0.0.1:6379` | Host port binding |
 | `FRONTEND_PORT` | `0.0.0.0:8080` | Web panel port |
 | `BACKEND_PORT` | `127.0.0.1:3000` | Backend API port |
-| `SFTP_PORT` | `0.0.0.0:2022` | SFTP server port |
 
 > The backend entrypoint automatically runs `prisma migrate deploy` on every startup. For a fresh database, run `db:seed` to initialize sample data.
 
 ### SFTP
 
-| Variable | Default | Description |
-|---|---|---|
-| `SFTP_ENABLED` | `true` | Enable/disable built-in SFTP server |
-| `SFTP_MAX_FILE_SIZE` | `104857600` | Max upload size in bytes (100 MB) |
-| `SFTP_HOST_KEY` | *(auto-generate)* | SSH host key path. Leave empty to auto-generate. |
-| `SFTP_HOST_KEY_BASE64` | *(empty)* | Base64-encoded host key (alternative) |
+SFTP is hosted by the **node agent** on each game server node (default port `2022`), not by this compose stack. The per-node SFTP port is configured in the panel (Admin → Nodes) and written into the agent's `config.toml` by the deploy script.
 
-> **Podman:** set `SFTP_HOST_KEY=` and `SFTP_HOST_KEY_BASE64=` explicitly in `.env` to avoid interpolation issues.
+File size is the panel Admin → Security **Max upload size**.
 
 ### Backups
 
@@ -332,7 +325,7 @@ server {
     ssl_certificate     /etc/letsencrypt/live/panel.example.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/panel.example.com/privkey.pem;
 
-    client_max_body_size 100m;
+    client_max_body_size 0;
 
     location / {
         proxy_pass http://127.0.0.1:80;
@@ -386,7 +379,7 @@ No protocol, no port — bare hostname or IP only.
 
 ## Development Setup
 
-Catalyst uses a Bun workspace monorepo. Requirements:
+Catalyst uses a **pnpm** workspace monorepo. Requirements:
 
 - [Node.js](https://nodejs.org/) >= 22 + [pnpm](https://pnpm.io/) >= 8
 - Docker or Podman (for PostgreSQL, Redis)
@@ -450,7 +443,7 @@ curl -fsSL https://raw.githubusercontent.com/catalystctl/catalyst/main/install.s
 | Docker Compose hangs on start | It waits for healthchecks (1–3 min). Check `docker compose ps`. |
 | PostgreSQL connection error | Verify container: `docker compose ps postgres`. Check `POSTGRES_PASSWORD` in `.env`. |
 | Redis warning | Redis is optional. Safe to ignore unless using rate limiting or caching. |
-| SFTP refused | Check `SFTP_ENABLED=true` and port mapping. Podman: set `SFTP_HOST_KEY=` explicitly. |
+| SFTP refused | SFTP runs on the node agent — check agent status and port on the node |
 | Podman port 80 error | Use port 8080, or run: `echo 'net.ipv4.ip_unprivileged_port_start=80' \| sudo tee -a /etc/sysctl.conf && sudo sysctl -p` |
 | Port already in use | `ss -tlnp \| grep :3000` then change in `.env` |
 | Backend crash loop | Check `BETTER_AUTH_SECRET` and `DATABASE_URL` are set. Check `docker compose logs -f backend`. |

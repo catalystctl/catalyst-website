@@ -21,7 +21,7 @@ export interface Props {
 
 const {
   title,
-  description = "Catalyst replaces Pterodactyl with a faster Rust backend, containerd runtime, and 60+ API endpoints. Deploy game servers in 60 seconds. Free, open source, GPLv3.",
+  description = "Catalyst is an open-source game server panel in early testing: TypeScript panel with Rust node agent and containerd. 200+ API route handlers, 50+ permissions, 167 templates.",
   ogImage,
   canonicalUrl,
   type = "website",
@@ -38,7 +38,7 @@ const siteUrl = Astro.site?.toString().replace(/\/+$/, "") || "https://catalystc
 const fullUrl = canonicalUrl || new URL(Astro.url.pathname, siteUrl).toString();
 // Avoid "Catalyst - Catalyst" duplication when title already contains brand
 const fullTitle = title === "Home"
-  ? "Catalyst — Modern Game Server Panel Built with Rust & containerd"
+  ? "Catalyst — Open-Source Game Server Panel (Early Testing)"
   : title.includes("Catalyst") ? title : `${title} - Catalyst`;
 const ogImageUrl = ogImage ? new URL(ogImage, siteUrl).toString() : siteUrl + B + "og-default.png";
 
@@ -129,12 +129,12 @@ const jsonLd = isArticle
       "license": "https://www.gnu.org/licenses/gpl-3.0.en.html",
       "codeRepository": GITHUB_URL,
       "featureList": [
-        "Real-time console streaming via WebSocket",
-        "containerd runtime for superior performance",
-        "RBAC with 20+ granular permissions",
-        "60+ REST API endpoints",
+        "Live console via panel gateway to Rust agent",
+        "containerd runtime on game nodes",
+        "RBAC with 50+ granular permissions",
+        "200+ API route handlers",
         "Plugin system for extensibility",
-        "Automatic crash detection and recovery",
+        "Backups to local, S3-compatible, and SFTP",
       ],
     };
 
@@ -300,7 +300,7 @@ const breadcrumbLd = breadcrumbItems && breadcrumbItems.length > 0
             href={B + "#install"}
             class="hidden sm:inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-2 text-xs font-semibold text-primary-foreground shadow-[0_0_0_1px_hsl(29_47%_50%/0.25),0_6px_20px_-8px_hsl(29_47%_56%/0.4)] transition-all duration-200 hover:bg-primary-600 active:scale-[0.98]"
           >
-            Install in 60s
+            Install panel
           </a>
           <a
             href={DISCORD_URL}
@@ -362,7 +362,7 @@ const breadcrumbLd = breadcrumbItems && breadcrumbItems.length > 0
             href={B + "#install"}
             class="flex items-center justify-center gap-2 rounded-lg bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground"
           >
-            Install in 60s
+            Install panel
           </a>
           <a
             href={DISCORD_URL}
@@ -417,14 +417,14 @@ const breadcrumbLd = breadcrumbItems && breadcrumbItems.length > 0
               <span class="font-display text-sm font-semibold text-zinc-100">Catalyst</span>
             </a>
             <p class="text-sm text-zinc-500 leading-relaxed max-w-xs">
-              Modern game server panel. Rust backend, containerd runtime, GPLv3.
+              Open-source game server panel in early testing. TypeScript panel, Rust agent, containerd nodes.
             </p>
             <div class="mt-5 flex flex-wrap items-center gap-2">
               <a
                 href={B + "#install"}
                 class="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-2 text-xs font-semibold text-primary-foreground transition-all hover:bg-primary-600 active:scale-[0.98]"
               >
-                Install in 60s
+                Install panel
               </a>
               <a
                 href={DISCORD_URL}

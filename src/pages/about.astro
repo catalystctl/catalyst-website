@@ -10,7 +10,7 @@ const DISCORD_URL = "https://discord.gg/mybxhmru3y";
 
 <Layout
   title="About Catalyst"
-  description="Catalyst is an open-source game server panel built with Rust and containerd. Meet the project, its principles, and the team behind it."
+  description="Catalyst is an open-source game server panel in early testing: TypeScript panel with Rust node agent and containerd. Meet the project and its principles."
   canonicalUrl="https://catalystctl.com/about/"
   breadcrumbItems={[{ name: "About" }]}
 >
@@ -24,8 +24,12 @@ const DISCORD_URL = "https://discord.gg/mybxhmru3y";
           Built for hosts who ship.
         </h1>
         <p class="mt-5 text-base sm:text-lg text-zinc-400 leading-relaxed text-pretty">
-          Catalyst is an open-source game server panel written in Rust, running on containerd — a drop-in Pterodactyl alternative with sub-10ms console streaming, a plugin system, and a one-line install. Free under GPLv3.
+          Catalyst is an open-source game server panel in early testing: a TypeScript panel with a Rust node agent running on containerd — with live console, 258 egg definitions across 167 games, a plugin system, and one-command panel install. Panel GPLv3, agent MIT/Apache-2.0.
         </p>
+        <div class="mt-4 inline-flex items-center gap-2 rounded-full border border-success/20 bg-success/[0.08] px-3 py-1 text-xs font-medium text-success">
+          <span class="status-dot status-dot-success"></span>
+          Open source · early testing
+        </div>
         <div class="mt-7 flex flex-wrap gap-3">
           <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary-600 active:scale-[0.98] min-h-11 shadow-[0_0_0_1px_hsl(29_47%_50%/0.3),0_8px_28px_-8px_hsl(29_47%_56%/0.45)]">
             View on GitHub
@@ -42,11 +46,11 @@ const DISCORD_URL = "https://discord.gg/mybxhmru3y";
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <div class="rounded-xl border border-zinc-800/60 bg-surface-1 p-5">
             <h3 class="font-semibold text-foreground text-sm">Open source, no gates</h3>
-            <p class="mt-2 text-sm text-zinc-500 leading-relaxed">GPLv3. Every line is on GitHub. No paid tiers, no feature flags, no telemetry.</p>
+            <p class="mt-2 text-sm text-zinc-500 leading-relaxed">Panel GPLv3, agent MIT/Apache-2.0. Code on GitHub. No paid tiers. Early testing — expect rough edges.</p>
           </div>
           <div class="rounded-xl border border-zinc-800/60 bg-surface-1 p-5">
-            <h3 class="font-semibold text-foreground text-sm">Performance is the product</h3>
-            <p class="mt-2 text-sm text-zinc-500 leading-relaxed">Rust backend, containerd runtime, native WebSocket. Sub-10ms console, <1s startup, 50 MB at rest.</p>
+            <h3 class="font-semibold text-foreground text-sm">Honest architecture</h3>
+            <p class="mt-2 text-sm text-zinc-500 leading-relaxed">TypeScript Fastify panel (PostgreSQL + Redis) with a containerd-native Rust agent. Live console, files, SFTP, backups, and scheduling.</p>
           </div>
           <div class="rounded-xl border border-zinc-800/60 bg-surface-1 p-5">
             <h3 class="font-semibold text-foreground text-sm">Extensible, not forkable</h3>
@@ -79,16 +83,16 @@ const DISCORD_URL = "https://discord.gg/mybxhmru3y";
             <div class="text-xs text-zinc-500 mt-1">License</div>
           </div>
           <div class="rounded-xl border border-zinc-800/60 bg-surface-1 px-4 py-4 text-center">
-            <div class="font-display text-xl font-bold text-foreground">Rust</div>
-            <div class="text-xs text-zinc-500 mt-1">Backend</div>
+            <div class="font-display text-xl font-bold text-foreground">TS + Rust</div>
+            <div class="text-xs text-zinc-500 mt-1">Panel + agent</div>
           </div>
           <div class="rounded-xl border border-zinc-800/60 bg-surface-1 px-4 py-4 text-center">
             <div class="font-display text-xl font-bold text-foreground">containerd</div>
-            <div class="text-xs text-zinc-500 mt-1">Runtime</div>
+            <div class="text-xs text-zinc-500 mt-1">Nodes runtime</div>
           </div>
           <div class="rounded-xl border border-zinc-800/60 bg-surface-1 px-4 py-4 text-center">
-            <div class="font-display text-xl font-bold text-foreground">60+</div>
-            <div class="text-xs text-zinc-500 mt-1">API endpoints</div>
+            <div class="font-display text-xl font-bold text-foreground">200+</div>
+            <div class="text-xs text-zinc-500 mt-1">API route handlers</div>
           </div>
         </div>
       </section>
@@ -118,7 +122,7 @@ const DISCORD_URL = "https://discord.gg/mybxhmru3y";
     "@type": "AboutPage",
     "name": "About Catalyst",
     "url": "https://catalystctl.com/about/",
-    "description": "Catalyst is an open-source game server panel built with Rust and containerd — a drop-in Pterodactyl alternative.",
+    "description": "Catalyst is an open-source game server panel in early testing: TypeScript panel with Rust node agent and containerd.",
     "mainEntity": {
       "@type": "Organization",
       "@id": "https://catalystctl.com/#organization",

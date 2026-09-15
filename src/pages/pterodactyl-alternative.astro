@@ -9,33 +9,33 @@ const DISCORD_URL = "https://discord.gg/mybxhmru3y";
 
 const reasons = [
   {
-    title: "Sub-10ms console latency",
-    description: "Catalyst's WebSocket console streams logs under 10ms. Pterodactyl's Node.js layer averages ~100ms. For competitive game servers, that gap is the product.",
+    title: "Live console via agent",
+    description: "Console streams from the Rust agent through the panel gateway, with file manager, SFTP, and metrics in the same view. No Docker daemon on game nodes.",
     icon: `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" /></svg>`,
   },
   {
-    title: "Rust backend, not PHP",
-    description: "Axum compiles to a single binary with zero runtime deps. No PHP-FPM, no Composer, no Laravel upgrade treadmill. Cold start under a second.",
+    title: "TypeScript panel + Rust agent, not PHP",
+    description: "Panel is TypeScript on Fastify with PostgreSQL + Redis. Game nodes run a single static Rust binary that talks directly to containerd.",
     icon: `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" /></svg>`,
   },
   {
-    title: "containerd, not Docker daemon",
-    description: "Talks straight to containerd, the runtime behind Kubernetes. Faster startups, lower per-server memory, no daemon to babysit.",
+    title: "containerd on game nodes",
+    description: "Nodes talk straight to containerd, the runtime behind Kubernetes. The panel itself ships as Docker Compose. No Docker daemon on game nodes.",
     icon: `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 01-3-3m3 3a3 3 0 100 6h13.5a3 3 0 100-6m-16.5-3a3 3 0 013-3h13.5a3 3 0 013 3m-19.5 0a4.5 4.5 0 01.9-2.7L5.737 5.1a3.375 3.375 0 012.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 01.9 2.7m0 0a3 3 0 01-3 3m0 3h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008zm-3 6h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008z" /></svg>`,
   },
   {
     title: "Native plugin system",
-    description: "Pterodactyl has no plugin architecture. Catalyst lets you register TypeScript hooks, REST routes, and scheduled tasks without forking core.",
+    description: "Pterodactyl has no native plugin API and custom work usually means a fork. Catalyst lets you register TypeScript hooks, REST routes, and scheduled tasks without forking core.",
     icon: `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.25 9.75L16.5 12l-2.25 2.25m-4.5 0L7.5 12l2.25-2.25M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" /></svg>`,
   },
   {
-    title: "20+ granular permissions",
-    description: "Not just admin vs user. Restart servers, view files, manage nodes, create API keys, read audit logs. Mix precise roles.",
+    title: "50+ granular permissions",
+    description: "Not just admin vs user. Servers, nodes, templates, users, backups, files, console, databases, and alerts each have scoped permissions for precise roles.",
     icon: `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg>`,
   },
   {
-    title: "60+ REST API endpoints",
-    description: "Servers, nodes, users, files, backups, plugins. Pterodactyl sits around ~40 endpoints and is harder to automate at scale.",
+    title: "200+ API route handlers",
+    description: "Servers, nodes, users, files, backups, schedules, templates, and plugins over Fastify with RBAC on routes. Early testing — API may still change.",
     icon: `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" /></svg>`,
   },
 ];
@@ -44,53 +44,51 @@ const comparisons = [
   {
     category: "Architecture",
     rows: [
-      { feature: "Backend language", catalyst: "Rust (Axum)", pterodactyl: "PHP (Laravel)", winner: "catalyst" },
-      { feature: "Frontend", catalyst: "TypeScript (React + Vite)", pterodactyl: "React + Laravel Mix", winner: "catalyst" },
-      { feature: "Container runtime", catalyst: "containerd (native)", pterodactyl: "Docker (layered)", winner: "catalyst" },
-      { feature: "WebSocket implementation", catalyst: "Native Rust (Axum)", pterodactyl: "Node.js (ws)", winner: "catalyst" },
-      { feature: "Database", catalyst: "PostgreSQL", pterodactyl: "MySQL / MariaDB", winner: "tie" },
-    ],
-  },
-  {
-    category: "Performance",
-    rows: [
-      { feature: "Console latency", catalyst: "< 10ms", pterodactyl: "~100ms", winner: "catalyst" },
-      { feature: "Memory footprint (panel)", catalyst: "~50MB", pterodactyl: "~200MB+", winner: "catalyst" },
-      { feature: "Startup time", catalyst: "< 1s", pterodactyl: "~5s", winner: "catalyst" },
-      { feature: "Container overhead", catalyst: "Minimal (containerd)", pterodactyl: "Higher (Docker daemon)", winner: "catalyst" },
-      { feature: "Concurrent connections", catalyst: "10,000+", pterodactyl: "~1,000", winner: "catalyst" },
-    ],
-  },
-  {
-    category: "Features",
-    rows: [
-      { feature: "REST API endpoints", catalyst: "60+", pterodactyl: "~40", winner: "catalyst" },
-      { feature: "Plugin system", catalyst: "Native (hooks + routes)", pterodactyl: "None", winner: "catalyst" },
-      { feature: "RBAC permissions", catalyst: "20+ granular", pterodactyl: "Basic (admin/user)", winner: "catalyst" },
-      { feature: "API key management", catalyst: "Scoped + expiring", pterodactyl: "Basic", winner: "catalyst" },
-      { feature: "Audit logging", catalyst: "Built-in", pterodactyl: "Third-party only", winner: "catalyst" },
-      { feature: "Auto crash recovery", catalyst: "Yes", pterodactyl: "Partial", winner: "catalyst" },
-      { feature: "SFTP support", catalyst: "Built-in", pterodactyl: "Built-in", winner: "tie" },
-      { feature: "Scheduling / cron", catalyst: "Native tasks", pterodactyl: "Basic", winner: "catalyst" },
+      { feature: "Panel language", catalyst: "TypeScript (Fastify)", pterodactyl: "PHP (Laravel)", winner: "catalyst" },
+      { feature: "Node agent", catalyst: "Rust (static binary)", pterodactyl: "Go (Wings)", winner: "tie" },
+      { feature: "Frontend", catalyst: "TypeScript (React + Vite)", pterodactyl: "React", winner: "tie" },
+      { feature: "Container runtime (nodes)", catalyst: "containerd (native)", pterodactyl: "Docker via Wings", winner: "catalyst" },
+      { feature: "Database", catalyst: "PostgreSQL + Redis", pterodactyl: "MySQL / MariaDB", winner: "tie" },
     ],
   },
   {
     category: "Operations",
     rows: [
-      { feature: "Installation", catalyst: "Single script (60s)", pterodactyl: "Manual + Wings daemon", winner: "catalyst" },
-      { feature: "Node agent", catalyst: "Lightweight Rust binary", pterodactyl: "Wings (Node.js)", winner: "catalyst" },
-      { feature: "TLS / HTTPS", catalyst: "Auto (Let's Encrypt ready)", pterodactyl: "Manual setup", winner: "catalyst" },
-      { feature: "Backup system", catalyst: "S3-compatible", pterodactyl: "S3-compatible", winner: "tie" },
-      { feature: "Multi-node clustering", catalyst: "Native", pterodactyl: "Via Wings", winner: "tie" },
+      { feature: "Live console", catalyst: "WebSocket via panel + agent", pterodactyl: "Live console via Wings", winner: "tie" },
+      { feature: "File access", catalyst: "File manager + SFTP", pterodactyl: "File manager + SFTP", winner: "tie" },
+      { feature: "Backups", catalyst: "Local / S3 / SFTP", pterodactyl: "Local / S3", winner: "tie" },
+      { feature: "Scheduling", catalyst: "Cron tasks built-in", pterodactyl: "Schedules built-in", winner: "tie" },
+      { feature: "Game templates", catalyst: "258 eggs across 167 games", pterodactyl: "Eggs ecosystem", winner: "tie" },
+    ],
+  },
+  {
+    category: "Features",
+    rows: [
+      { feature: "API surface", catalyst: "200+ route handlers", pterodactyl: "REST + WebSocket API", winner: "catalyst" },
+      { feature: "Plugin system", catalyst: "Native (hooks + routes)", pterodactyl: "No native plugin API", winner: "catalyst" },
+      { feature: "RBAC permissions", catalyst: "50+ granular", pterodactyl: "Roles + subusers", winner: "catalyst" },
+      { feature: "API key management", catalyst: "Scoped + expiring", pterodactyl: "API keys", winner: "tie" },
+      { feature: "Audit logging", catalyst: "Built-in", pterodactyl: "Activity logs", winner: "tie" },
+      { feature: "SFTP support", catalyst: "Built-in", pterodactyl: "Built-in", winner: "tie" },
+      { feature: "Maturity", catalyst: "Early testing", pterodactyl: "Mature ecosystem", winner: "pterodactyl" },
+    ],
+  },
+  {
+    category: "Install",
+    rows: [
+      { feature: "Panel install", catalyst: "Single script (Docker Compose)", pterodactyl: "Manual panel setup", winner: "catalyst" },
+      { feature: "Node setup", catalyst: "Rust agent + containerd", pterodactyl: "Wings + Docker", winner: "tie" },
+      { feature: "TLS / HTTPS", catalyst: "TLS-ready (Caddy/Traefik examples)", pterodactyl: "Manual TLS", winner: "catalyst" },
+      { feature: "Pterodactyl import", catalyst: "Built-in migration job", pterodactyl: "—", winner: "catalyst" },
     ],
   },
 ];
 
 const competitors = [
-  { name: "Pterodactyl", type: "PHP + Docker", note: "The incumbent. Mature but aging stack." },
-  { name: "Pelican", type: "PHP + Docker", note: "Pterodactyl fork. Same architecture, different team." },
+  { name: "Pterodactyl", type: "PHP + Go (Wings) + Docker", note: "The incumbent. Mature ecosystem." },
+  { name: "Pelican", type: "PHP + Go (Wings) + Docker", note: "Pterodactyl fork. Same architecture, different team." },
   { name: "PufferPanel", type: "Go + Docker", note: "Lightweight but limited feature set." },
-  { name: "Catalyst", type: "Rust + containerd", note: "Modern stack, plugin system, 60+ API endpoints." },
+  { name: "Catalyst", type: "TS panel + Rust agent + containerd", note: "Early testing. Native plugins, 200+ route handlers, 50+ permissions." },
 ];
 
 const verdicts = [
@@ -98,12 +96,12 @@ const verdicts = [
     title: "Choose Catalyst if...",
     accent: true,
     points: [
-      "You want a modern Rust stack with real performance headroom",
+      "You want containerd-native nodes with a TypeScript panel",
       "You need plugins without forking core",
-      "You care about sub-10ms console latency",
-      "You prefer a one-script install",
-      "You need granular RBAC with 20+ permissions",
-      "You want 60+ REST endpoints for automation",
+      "You want live console, files, SFTP, and backups in one panel",
+      "You prefer a one-command panel install (Docker Compose)",
+      "You need granular RBAC with 50+ permissions",
+      "You want 200+ API route handlers for automation — and accept early-testing churn",
     ],
   },
   {
@@ -112,39 +110,39 @@ const verdicts = [
     points: [
       "You have a large install and no migration bandwidth",
       "Your team is deep in PHP and Laravel",
-      "You depend on Pterodactyl-only plugins or themes",
-      "You need the largest community ecosystem today",
+      "You depend on Pterodactyl-only addons or themes",
+      "You need the largest mature community ecosystem today",
     ],
   },
 ];
 
 const lookFor = [
   {
-    title: "Performance that scales",
-    body: "Game panels are I/O-bound and connection-heavy. PHP plus a Node WebSocket hop struggles under concurrent consoles. A modern alternative should hold thousands of streams. Catalyst's Rust backend is built for that load.",
+    title: "Honest stack fit",
+    body: "Catalyst is a TypeScript Fastify panel (PostgreSQL + Redis) with a Rust agent on game nodes. Pterodactyl is PHP + Go Wings with Docker. Pick the ops model your team wants to run — Catalyst trades maturity for containerd-native nodes and native plugins.",
   },
   {
     title: "A real plugin architecture",
-    body: "Pterodactyl is monolithic. Custom work means a fork. Look for hooks, extra API routes, and background tasks without touching core. That is the Catalyst plugin model.",
+    body: "Pterodactyl has no native plugin API, so custom work usually means a fork. Look for hooks, extra API routes, and background tasks without touching core. That is the Catalyst plugin model.",
   },
   {
     title: "Modern container runtime",
-    body: "containerd is lighter and the runtime behind Kubernetes. A panel on containerd starts faster and lines up with cloud-native ops.",
+    body: "containerd is the runtime behind Kubernetes. Catalyst runs game workloads directly on containerd (panel itself ships via Docker Compose), which lines up with cloud-native ops.",
   },
   {
     title: "API coverage",
-    body: "At scale everything is automated. Aim for broad endpoints across servers, nodes, users, files, backups, and permissions. Catalyst ships 60+.",
+    body: "At scale everything is automated. Aim for broad coverage across servers, nodes, users, files, backups, and permissions. Catalyst ships 200+ route handlers with RBAC.",
   },
   {
     title: "Security by default",
-    body: "Granular RBAC, scoped keys, audit logs, and TLS should ship day one. Catalyst exposes 20+ permissions so roles like support or billing stay precise.",
+    body: "Granular RBAC, scoped expiring keys, audit logs, 2FA/passkey, and TLS-ready examples should ship day one. Catalyst exposes 50+ permissions so roles like support stay precise.",
   },
 ];
 ---
 
 <Layout
-  title="Best Pterodactyl Alternative in 2026"
-  description="Catalyst is the best Pterodactyl alternative in 2026. Built with Rust and containerd for superior performance, security, and extensibility. Free and open source."
+  title="Pterodactyl Alternative: Honest Comparison"
+  description="Catalyst in early testing: TypeScript panel with Rust agent and containerd nodes, native plugins, 200+ API route handlers. Honest comparison with Pterodactyl."
   canonicalUrl="https://catalystctl.com/pterodactyl-alternative/"
   breadcrumbItems={[{ name: "Pterodactyl Alternative" }]}
 >
@@ -177,14 +175,14 @@ const lookFor = [
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-end" data-reveal>
         <div class="lg:col-span-7">
           <h1 class="font-display font-bold text-foreground tracking-tight leading-[1.08] text-balance" style="font-size: clamp(2.1rem, 5.5vw, 3.75rem);">
-            The Pterodactyl alternative built for <span class="text-primary">2026</span>.
+            The Pterodactyl alternative in <span class="text-primary">early testing</span>.
           </h1>
           <p class="mt-5 max-w-xl text-base sm:text-lg text-zinc-400 leading-relaxed text-pretty">
-            Rust backend, containerd runtime, native plugins, sub-10ms console streaming. Free under GPLv3.
+            TypeScript panel, Rust agent, containerd nodes, native plugins, live console. Panel GPLv3, agent MIT/Apache-2.0.
           </p>
           <div class="mt-7 flex flex-wrap items-center gap-3">
             <a href={B + "#install"} class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary-600 active:scale-[0.98] min-h-11 shadow-[0_0_0_1px_hsl(29_47%_50%/0.3),0_8px_28px_-8px_hsl(29_47%_56%/0.45)]">
-              Install in 60s
+              Install panel
             </a>
             <a href={B + "migrate-from-pterodactyl/"} class="inline-flex items-center gap-2 rounded-lg border border-zinc-700/80 bg-surface-1/60 px-5 py-3 text-sm font-medium text-zinc-200 transition-all duration-200 hover:bg-surface-2 active:scale-[0.98] min-h-11">
               Open migration guide
@@ -195,20 +193,20 @@ const lookFor = [
         <div class="lg:col-span-5">
           <div class="rounded-xl border border-zinc-800/60 bg-surface-1/80 p-5 grid grid-cols-2 gap-4">
             <div>
-              <div class="font-display text-2xl font-bold text-foreground tabular-nums">&lt;10ms</div>
-              <div class="text-xs text-zinc-500 mt-0.5">Console latency</div>
+              <div class="font-display text-2xl font-bold text-foreground tabular-nums">Live</div>
+              <div class="text-xs text-zinc-500 mt-0.5">Console + SFTP</div>
             </div>
             <div>
-              <div class="font-display text-2xl font-bold text-foreground tabular-nums">60+</div>
-              <div class="text-xs text-zinc-500 mt-0.5">API endpoints</div>
+              <div class="font-display text-2xl font-bold text-foreground tabular-nums">200+</div>
+              <div class="text-xs text-zinc-500 mt-0.5">API route handlers</div>
             </div>
             <div>
-              <div class="font-display text-2xl font-bold text-foreground tabular-nums">20+</div>
+              <div class="font-display text-2xl font-bold text-foreground tabular-nums">50+</div>
               <div class="text-xs text-zinc-500 mt-0.5">RBAC permissions</div>
             </div>
             <div>
-              <div class="font-display text-2xl font-bold text-foreground">GPLv3</div>
-              <div class="text-xs text-zinc-500 mt-0.5">Open source</div>
+              <div class="font-display text-2xl font-bold text-foreground">258</div>
+              <div class="text-xs text-zinc-500 mt-0.5">Egg definitions</div>
             </div>
           </div>
         </div>
@@ -220,7 +218,7 @@ const lookFor = [
   <section class="max-w-6xl mx-auto px-4 py-8" aria-label="What is Catalyst" data-speakable>
     <div class="max-w-3xl rounded-xl border border-zinc-800/60 bg-surface-1/60 px-6 py-5" data-reveal>
       <p class="text-sm sm:text-base text-zinc-300 leading-relaxed">
-        <strong class="text-foreground font-semibold">Catalyst</strong> is an open-source game server panel built with Rust and containerd — a drop-in Pterodactyl alternative with sub-10ms console streaming, a native plugin system, 20+ granular RBAC permissions, and a one-line install. It is free under GPLv3 and talks directly to containerd for lower memory overhead and faster startup than Docker-based panels.
+        <strong class="text-foreground font-semibold">Catalyst</strong> is an open-source game server panel in early testing: a TypeScript panel with a Rust node agent and containerd on game nodes — with live console, native plugin system, 50+ RBAC permissions, and one-command panel install. Panel GPLv3, agent MIT/Apache-2.0. Migration from Pterodactyl is via built-in import, not drop-in.
       </p>
     </div>
   </section>
@@ -296,8 +294,8 @@ const lookFor = [
 
     <div class="mt-8 max-w-3xl space-y-4 text-sm sm:text-base text-zinc-400 leading-relaxed" data-reveal>
       <h3 class="text-foreground font-semibold text-lg">Why not Pelican or PufferPanel?</h3>
-      <p>Pelican forks Pterodactyl with a new team but keeps the PHP + Docker stack. If you want a true modern alternative, Catalyst is the option on Rust and containerd.</p>
-      <p>PufferPanel is lighter and written in Go, a step up from PHP. It still lacks Catalyst depth: no plugin system, fewer API endpoints, thinner permissions.</p>
+      <p>Pelican forks Pterodactyl with a new team but keeps the PHP + Go Wings + Docker stack. If you want containerd-native nodes with native plugins, Catalyst is the early-testing option with a TypeScript panel and Rust agent.</p>
+      <p>PufferPanel is lighter and written in Go, a step up from PHP for small fleets. It still lacks Catalyst depth: no native plugin system, narrower API, thinner permissions.</p>
     </div>
   </section>
 
@@ -428,7 +426,7 @@ const lookFor = [
         </p>
         <div class="mt-7 flex flex-wrap gap-3">
           <a href={B + "#install"} class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary-600 active:scale-[0.98] min-h-11 shadow-[0_0_0_1px_hsl(29_47%_50%/0.3),0_8px_28px_-8px_hsl(29_47%_56%/0.45)]">
-            Install in 60s
+            Install panel
           </a>
           <a href={B + "migrate-from-pterodactyl/"} class="inline-flex items-center gap-2 rounded-lg border border-zinc-700/80 px-5 py-3 text-sm font-medium text-zinc-300 transition-all duration-200 hover:bg-surface-2 hover:text-zinc-100 active:scale-[0.98] min-h-11">
             Open migration guide

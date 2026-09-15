@@ -107,7 +107,7 @@ Once all servers are running on Catalyst, update your external integrations:
 
 1. **WHMCS/billing module:** Update to use Catalyst's API endpoints instead of Pterodactyl's
 2. **Discord bots:** Update API URLs and authentication
-3. **Custom dashboards:** Update to use Catalyst's 60+ endpoints
+3. **Custom dashboards:** Update to use Catalyst's 200+ route handlers
 4. **Monitoring:** Set up Catalyst-compatible monitoring (or use the built-in resource graphs)
 
 Catalyst's API is different from Pterodactyl's, but it's more comprehensive and better documented. Most integrations can be updated in a few hours.

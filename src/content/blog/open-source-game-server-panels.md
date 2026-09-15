@@ -13,7 +13,7 @@ keywords:
   - free game server panel
 ---
 
-> **TL;DR:** Four open-source panels dominate in 2026: **Pterodactyl** (largest community), **Pelican** (its fork), **Catalyst** (Rust + containerd, fastest), and **PufferPanel** (lightweight Go). Pick Pterodactyl for maturity, Catalyst for performance and plugins, Pelican for community preference, PufferPanel for simplicity.
+> **TL;DR:** Four open-source panels dominate in 2026: **Pterodactyl** (largest community), **Pelican** (its fork), **Catalyst** (TS panel + Rust agent + containerd, in early testing), and **PufferPanel** (lightweight Go). Pick Pterodactyl for maturity, Catalyst for containerd-native nodes and plugins, Pelican for community preference, PufferPanel for simplicity.
 
 Self-hosting game servers doesn't mean you have to SSH into a box and run shell scripts. Open source game server panels give you a web interface, console access, file management, and automation - for free.
 
@@ -36,7 +36,7 @@ Once you've used a panel, going back to manual server management feels like edit
 
 ### Pterodactyl
 
-**License:** MIT | **Stack:** PHP + Node.js + Docker | **Maturity:** Very high
+**License:** AGPL-3.0 | **Stack:** PHP + Go (Wings) + Docker | **Maturity:** Very high
 
 Pterodactyl is the most widely used open source game server panel. It's been around since 2015 and has the largest community, the most templates (eggs), and the most third-party resources.
 
@@ -47,17 +47,17 @@ Pterodactyl is the most widely used open source game server panel. It's been aro
 - Battle-tested at commercial hosting scale
 
 **Cons:**
-- PHP backend is slower and more resource-intensive than modern alternatives
-- No plugin system - customization requires forking
+- PHP panel is heavier to operate than minimal alternatives
+- No native plugin system - customization often requires forking
 - Wings daemon adds operational complexity
-- Coarse permissions (admin vs user, nothing in between)
-- Installation is manual and takes 30+ minutes
+- Coarse permissions compared to granular RBAC
+- Installation is manual
 
 **Best for:** People who want the most established option and don't mind the aging stack.
 
 ### Pelican Panel
 
-**License:** MIT | **Stack:** PHP + Node.js + Docker | **Maturity:** Medium
+**License:** MIT | **Stack:** PHP + Go (Wings) + Docker | **Maturity:** Medium
 
 Pelican is a fork of Pterodactyl with a different governance model. It's Pterodactyl's code with a different team making decisions.
 
@@ -76,25 +76,25 @@ Pelican is a fork of Pterodactyl with a different governance model. It's Pteroda
 
 ### Catalyst
 
-**License:** GPLv3 | **Stack:** Rust + TypeScript + containerd | **Maturity:** Medium (growing fast)
+**License:** Panel GPLv3, agent MIT/Apache-2.0 | **Stack:** TypeScript panel + Rust agent + containerd | **Maturity:** Early testing
 
-Catalyst is built from scratch with a modern stack - Rust backend, containerd runtime, and a native plugin system. It's designed as a true alternative, not a fork.
+Catalyst is built from scratch — TypeScript Fastify panel (PostgreSQL + Redis) with a containerd-native Rust agent and a native plugin system. It's designed as a true alternative, not a fork.
 
 **Pros:**
-- Fastest panel (sub-10ms console, <1s startup, 50MB RAM)
+- Live console, file manager, SFTP, backups, and scheduling in one panel
 - Native plugin system for extending without forking
-- 20+ granular RBAC permissions
-- 60+ REST API endpoints
+- 50+ granular RBAC permissions
+- 200+ API route handlers
 - Built-in Pterodactyl migration tool
-- Single-script install in 60 seconds
-- containerd is more efficient than Docker (more servers per node)
+- One-command panel install (Docker Compose); 167 game templates
+- containerd on game nodes (panel itself ships via Docker)
 
 **Cons:**
-- Newer project with a smaller community
+- Early testing with a smaller community — expect churn
 - Fewer third-party themes and mods than Pterodactyl
-- GPLv3 license (more restrictive than MIT for some use cases)
+- Panel GPLv3 is more restrictive than MIT for some use cases
 
-**Best for:** People who want a modern, extensible panel and value performance. Especially good for hosting providers and anyone doing API-driven automation.
+**Best for:** People who want containerd-native nodes and extensibility and accept early testing. Especially relevant for API-driven automation.
 
 ### PufferPanel
 
@@ -120,18 +120,17 @@ PufferPanel is a lightweight panel written in Go. It's simpler than Pterodactyl 
 
 | Feature | Pterodactyl | Pelican | Catalyst | PufferPanel |
 |---------|-------------|---------|----------|-------------|
-| License | MIT | MIT | GPLv3 | Apache 2.0 |
-| Backend language | PHP | PHP | Rust | Go |
-| Container runtime | Docker | Docker | containerd | Docker |
-| Node agent | Wings (Node.js) | Wings (Node.js) | Agent (Rust) | Built-in |
-| Plugin system | No | No | Yes | No |
-| API endpoints | ~40 | ~40 | 60+ | ~20 |
-| RBAC granularity | Basic | Basic | 20+ perms | Basic |
-| Console latency | ~100ms | ~100ms | <10ms | ~50ms |
-| Panel memory | ~200MB+ | ~200MB+ | ~50MB | ~40MB |
-| Install time | 30+ min | 30+ min | ~60s | ~10min |
+| License | AGPL-3.0 | MIT | Panel GPLv3 / agent MIT-Apache | Apache 2.0 |
+| Panel language | PHP | PHP | TypeScript | Go |
+| Container runtime (nodes) | Docker via Wings | Docker via Wings | containerd via Rust agent | Docker |
+| Node agent | Wings (Go) | Wings (Go) | Agent (Rust) | Built-in |
+| Plugin system | No native API | No native API | Yes | No |
+| API surface | REST + WebSocket | REST + WebSocket | 200+ route handlers | Limited |
+| RBAC granularity | Roles + subusers | Roles + subusers | 50+ perms | Basic |
+| Live console | Via Wings | Via Wings | Via panel + agent | Built-in |
+| Panel install | Manual | Manual | One command (Compose) | Simple |
 | Migration from Pterodactyl | N/A | Fork upgrade | Built-in | Manual |
-| Community size | Large | Medium | Growing | Small |
+| Community size | Large | Medium | Early / growing | Small |
 
 ## Which panel for which use case?
 
@@ -141,11 +140,11 @@ PufferPanel is a lightweight panel written in Go. It's simpler than Pterodactyl 
 
 ### Self-hosting multiple games (5-20 servers)
 
-**Catalyst** is the best choice. The plugin system lets you add custom functionality as you need it, and the performance difference is noticeable when you're running multiple servers on limited hardware.
+**Catalyst** is worth evaluating if you want native plugins and granular RBAC. Pterodactyl remains the mature default.
 
 ### Starting a hosting business (20+ servers)
 
-**Catalyst** is the strongest option. The API coverage, RBAC, and plugin system are designed for this use case. Pterodactyl works too, but you'll hit its limitations faster as you scale.
+Evaluate both: **Catalyst** for API coverage, RBAC, and plugins in early testing; **Pterodactyl** for maturity and ecosystem. Do not bet production on latency headlines — test with your workload.
 
 ### Existing Pterodactyl user considering a switch
 
@@ -166,6 +165,6 @@ All four panels are open source and free to use. That means:
 
 ## Getting started
 
-If you're new to game server panels, start with Catalyst's [quick start guide](/docs/getting-started/quickstart/). One command, sixty seconds, and you have a fully functional game server management panel.
+If you're new to game server panels, start with Catalyst's [quick start guide](/docs/getting-started/quickstart/). One command installs the panel; game nodes need containerd plus the agent.
 
 For a broader comparison, check out [every Pterodactyl alternative in the 2026 buyer's guide](/blog/pterodactyl-alternatives-2026/) and the [three-way Pterodactyl vs Pelican vs Catalyst comparison](/blog/pterodactyl-vs-pelican-vs-catalyst/). For the infrastructure angle, see [why platforms are moving to Rust](/blog/why-game-server-platforms-moving-to-rust/).

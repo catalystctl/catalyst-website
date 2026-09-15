@@ -1,12 +1,12 @@
 ---
-title: Complete Installation Guide
-description: The comprehensive reference for deploying Catalyst — every option, variable, and edge case.
-order: 3
+title: "Complete Installation Guide"
+description: "The comprehensive reference for deploying Catalyst — every option, variable, and edge case."
+order: 5
 keywords:
-  - catalyst install detailed
-  - docker production
-  - tls https
-  - build from source
+  - "catalyst install detailed"
+  - "docker production"
+  - "tls https"
+  - "build from source"
 ---
 
 > **The comprehensive reference for deploying Catalyst.**
@@ -45,8 +45,8 @@ The stack consists of four services:
 | Service | Image | Purpose | Default Port |
 |---------|-------|---------|-------------|
 | `postgres` | `postgres:16-alpine` | Primary database | `127.0.0.1:5432` |
-| `redis` | `redis:7-alpine` | Cache / sessions | `127.0.0.1:6379` |
-| `backend` | `ghcr.io/catalystctl/catalyst-backend:latest` | API + SFTP | `127.0.0.1:3000`, `0.0.0.0:2022` |
+| `redis` | `redis:7-alpine` | Compose service; not used as session store by current backend | `127.0.0.1:6379` |
+| `backend` | `ghcr.io/catalystctl/catalyst-backend:latest` | API (SFTP runs on the node agent, not here) | `127.0.0.1:3000` |
 | `frontend` | `ghcr.io/catalystctl/catalyst-frontend:latest` | Web panel | `0.0.0.0:80` |
 
 > **Important:** Docker Compose (with Docker or Podman) is the **only supported deployment method**. Direct bare-metal installation is not supported.
@@ -68,7 +68,7 @@ The stack consists of four services:
 
 | Requirement | Minimum | Recommended | Notes |
 |---|---|---|---|
-| **OS** | Any Linux with Docker/Podman | Ubuntu 22.04+ / Debian 12+ | macOS and Windows are not supported for production |
+| **OS** | Ubuntu 22.04+/Debian 12+ and other systemd Linux with Docker/Podman | Ubuntu 22.04+ / Debian 12+ | Auto-install covers Ubuntu, Debian, RHEL/Rocky/Alma, Fedora, openSUSE, Alpine, Arch derivatives; other distros need manual Docker install. Requires `curl`, `tar`, `openssl`. |
 | **Docker** | 20.10+ | 26+ (rootless) | Rootless Docker is the most secure option |
 | **Podman** | 4.0+ | 5+ | Rootless Podman is fully supported |
 | **Compose** | V2 plugin or `podman-compose` | Latest stable | `docker compose` (space) not `docker-compose` (hyphen) |
@@ -147,9 +147,10 @@ The `install.sh` script performs these operations in order:
 - Otherwise, copies all files fresh
 
 **Step 6 — Generate Secrets**
-- Generates a 32-character PostgreSQL password: `openssl rand -base64 48 | tr -d '/+=' | head -c 32`
-- Generates a 32-byte base64 Better Auth secret: `openssl rand -base64 32`
-- Patches these into `.env` using `sed`
+- Generates all five secrets with `openssl rand`: 32-char `POSTGRES_PASSWORD`, `BETTER_AUTH_SECRET`, `REDIS_PASSWORD`, `API_KEY_SECRET`, `BACKUP_CREDENTIALS_ENCRYPTION_KEY`
+- Reuses existing non-placeholder values; regenerates `CHANGE_ME*` placeholders and preserves an intentionally empty `REDIS_PASSWORD`
+- Writes atomically via a staging file (`.env.staging.$$`, `chmod 600`), preserving any existing `.env` as `.env.backup.$$`
+- Prompts `PUBLIC_URL` (defaults to the host LAN IP port 8080, scheme-forced, trailing `/` stripped), derives `PASSKEY_RP_ID`, sets `NODE_ENV=production` automatically for `https://` URLs, and offers a TLS overlay (`DOMAIN`/`ACME_EMAIL`) for `http://` URLs
 
 **Step 7 — Print Next Steps**
 - Displays the three required variables to set
@@ -267,12 +268,12 @@ docker compose exec redis redis-cli ping
 curl http://localhost:3000/health
 # Expected: {"status":"ok"}
 
-# 5. Check frontend is serving
-curl -I http://localhost:80
+# 5. Check frontend is serving (default install uses :8080 from .env.example; bare Compose fallback is :80)
+curl -I http://localhost:8080
 # Expected: HTTP/1.1 200 OK
 
 # 6. Check the full panel
-curl -s http://localhost:80 | head -5
+curl -s http://localhost:8080 | head -5
 # Expected: HTML containing "Catalyst"
 ```
 
@@ -391,15 +392,11 @@ This builds and runs the Rust agent locally. Requires root for containerd access
 
 When you first visit your Catalyst URL, the setup wizard detects that no users exist:
 
-1. Register your first account — it becomes the **administrator** automatically
+1. Complete the **Setup** wizard — the account you create becomes the **administrator** and open registration is disabled
 2. The admin has full access to all features
 3. From the admin panel, configure SMTP, branding, and OAuth providers
 
-> **Alternative:** Run the seed script to create a default admin:
-> ```bash
-> docker compose exec -e NODE_ENV=development catalyst-backend pnpm run db:seed
-> ```
-> Default credentials: `admin@example.com` / `admin123` — **change this password immediately**.
+> **Production installs:** complete the `/setup` wizard or `bootstrap-production.ts`. Do not run `db:seed` in production (the backend image has no dev dependencies for seeding).
 
 ### Verify the Stack
 
@@ -420,8 +417,8 @@ docker compose ps
 | Service | URL | Notes |
 |---------|-----|-------|
 | Web Panel | Your `PUBLIC_URL` | e.g. `http://localhost:8080` |
-| REST API | `http://localhost:3000/api` | Backend API |
-| API Docs | `http://localhost:3000/docs` | Swagger/OpenAPI UI |
+| REST API | `http://localhost:3000/api` | Backend API (Compose publishes it on `127.0.0.1:3000` by default) |
+| API Docs | `http://localhost:3000/docs` | Swagger UI (requires `DOCS_ENABLED=true` in production) |
 | Health | `http://localhost:3000/health` | Returns `{"status":"ok"}` |
 | SFTP | `localhost:2022` | File transfer protocol |
 
@@ -511,10 +508,10 @@ See [TLS / HTTPS Configuration](#tls--https-configuration) for the three support
 **9. Backup Encryption Key**
 
 ```bash
-openssl rand -hex 32
+openssl rand -base64 32
 ```
 
-If using S3 backups, this key encrypts the S3 credentials stored in the database. **If lost, you cannot recover the credentials and backups will fail.** Back up this key separately.
+If using S3 backups, this key encrypts the S3 credentials stored in the database (same format `install.sh` generates). **If lost, you cannot recover the credentials and backups will fail.** Back up this key separately.
 
 **10. Auto-Updater Caution**
 
@@ -691,7 +688,7 @@ If you already run Nginx, Apache, HAProxy, or another proxy:
        add_header X-Content-Type-Options "nosniff" always;
        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
 
-       client_max_body_size 100m;
+       client_max_body_size 0;
 
        location / {
            proxy_pass http://catalyst;
@@ -796,7 +793,6 @@ Rootless Podman cannot bind ports below 1024. Two options:
 ```env
 FRONTEND_PORT=0.0.0.0:8080
 BACKEND_PORT=0.0.0.0:3000
-SFTP_PORT=0.0.0.0:2022
 ```
 
 This is the default in `.env.example`.
@@ -839,16 +835,9 @@ The exact path depends on your UID:
 podman info --format '{{.Host.RemoteSocket.Path}}'
 ```
 
-### SFTP Host Key Quirk
+### SFTP
 
-`podman-compose` may pass literal `${VAR:-}` strings instead of empty values. Explicitly set:
-
-```env
-SFTP_HOST_KEY=
-SFTP_HOST_KEY_BASE64=
-```
-
-The backend will auto-generate a host key on first start.
+SFTP runs on the node agent (default port `2022`), not in this compose stack — no extra env or port mapping is needed here.
 
 ### Volume Ownership
 
@@ -883,7 +872,6 @@ PUBLIC_URL=http://<YOUR_LAN_IP>:8080
 PASSKEY_RP_ID=<YOUR_LAN_IP>
 FRONTEND_PORT=0.0.0.0:8080
 BACKEND_PORT=0.0.0.0:3000
-SFTP_PORT=0.0.0.0:2022
 ```
 
 Find your LAN IP:
@@ -1028,7 +1016,7 @@ Migrations run automatically, but you can verify:
 
 ```bash
 # Check migration status
-docker compose exec backend bunx prisma migrate status --schema prisma/schema.prisma
+docker compose exec backend npx prisma migrate status --schema prisma/schema.prisma
 
 # View migration logs
 docker compose logs backend | grep -i "migrat"
@@ -1048,8 +1036,8 @@ docker compose ps
 # 2. Verify backend health
 curl http://localhost:3000/health
 
-# 3. Check the panel loads
-curl -s http://localhost:80 | grep -i catalyst
+# 3. Check the panel loads (default install port is :8080)
+curl -s http://localhost:8080 | grep -i catalyst
 
 # 4. Verify agents are connected (in the admin panel)
 # Admin → Nodes → check status indicators
@@ -1170,8 +1158,7 @@ cp .env .env.backup.$(date +%Y%m%d)
 | Can't log in | `PUBLIC_URL` mismatch | Set to exact browser URL |
 | CORS errors | `CORS_ORIGIN` doesn't match | Set `PUBLIC_URL` correctly |
 | Cookies rejected | `PUBLIC_URL` uses HTTP but `NODE_ENV=production` | Set `NODE_ENV=development` or use HTTPS |
-| SFTP refused | Port not mapped | Check `SFTP_ENABLED=true` in `.env` |
-| SFTP refused (Podman) | Variable interpolation quirk | Set `SFTP_HOST_KEY=` explicitly |
+| SFTP refused | SFTP runs on the node agent | Check agent status and SFTP port on the node |
 | Passkeys don't work | `PASSKEY_RP_ID` mismatch | Set to bare hostname |
 | 2FA codes rejected | Clock drift | Sync server time with NTP |
 | Panel blank page | Stale JS bundle | Clear browser cache |
@@ -1214,19 +1201,17 @@ This section explains every variable in `.env.example` in detail.
 
 | Variable | Default | Required? | Description |
 |----------|---------|-----------|-------------|
-| `POSTGRES_USER` | `catalyst` | No | PostgreSQL username. |
+| `POSTGRES_USER` | `catalyst` | No | PostgreSQL username. Note: `docker-compose.yml` currently hardcodes the user/db (`catalyst`/`catalyst_db`) — this variable is informational until the compose file interpolates it. |
 | `POSTGRES_PASSWORD` | *(placeholder)* | **Yes** | Strong password. Generate: `openssl rand -base64 48 \| tr -d '/+=' \| head -c 32`. |
-| `POSTGRES_DB` | `catalyst_db` | No | Database name. |
+| `POSTGRES_DB` | `catalyst_db` | No | Database name. Note: `docker-compose.yml` currently hardcodes it — informational until the compose file interpolates it. |
 | `POSTGRES_PORT` | `127.0.0.1:5432` | No | Host port binding. `127.0.0.1` restricts to localhost. Comment out to disable external access entirely. |
 
 ### Redis
 
 | Variable | Default | Required? | Description |
 |----------|---------|-----------|-------------|
-| `REDIS_PASSWORD` | *(empty)* | No | Redis auth password. Leave empty for no password (acceptable when not exposed). |
+| `REDIS_PASSWORD` | *(auto-generated)* | **Yes (Docker)** | Redis auth password. `install.sh` generates it; the compose file refuses to boot Redis without it (`--requirepass ${REDIS_PASSWORD:?...}`). |
 | `REDIS_PORT` | *(commented out)* | No | Host port binding. Commented out by default — Redis is internal-only. |
-
-> Redis is optional. If unavailable, Catalyst falls back to in-memory caching gracefully.
 
 ### Authentication
 
@@ -1240,17 +1225,14 @@ This section explains every variable in `.env.example` in detail.
 | Variable | Default | Required? | Description |
 |----------|---------|-----------|-------------|
 | `FRONTEND_PORT` | `0.0.0.0:8080` | No | Web panel port. `0.0.0.0` = all interfaces; `127.0.0.1` = localhost only. |
-| `BACKEND_PORT` | `0.0.0.0:3000` | No | Backend API port. Should be `127.0.0.1` in production. |
-| `SFTP_PORT` | `0.0.0.0:2022` | No | SFTP server port. Must be externally reachable for SFTP access. |
+| `BACKEND_PORT` | `127.0.0.1:3000` | No | Backend API publish binding. Compose default is localhost-only; keep it that way in production. |
 
 ### SFTP
 
-| Variable | Default | Required? | Description |
-|----------|---------|-----------|-------------|
-| `SFTP_ENABLED` | `true` | No | Enable/disable the built-in SFTP server. |
-| `SFTP_HOST_KEY` | *(empty)* | No | Path to SSH host private key. Leave empty to auto-generate. |
-| `SFTP_HOST_KEY_BASE64` | *(empty)* | No | Base64-encoded host key. Alternative to `SFTP_HOST_KEY`. |
-| `SFTP_MAX_FILE_SIZE` | `104857600` | No | Max upload size in bytes (100 MB). |
+SFTP is hosted by the **node agent** on each game server node (default port `2022`), not by this compose stack. The per-node SFTP port is configured in the panel (Admin → Nodes) and written into the agent's `config.toml` by the deploy script.
+
+File size is the panel Admin → Security **Max upload size**.
+
 
 ### Backups
 
@@ -1263,7 +1245,7 @@ This section explains every variable in `.env.example` in detail.
 | `BACKUP_S3_SECRET_KEY` | *(commented out)* | For S3 | S3 secret access key. |
 | `BACKUP_S3_ENDPOINT` | *(commented out)* | For S3 | Custom endpoint (e.g., MinIO). |
 | `BACKUP_S3_PATH_STYLE` | `true` | For S3 | `true` for MinIO; `false` for AWS S3. |
-| `BACKUP_CREDENTIALS_ENCRYPTION_KEY` | *(empty)* | For S3 | Encrypts S3 credentials in DB. Generate: `openssl rand -hex 32`. |
+| `BACKUP_CREDENTIALS_ENCRYPTION_KEY` | *(empty)* | For S3 | Encrypts S3 credentials in DB. `install.sh` generates base64 (`openssl rand -base64 32`). |
 
 ### Webhooks
 
@@ -1277,8 +1259,8 @@ This section explains every variable in `.env.example` in detail.
 | Variable | Default | Required? | Description |
 |----------|---------|-----------|-------------|
 | `SUSPENSION_ENFORCED` | `true` | No | Enforce suspension across all operations. |
-| `SUSPENSION_DELETE_BLOCKED` | `false` | No | Block file deletion on suspended servers. |
-| `SUSPENSION_DELETE_POLICY` | `keep` | No | `keep`, `block`, or `allow` deletion. |
+| `SUSPENSION_DELETE_BLOCKED` | Compose ships `false`; code default is blocked unless `false` | No | Block file deletion on suspended servers. |
+| `SUSPENSION_DELETE_POLICY` | Compose ships `keep`; code only treats exact `block` as blocking | No | Suspension delete policy. |
 
 ### OAuth Providers
 

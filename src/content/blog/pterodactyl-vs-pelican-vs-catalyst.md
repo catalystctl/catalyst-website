@@ -13,7 +13,7 @@ keywords:
   - best game server panel
 ---
 
-> **TL;DR:** **Catalyst** is the only panel on a different architecture (Rust + containerd) — faster, plugin-capable, containerd-native. **Pterodactyl** and **Pelican** are the same PHP + Docker codebase with different teams. Pick Catalyst for performance and extensibility; Pelican for Pterodactyl governance without migration.
+> **TL;DR:** **Catalyst** is on a different ops model (TypeScript panel + Rust agent + containerd nodes) with native plugins and built-in Pterodactyl import. **Pterodactyl** and **Pelican** are the same PHP + Go Wings + Docker codebase with different teams. Pick Catalyst for containerd-native nodes and extensibility in early testing; Pterodactyl for maturity; Pelican for Pterodactyl governance without migration.
 
 Choosing a game server panel used to be simple: you picked Pterodactyl and moved on. But with Pelican emerging as a fork and Catalyst building an entirely new architecture, you now have a real decision to make.
 
@@ -29,9 +29,9 @@ Pterodactyl has been the standard for game server management since the mid-2010s
 
 Pelican is a community fork of Pterodactyl. Same codebase, same architecture, but with a different governance model and development roadmap. It was created as an alternative to Pterodactyl's original maintainer model.
 
-### Catalyst - The new architecture
+### Catalyst - The different ops model
 
-Catalyst is built from scratch with Rust (Axum) on the backend, TypeScript (React + Vite) on the frontend, and containerd for container management instead of Docker. It's not a fork - it's a fundamentally different approach.
+Catalyst is built from scratch with TypeScript (Fastify, PostgreSQL + Redis) on the panel, TypeScript (React + Vite) on the frontend, and a Rust agent that talks directly to containerd on game nodes instead of Docker. It's not a fork - it's a fundamentally different ops model, currently in early testing.
 
 ## Architecture comparison
 
@@ -39,55 +39,54 @@ This is where the real differences live.
 
 | Aspect | Pterodactyl | Pelican | Catalyst |
 |--------|-------------|---------|----------|
-| Backend | PHP (Laravel) | PHP (Laravel) | Rust (Axum) |
-| Frontend | React + Laravel Mix | React + Laravel Mix | React + Vite |
-| Container runtime | Docker (via Wings) | Docker (via Wings) | containerd (native) |
-| Node agent | Wings (Node.js) | Wings (Node.js) | Catalyst Agent (Rust) |
-| Database | MySQL/MariaDB | MySQL/MariaDB | PostgreSQL |
-| Single binary | No | No | Yes |
+| Panel | PHP (Laravel) | PHP (Laravel) | TypeScript (Fastify, PostgreSQL + Redis) |
+| Frontend | React | React | React + Vite (TypeScript) |
+| Container runtime (nodes) | Docker (via Wings) | Docker (via Wings) | containerd (native via Rust agent) |
+| Node agent | Wings (Go) | Wings (Go) | Catalyst Agent (Rust, static binary) |
+| Database | MySQL/MariaDB | MySQL/MariaDB | PostgreSQL + Redis |
+| Maturity | Mature | Growing fork | Early testing |
 
-Pelican and Pterodactyl share the same architecture because Pelican is a fork. Catalyst is the only panel with a fundamentally different stack.
+Pelican and Pterodactyl share the same architecture because Pelican is a fork. Catalyst is the only panel with a fundamentally different node model.
 
 **Why architecture matters:**
 
-- **PHP vs Rust:** Rust compiles to a single binary with zero runtime dependencies. No PHP-FPM, no Composer, no Laravel upgrade cycles. Catalyst starts in under a second and uses roughly 50MB of RAM for the panel process. Pterodactyl's PHP process uses 200MB+ at rest.
+- **Panel stack:** Catalyst's panel is TypeScript on Fastify with PostgreSQL and Redis. Pterodactyl is PHP on Laravel. Both need a database and careful ops — neither is zero-maintenance.
 
-- **Docker vs containerd:** Docker is a convenience layer on top of containerd. Pterodactyl adds yet another layer by wrapping Docker through Wings. Catalyst talks directly to containerd - the same runtime that powers Kubernetes. Less overhead, faster container startup, lower per-server memory usage.
+- **Docker vs containerd:** Docker is a convenience layer on top of containerd. Catalyst game nodes talk directly to containerd - the same runtime that powers Kubernetes. The panel itself still ships as Docker Compose.
 
-- **Wings vs Rust agent:** Wings is a Node.js daemon that has to run on every node. It's another process to monitor, update, and debug. Catalyst's node agent is a single Rust binary with no runtime dependencies.
+- **Wings vs Rust agent:** Wings (Go) runs on every Pterodactyl node. Catalyst's node agent is a single static Rust binary that talks to containerd, with console, files, SFTP, backups, and metrics.
 
-## Performance comparison
+## What to compare
 
-Numbers matter when you're running game servers. Here's what you can expect:
+Skip unverified latency and memory shootouts — no public benchmark in this repo backs them. Compare what you can verify in code:
 
-| Metric | Pterodactyl | Pelican | Catalyst |
+| What | Pterodactyl | Pelican | Catalyst |
 |--------|-------------|---------|----------|
-| Console latency | ~100ms | ~100ms | <10ms |
-| Panel memory at rest | ~200MB+ | ~200MB+ | ~50MB |
-| Panel startup time | ~5s | ~5s | <1s |
-| Concurrent WebSocket connections | ~1,000 | ~1,000 | 10,000+ |
-| Container startup | Normal | Normal | Faster (containerd) |
+| Live console | Via Wings | Via Wings | Via panel gateway + Rust agent |
+| File access | File manager + SFTP | File manager + SFTP | File manager + SFTP |
+| Backups | Local / S3 | Local / S3 | Local / S3-compatible / SFTP |
+| Scheduling | Schedules | Schedules | Cron tasks |
+| Game templates | Eggs ecosystem | Eggs (compatible) | 167 included, imports Pterodactyl eggs |
 
-Pelican and Pterodactyl have identical performance because they're the same codebase. Catalyst's Rust backend and native WebSocket implementation deliver 10x lower console latency and 10x more concurrent connections.
+Catalyst's advantage is structural (containerd-native nodes, native plugins, 50+ RBAC permissions, 200+ API route handlers), not a published latency number.
 
-**When performance matters:**
+**When structure matters:**
 
-- **Competitive gaming:** If your users care about real-time console access for competitive servers, 10ms vs 100ms latency is noticeable.
-- **Large fleets:** If you're running 500+ servers, memory efficiency and concurrent connection limits become real constraints.
-- **API-heavy automation:** If you're making hundreds of API calls per minute, Rust's response times are consistently faster than PHP's.
+- **containerd alignment:** If your nodes already run containerd/Kubernetes tooling, Catalyst nodes fit that model.
+- **Large fleets:** If you're running many servers, granular RBAC and API-driven automation matter more than headlines.
+- **API-heavy automation:** If you're making many API calls, check the actual route coverage (Catalyst: 200+ handlers across servers, nodes, users, files, backups, plugins).
 
 ## Feature comparison
 
 | Feature | Pterodactyl | Pelican | Catalyst |
 |---------|-------------|---------|----------|
-| REST API endpoints | ~40 | ~40 | 60+ |
-| Plugin system | No | No | Yes (hooks, routes, tasks) |
-| RBAC granularity | Basic (admin/user) | Basic | 20+ granular permissions |
-| API key scoping | Basic | Basic | Scoped + expiring |
-| Audit logging | Third-party | Third-party | Built-in |
-| Auto crash recovery | Partial | Partial | Built-in |
+| API surface | REST + WebSocket | REST + WebSocket | 200+ route handlers |
+| Plugin system | No native API | No native API | Yes (hooks, routes, tasks) |
+| RBAC granularity | Roles + subusers | Roles + subusers | 50+ granular permissions |
+| API key scoping | API keys | API keys | Scoped + expiring |
+| Audit logging | Activity logs | Activity logs | Built-in audit logs |
 | Built-in migration tool | No | No | Yes (from Pterodactyl) |
-| Scheduled tasks | Basic | Basic | Native |
+| Scheduled tasks | Schedules | Schedules | Cron tasks |
 
 The plugin system is the biggest differentiator. With Pterodactyl or Pelican, if you need custom API routes, new UI components, or integration with external services, you fork the project and maintain a separate codebase. With Catalyst, you write a TypeScript plugin that registers hooks, adds routes, and runs scheduled tasks - all without touching core code.
 
@@ -118,11 +117,10 @@ Pterodactyl has the largest community and the most third-party resources. Pelica
 - You don't need architectural improvements over Pterodactyl
 
 ### Choose Catalyst if:
-- You want a modern stack with better performance characteristics
+- You want containerd-native nodes with a TypeScript panel
 - You need a plugin system to extend the panel without forking
 - You want granular RBAC for precise access control
-- You're building a hosting business that needs API-driven automation
-- You care about console latency for competitive gaming
+- You're building automation on a broad API (200+ handlers) and accept early-testing churn
 - You want to align with containerd/Kubernetes ecosystem
 
 ## Can you switch later?
@@ -133,4 +131,4 @@ Check out the [migration guide](/migrate-from-pterodactyl/) for details.
 
 ## The bottom line
 
-Pterodactyl and Pelican are the same architecture with different teams. If you want "Pterodactyl but different governance," pick Pelican. If you want a panel that's actually different - faster, more extensible, more secure, more API-complete - Catalyst is the one. The [side-by-side comparison](/pterodactyl-alternative/#comparison) tells the full story. Migrating? Our [migration playbook for 50+ servers](/blog/migrate-50-servers-from-pterodactyl/) walks through a real-world rollout.
+Pterodactyl and Pelican are the same architecture with different teams. If you want "Pterodactyl but different governance," pick Pelican. If you want a structurally different panel — containerd-native nodes, native plugins, 50+ permissions — and you accept early testing, Catalyst is the one. The [side-by-side comparison](/pterodactyl-alternative/#comparison) tells the full story. Migrating? Our [migration playbook for 50+ servers](/blog/migrate-50-servers-from-pterodactyl/) walks through a real-world rollout.

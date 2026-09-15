@@ -1,13 +1,13 @@
 ---
-title: Architecture Overview
-description: Deep dive into Catalyst system design, component responsibilities, data flows, and security model.
+title: "Architecture Overview"
+description: "Deep dive into Catalyst system design, component responsibilities, data flows, and security model."
 order: 0
 keywords:
-  - catalyst architecture
-  - system design
-  - data flow
-  - authentication
-  - authorization
+  - "catalyst architecture"
+  - "system design"
+  - "data flow"
+  - "authentication"
+  - "authorization"
 ---
 
 > A deep dive into Catalyst's system design, component responsibilities, data flows, security model, and technology stack rationale.
@@ -76,7 +76,7 @@ Catalyst is a **three-tier architecture** consisting of a React frontend SPA, a 
 | Service | Dependency | Purpose |
 |---------|------------|---------|
 | Backend | PostgreSQL | Primary data store (users, servers, nodes, templates, etc.) |
-| Backend | Redis (optional) | Cache and session store |
+| Backend | Redis (compose service; optional) | **Not** used as session/cache store in current backend code (in-memory / DB sessions) |
 | Backend | Better Auth | Authentication (session management, OAuth) |
 | Backend | Plugin SDK | Plugin runtime and extension system |
 | Agent | containerd | Container orchestration on nodes |
@@ -102,13 +102,13 @@ Catalyst is a **three-tier architecture** consisting of a React frontend SPA, a 
 | `src/pages/` | Route-based page components |
 | `src/stores/` | Zustand client-state stores |
 | `src/hooks/` | Custom React hooks (auth, setup status, theme) |
-| `src/services/` | API client layer (TanStack Query integration) |
+| `src/services/` | API client layer (csync integration) |
 | `src/plugins/` | Plugin provider and slot system |
 
 **Responsibilities:**
 
 1. **User Interface Rendering**: Serves as the single-page application, handling all client-side routing via React Router DOM v7.
-2. **State Management**: Uses TanStack Query for server state (automated caching, background refetching, optimistic updates) and Zustand for transient client state.
+2. **State Management**: Uses **Catalyst Sync (csync)** for server state (entity/view cache, SSE patch-first updates) and Zustand for transient client state.
 3. **Authentication UI**: Handles login, registration, 2FA, passkey setup, and profile management.
 4. **Plugin Slot System**: Dynamically injects plugin-provided React components into designated slots (admin dashboard tabs, server detail tabs, user navigation).
 5. **Theme System**: Applies panel branding (custom CSS, logo, color scheme) fetched from the backend's public theme settings endpoint.
@@ -135,14 +135,14 @@ Catalyst is a **three-tier architecture** consisting of a React frontend SPA, a 
 | `src/lib/` | Core libraries (permissions, validation, IPAM, caching, agent auth) |
 | `src/middleware/` | RBAC middleware, custom serializers |
 | `src/websocket/` | WebSocket gateway for agent communication |
-| `src/sftp-server.ts` | SSH2-based SFTP server implementation |
+| `src/sftp-server.ts` | Deprecated stub — SFTP runtime lives on the agent |
 | `src/plugins/` | Plugin loader, worker thread management, extension resolution |
 
 **Responsibilities:**
 
 1. **REST API Gateway**: Serves all `/api/*` endpoints for frontend and third-party integrations.
 2. **WebSocket Gateway**: Manages bidirectional real-time communication with agents on game server nodes.
-3. **SFTP Server**: Provides JWT-authenticated SFTP access for server file management.
+3. **SFTP Server**: Provides agent-hosted SFTP access for server file management (opaque `sftp_` tokens).
 4. **Authentication Hub**: Integrates Better Auth for session-based auth, API keys, and OAuth/OIDC providers.
 5. **Plugin Host**: Loads, isolates, and communicates with plugin Worker Threads.
 6. **Task Scheduler**: Cron-based scheduled task execution (backups, restarts, commands).
@@ -162,7 +162,7 @@ Catalyst is a **three-tier architecture** consisting of a React frontend SPA, a 
 8. Bootstrap OIDC config from database (falls back to env vars)
 9. Initialize Better Auth
 10. Start server on configured port
-11. Start SFTP server (if enabled)
+11. SFTP process start is a no-op stub (agent hosts SFTP)
 12. Start task scheduler
 13. Start alert service
 14. Start auto-updater (if enabled)
@@ -219,15 +219,6 @@ CatalystAgent
 2. **Health monitoring** — 5-second interval heartbeat to backend
 3. **File tunnel server** — HTTP endpoint for backend to fetch server files
 
-### Shared Layer
-
-**Location:** `catalyst-shared/`
-
-**Responsibilities:**
-
-- Exports TypeScript interfaces used by both frontend and backend.
-- No runtime code — types-only package shared via pnpm workspaces.
-
 ---
 
 ## Data Flows
@@ -239,7 +230,7 @@ Browser                    Frontend                      Backend
   │                            │                               │
   │  GET /api/servers          │                               │
   │ ──────────────────────────>│                               │
-  │                            │  TanStack Query cache hit?    │
+  │                            │  csync cache hit?    │
   │                            │  ── No ──> GET /api/servers  │
   │                            │  ── Yes ──> Return cached    │
   │                            │                               │
@@ -382,7 +373,7 @@ Agent Node A          WebSocket Gateway          Backend Services
 | Routes | `app.register(pluginRoutes)` | N/A |
 | WebSocket | Custom message handlers | N/A |
 | UI Slots | N/A | Admin dashboard, server details, nav bar |
-| Data | Prisma queries | TanStack Query hooks |
+| Data | Prisma queries | csync hooks |
 
 ### Backup Flow
 
@@ -847,26 +838,26 @@ Node Network
 
 ### SFTP Security
 
-SFTP access is **JWT-authenticated** and **session-scoped**:
+SFTP access uses **opaque `sftp_` tokens** (in-memory on the panel) and is **session-scoped**:
 
 ```
 User requests SFTP connection
          │
          ▼
-  Backend generates JWT token (user + server + TTL)
+  Backend generates `sftp_` token (user + server + TTL, in-memory)
          │
          ▼
   Token stored in-memory (SFTP_TTL_OPTIONS: 5min, 15min, 1hr, 24hr)
          │
          ▼
-  SFTP server validates JWT on connection
+  Agent SFTP validates token via backend `/api/agent/sftp/validate-token`
          │
          ▼
-  User connects with:
-    host: panel.example.com
-    port: 2022
-    user: {userId}
-    password: {jwtToken}
+  User connects with (values from GET /api/sftp/connection-info):
+    host: {node publicAddress or hostname}
+    port: {node sftpPort, default 2022}
+    username: {serverId}
+    password: {sftp_<hex> token}
 ```
 
 **Security features:**
@@ -874,7 +865,7 @@ User requests SFTP connection
 - Tokens expire automatically based on TTL.
 - Tokens can be individually revoked or all revoked at once by the server owner.
 - Token rotation is supported (generate new token without closing existing session).
-- The SSH2 SFTP server runs on a dedicated port (`SFTP_PORT`, default `2022`).
+- The **agent** SFTP server listens on the node (default `2022`, configured per node). The panel/compose stack does **not** listen on `2022`; connection-info points clients at the **node**.
 
 ### Container Security
 
@@ -884,7 +875,7 @@ User requests SFTP connection
 2. **Resource limits**: CPU and memory limits enforced by containerd and/or cgroups.
 3. **Disk quotas**: Per-server disk limits tracked by `StorageManager`.
 4. **File path validation**: The `path-validation.ts` module prevents path traversal attacks (e.g., `../../etc/passwd`).
-5. **Host-key for SFTP**: The SFTP server uses a dedicated host key (`SFTP_HOST_KEY`), not the host's SSH keys.
+5. **Host-key for SFTP**: The agent's SFTP server uses a dedicated host key (`sftp.host_key_path` in the agent config), not the host's SSH keys.
 
 **Firewall rules:**
 
@@ -906,8 +897,8 @@ iptables -A FORWARD -s 172.18.0.2 -p udp --dport 25565 -j ACCEPT
 | S3 backup credentials | Encrypted at rest using `BACKUP_CREDENTIALS_ENCRYPTION_KEY` |
 | Passwords | bcrypt hashing (via Better Auth) |
 | Session cookies | `httpOnly`, `secure`, `sameSite=strict` |
-| SFTP tokens | JWT signed with `BETTER_AUTH_SECRET` |
-| API keys | SHA-256 hashed (never stored in plaintext) |
+| SFTP tokens | Opaque `sftp_` tokens in panel memory (not JWT) |
+| API keys | HMAC-SHA256 digests with `API_KEY_SECRET` (never stored in plaintext) |
 | Audit logs | Captured for all admin actions |
 | System errors | Captured with stack traces, user context, and metadata |
 
@@ -921,7 +912,7 @@ iptables -A FORWARD -s 172.18.0.2 -p udp --dport 25565 -j ACCEPT
 
 | Approach | Supported? | Notes |
 |----------|------------|-------|
-| Multiple backend instances | ⚠️ Partial | Shared secrets and in-memory state (SFTP tokens, session cache) limit multi-instance deployments. Redis is optional and not fully utilized for session storage yet. |
+| Multiple backend instances | ⚠️ Partial | Shared secrets and in-memory state (SFTP tokens) limit multi-instance deployments. Redis is in compose but **not** a session store in current backend code. |
 | Worker threads | ✅ Yes | The backend supports `WORKERS` env var for Cluster API multi-process mode. |
 | Reverse proxy | ✅ Yes | Nginx, Caddy, Traefik all supported as load balancers. |
 
@@ -976,13 +967,13 @@ iptables -A FORWARD -s 172.18.0.2 -p udp --dport 25565 -j ACCEPT
 | NestJS | Heavier, more opinionated; overkill for a REST API with WebSocket |
 | Hapi | Stale ecosystem; smaller community |
 
-### Frontend — React 18 + Vite
+### Frontend — React 19 + Vite
 
-**Why React 18 + Vite:**
+**Why React 19 + Vite:**
 
 - **Component model**: Declarative UI with composable components.
 - **Code splitting**: Vite's native ESM support + lazy loading reduces bundle size.
-- **TanStack Query**: Excellent server state management with automatic caching and invalidation.
+- **Catalyst Sync (csync)**: Frontend server-state runtime with entity/view caching and SSE-friendly updates.
 - **Radix UI**: Headless UI primitives for accessibility and customization.
 - **Tailwind CSS v4**: Utility-first styling with fast compilation.
 
@@ -1099,7 +1090,7 @@ All retention jobs use randomized jitter (`0–60s`) to prevent synchronized dat
 | [Security](/docs/reference/security/) | Security policy, vulnerability reporting, and threat model |
 | [Troubleshooting](/docs/reference/troubleshooting/) | Common errors and resolution steps |
 | [Development](/docs/development/development/) | Build system, testing, and contribution guidelines |
-| Plugin System Analysis | Internal plugin system deep-dive (archival) |
+| [Plugin System Guide](/docs/plugins/plugins/) | Internal plugin system deep-dive (archival) |
 
 ---
 

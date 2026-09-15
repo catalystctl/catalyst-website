@@ -1,12 +1,12 @@
 ---
-title: Troubleshooting
-description: Common errors, solutions, FAQ, and debugging steps for Catalyst deployments.
-order: 0
+title: "Troubleshooting"
+description: "Common errors, solutions, FAQ, and debugging steps for Catalyst deployments."
+order: 2
 keywords:
-  - catalyst troubleshooting
-  - common errors
-  - debugging
-  - FAQ
+  - "catalyst troubleshooting"
+  - "common errors"
+  - "debugging"
+  - "FAQ"
 ---
 
 Common errors, solutions, FAQ, and debugging steps for Catalyst deployments.
@@ -71,9 +71,9 @@ docker compose up -d
 **Common causes:**
 - PostgreSQL not ready when backend starts
 - Corrupted database volume
-- Wrong `DATABASE_URL`
+- Wrong `DATABASE_URL` / mismatched `POSTGRES_PASSWORD`
 
-**Fix:**
+**Fix (generic):**
 
 ```bash
 # Check PostgreSQL status
@@ -82,13 +82,26 @@ docker compose logs postgres
 
 # Recreate the database volume (⚠️ this wipes your data)
 docker compose down
-docker volume rm catalyst-catalyst-postgres-data
+docker volume ls | grep catalyst-postgres
+docker volume rm <the-postgres-volume-name>
 docker compose up -d
 
 # Re-run migrations
 docker compose exec backend pnpm run db:migrate
 docker compose exec backend pnpm run db:seed
 ```
+
+**Fix specifically for `P1000` / `password authentication failed for user "catalyst"`:**
+
+The official Postgres image only applies `POSTGRES_PASSWORD` on **first** volume
+init. If you re-ran `install.sh`, used `--reconfigure`, or edited `.env` after the
+volume already existed, the backend now presents a password the DB user does not
+have.
+
+- **Wipe and re-init** (above), **or**
+- Put the original password back in `.env`, **or**
+- `ALTER USER catalyst WITH PASSWORD '...'` inside the running postgres container,
+  then update `.env` to match.
 
 ### Containerd Not Found (Agent)
 
@@ -330,6 +343,109 @@ docker compose logs backend | grep -i oidc
 
 ## Agent Connection & WebSocket Issues
 
+### Agent Exits with `status=226/NAMESPACE`
+
+**Symptoms:** After install or reboot, `catalyst-agent.service` fails immediately and restarts in a loop. Journal shows:
+
+```text
+catalyst-agent.service: Failed to set up mount namespacing: /tmp/catalyst-console: No such file or directory
+catalyst-agent.service: Failed at step NAMESPACE spawning /opt/catalyst-agent/catalyst-agent: No such file or directory
+catalyst-agent.service: Main process exited, code=exited, status=226/NAMESPACE
+```
+
+(The second line is misleading — the binary is usually present; systemd aborts during namespace setup before `ExecStart`.)
+
+**Cause:** The unit listed a non-existent path in `ReadWritePaths=` (historically `/tmp/catalyst-console`). With `ProtectSystem=` / mount namespacing, systemd requires every non-optional `ReadWritePaths` entry to exist at start. Paths under `/tmp` are especially fragile: `PrivateTmp=true` gives the service a private tmpfs, and host `/tmp` dirs vanish on reboot.
+
+Console I/O does **not** use `/tmp/catalyst-console`. FIFOs and log files live under `console_log_dir`, which defaults to `/var/lib/catalyst/console`.
+
+**Fix (immediate):**
+
+```bash
+# 1. Inspect the unit
+systemctl cat catalyst-agent.service
+
+# 2. Remove any /tmp/catalyst-console (or other missing) ReadWritePaths entry.
+#    Prefer the paths written by current deploy-agent.sh:
+sudo tee /etc/systemd/system/catalyst-agent.service << 'EOF'
+[Unit]
+Description=Catalyst Agent - Game Server Management
+After=network-online.target containerd.service
+Wants=network-online.target
+Requires=containerd.service
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/opt/catalyst-agent
+ExecStart=/opt/catalyst-agent/catalyst-agent --config /opt/catalyst-agent/config.toml
+Restart=always
+RestartSec=5
+LimitNOFILE=65536
+NoNewPrivileges=true
+ProtectSystem=full
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+ReadWritePaths=/var/lib/catalyst /etc/cni/net.d /var/lib/cni -/mnt /run/containerd
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo mkdir -p /var/lib/catalyst/console
+sudo systemctl daemon-reload
+sudo systemctl reset-failed catalyst-agent
+sudo systemctl restart catalyst-agent
+sudo systemctl status catalyst-agent --no-pager
+```
+
+**Fix (reinstall):** After the panel ships an updated `deploy-agent.sh`, re-run the one-liner install (or only re-fetch `/api/agent/deploy-script` and re-apply the unit) so the unit no longer references `/tmp/catalyst-console`.
+
+### File Explorer Empty After Remote-Agent Install
+
+**Symptoms:** You install a node with the curl | bash one-liner, create a game server, and the install console looks successful — but the file explorer is empty (maybe just `lost+found`). SFTP shows the same. The running container's `/data` may also look empty, or the game files exist on the host directory while the panel lists nothing.
+
+**Cause:** `ProtectSystem=full` gives `catalyst-agent.service` a private mount namespace. Older agents loop-mounted the per-server ext4 image (`/var/lib/catalyst/images/{uuid}.img` → `/var/lib/catalyst/{uuid}`) **inside that namespace**. containerd (host namespace) then bind-mounted the empty directory *underneath* the loop mount. The install script wrote files there; the file explorer listed the empty image.
+
+**Fix:** Upgrade the agent to a build that mounts disk images in the host mount namespace (`nsenter -t 1 -m`) and reconciles a leftover private-NS mount. Then restart the agent and start (or reinstall) the server so `ensure_mounted` can migrate host-directory files into the image:
+
+```bash
+sudo systemctl restart catalyst-agent
+# Then Start or Reinstall the server from the panel.
+```
+
+To confirm the split-brain on an unpatched agent:
+
+```bash
+# Agent's view (often empty ext4 / lost+found)
+ls /var/lib/catalyst/<server-uuid>
+# Host view via PID 1 — this is what containerd bind-mounts
+sudo nsenter -t 1 -m -- ls /var/lib/catalyst/<server-uuid>
+findmnt /var/lib/catalyst/<server-uuid>
+sudo nsenter -t 1 -m -- findmnt /var/lib/catalyst/<server-uuid>
+```
+
+If the two listings disagree, you are on the broken build.
+
+### Game servers unreachable / no NAT after systemd agent install
+
+**Symptoms:** The node is online and the server starts, but players cannot connect and the container has no outbound internet. `cargo run` on the same host works.
+
+**Cause:** `ProtectKernelTunables=true` and `ProtectKernelModules=true` stop the agent from running `sysctl` / `modprobe`. CNI NAT and port-forwards need `net.ipv4.ip_forward=1`. Disk-image quotas need the `loop` module.
+
+**Fix:** Re-run the current `deploy-agent.sh` one-liner (it writes `/etc/sysctl.d/99-catalyst.conf` and `/etc/modules-load.d/catalyst-loop.conf`), or apply once:
+
+```bash
+sudo sysctl -w net.ipv4.ip_forward=1
+echo 'net.ipv4.ip_forward = 1' | sudo tee /etc/sysctl.d/99-catalyst.conf
+sudo modprobe loop
+echo loop | sudo tee /etc/modules-load.d/catalyst-loop.conf
+```
+
 ### Agent Shows Offline in the Panel
 
 **Symptoms:** Node appears offline in the admin panel, no resource stats are reported.
@@ -477,7 +593,7 @@ npx prisma db seed -- --admin-password newpassword123
 ```
 
 ::: tip Reset Token Validation
-The `/api/auth/reset-password/validate` endpoint performs a constant-time comparison of the reset token. If the token is invalid or expired, a generic error is returned (no enumeration). Check `logs/backend` for the actual reason.
+The `/api/auth/reset-password/validate` endpoint performs a constant-time comparison of the reset token. If the token is invalid or expired, a generic error is returned (no enumeration). Check the backend container logs (`docker compose logs backend --tail=100`) for the actual reason. The backend logs to stdout only; there is no `logs/backend` file directory.
 :::
 
 ### 2FA Issues
@@ -759,9 +875,9 @@ docker compose exec backend curl -s http://localhost:3000/api/servers/SERVER_ID 
 # Verify the agent has a WebSocket connection
 sudo journalctl -u catalyst-agent -f --no-pager | grep "connected"
 
-# Check container logs (stdout/stderr)
-ls -la /var/log/catalyst/console/SERVER_ID/
-cat /var/log/catalyst/console/SERVER_ID/stdout
+# Check container logs (agent console output lives under the agent data dir)
+ls -la /var/lib/catalyst/console/SERVER_UUID/
+cat /var/lib/catalyst/console/SERVER_UUID/stdout
 ```
 
 **Common fixes:**
@@ -781,17 +897,20 @@ cat /var/log/catalyst/console/SERVER_ID/stdout
 
 **Symptoms:** SFTP client says "Connection refused" or "Timeout".
 
+SFTP is hosted by the **node agent** (default port `2022`), not the panel — run these checks on the node, not the panel host.
+
 **Check:**
 
 ```bash
-# Verify SFTP port is exposed in Docker
-grep 2022 catalyst-docker/docker-compose.yml
+# Is the agent running and listening on the SFTP port?
+systemctl status catalyst-agent
+ss -tlnp | grep 2022
 
-# Check if SFTP is enabled
-grep SFTP_ENABLED catalyst-docker/.env.example
+# Check the SFTP port configured for this agent
+grep -A 2 '\[sftp\]' /opt/catalyst-agent/config.toml
 
 # Test connectivity from the client machine
-nc -zv sftp-host 2022
+nc -zv <node-address> 2022
 
 # Check for firewall blocking port 2022
 sudo ufw status
@@ -801,20 +920,14 @@ sudo iptables -L -n | grep 2022
 **Fix:**
 
 ```bash
-# Ensure SFTP is enabled and the port is exposed
-# In catalyst-docker/.env:
-SFTP_ENABLED=true
-
-# In catalyst-docker/docker-compose.yml, verify:
-# ports:
-#   - "2022:2022"
-
-# Restart the backend
-docker compose restart backend
+# Restart the agent if it is down
+sudo systemctl restart catalyst-agent
 
 # Get an SFTP token (from the panel or API)
 # Admin → [Server] → Files → SFTP Connection Info
 ```
+
+If the agent listens on a non-default port, use the port shown in the panel's SFTP connection info. The panel does not listen on `2022` — there is nothing to expose in `catalyst-docker/docker-compose.yml`.
 
 ### File Manager Fails to Load Files
 
@@ -1205,36 +1318,41 @@ sudo docker compose up -d frontend
 # in the frontend's system errors page (/admin/system-errors)
 ```
 
-### Plugin Ticketing System Issues (WHMCS Integration)
+### Plugin Ticketing System Issues
 
 **Symptoms:**
-- Ticketing plugin shows "Connection error"
-- WHMCS OAuth flow fails
-- Tickets not syncing between Catalyst and WHMCS
+- Ticketing plugin fails to load or create tickets
+- Reporter/assignee always null on new tickets
+- SLA breach flags never update
 
 **Fix:**
 
 ```bash
-# Check if WHMCS OIDC is configured
-# Admin → System Settings → OIDC Providers
+# Confirm the plugin is discovered and enabled
+curl -s http://localhost:3000/api/plugins | jq '.[] | select(.name=="ticketing-plugin")'
 
-# Verify WHMCS connection:
-# 1. WHMCS_OIDC_CLIENT_ID and WHMCS_OIDC_CLIENT_SECRET must match
-# 2. WHMCS_OIDC_DISCOVERY_URL must resolve:
-   curl -s https://billing.example.com/.well-known/openid-configuration
+# Enable if needed
+curl -X POST http://localhost:3000/api/plugins/ticketing-plugin/enable \
+  -H "Authorization: Bearer <token>"
 
-# Check plugin logs:
-docker compose logs backend | grep -i "whmcs\|ticketing\|plugin"
+# Check backend logs for plugin errors
+docker compose logs backend | grep -i "ticketing\|plugin"
 
-# Reset plugin state:
-# Admin → Plugins → Ticketing → Reset Configuration
-
-# Verify ticket creation works from the API:
-curl -X POST http://localhost:3000/api/plugins/ticketing/tickets \
+# Create a ticket (title + description are required)
+curl -X POST http://localhost:3000/api/plugins/ticketing-plugin/tickets \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
-  -d '{"subject":"Test","body":"Test ticket"}'
+  -d '{"title":"Test","description":"Test ticket"}'
+
+# List tickets
+curl -s http://localhost:3000/api/plugins/ticketing-plugin/tickets \
+  -H "Authorization: Bearer <token>"
 ```
+
+Notes:
+- Host auth exposes `request.user.userId` (not `.id`) — v3 of the plugin uses this correctly.
+- Nested SLA fields are written as full objects via `$set`; dotted-key updates are not supported by collection storage.
+- Frontend lives at `catalyst-plugins/ticketing-plugin/frontend/` (not under `catalyst-frontend/src/plugins/`).
 
 ### Plugin Hot Reload Not Working
 
@@ -1382,8 +1500,8 @@ du -sh /var/lib/catalyst/servers/*/ | sort -rh | head -10
 # Check backup sizes
 du -sh /var/lib/catalyst/backups/
 
-# Check console log sizes (can grow large)
-du -sh /var/log/catalyst/console/*/
+# Check console log sizes (agent data dir; capped by console output limits)
+du -sh /var/lib/catalyst/console/*/
 ```
 
 **Fix:**
@@ -1411,15 +1529,9 @@ sudo systemctl restart catalyst-agent
 
 **Symptoms:** API returns 429 status with "Too many requests" message.
 
-**Current rate limits:**
+**Current rate limits (verify against `catalyst-backend/src/index.ts` and security settings):**
 
-| Tier | Limit | Window | Endpoints |
-|------|-------|--------|-----------|
-| **Critical** | 5 req/min | 1 minute | `/api/auth/login`, `/api/auth/register`, `/api/auth/forgot-password`, `/api/auth/reset-password` |
-| **High** | 10 req/min | 1 minute | `/api/servers/*` (create, start, stop, restart, delete) |
-| **Medium** | 30 req/min | 1 minute | File operations (list, read, write, upload, delete) |
-| **Normal** | 60 req/min | 1 minute | General API endpoints |
-| **Read** | 120 req/min | 1 minute | Read-only endpoints (GET /api/servers, GET /api/nodes, etc.) |
+Global Fastify limit is 1200 requests per minute per IP/user. Per-route overrides apply: `/health` 60/min, setup complete 5/min, auth endpoints use the dynamic `authRateLimitMax` default (60/min), file operations 180/min, console input 120/min, profile reads 120/min. API keys have their own per-key limits (default 100 per 60s). Check `X-RateLimit-*` headers and Admin → Security for the live values; do not rely on a fixed tier table.
 
 **Fix:**
 
@@ -1644,7 +1756,7 @@ sudo ctr -n catalyst images pull docker.io/your-image:tag
 For security vulnerabilities, **do not** open a public GitHub issue. Instead:
 
 - Read [SECURITY](/docs/reference/security/) for the full security policy
-- Read docs/SECURITY_QUICK_REFERENCE.md for the quick guide
+- Read [Security Policy](/docs/reference/security/) for the quick guide
 - Report via the channel specified in the security policy
 
 ---
@@ -1665,7 +1777,7 @@ The following are known limitations that are not bugs but may affect your deploy
 | **One restore stream at a time** | The agent only supports one backup restore at a time | Wait for the current restore to complete |
 | **Plugin hot reload is dev-only** | `PLUGIN_HOT_RELOAD=true` is intended for development | Set to `false` in production to prevent memory leaks |
 | **No built-in load balancing** | Only one backend instance is supported in Docker Compose | Use external load balancer (HAProxy, NGINX) for production |
-| **Rate limits are per-node** | Rate limiting applies per backend instance | Add more backend instances with external LB for high traffic |
+| **Rate limits are per-process** | Rate limiting applies per backend process | Keep `WORKERS=0` (single process) in Compose, or use sticky sessions behind an external load balancer |
 
 ::: tip Contributing
 If you find a bug or have a feature request, please open a GitHub issue. For documentation improvements, submit a pull request. See [development](/docs/development/development/) for contribution guidelines.

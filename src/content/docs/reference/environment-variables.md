@@ -1,12 +1,12 @@
 ---
-title: Environment Variables
-description: Complete reference for all Catalyst environment variables, grouped by service and category.
-order: 0
+title: "Environment Variables"
+description: "Complete reference for all Catalyst environment variables, grouped by service and category."
+order: 1
 keywords:
-  - catalyst env
-  - environment variables
-  - configuration
-  - docker env
+  - "catalyst env"
+  - "environment variables"
+  - "configuration"
+  - "docker env"
 ---
 
 > Complete reference for all Catalyst environment variables. Grouped by service and category for easy navigation.
@@ -49,9 +49,12 @@ cp catalyst-backend/.env.example catalyst-backend/.env
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
 | `NODE_ENV` | `development` \| `production` | `development` | Affects HSTS headers, cookie security, logging format, and debug output. Always set to `production` in deployed environments. |
-| `ENABLE_COMPRESSION` | `true` \| `false` | `false` | Enable HTTP response compression (gzip/br/deflate). In deployments with nginx in front, nginx handles compression instead — leave disabled here. |
+| `ENABLE_COMPRESSION` | `true` \| `false` | Enabled unless `false` | HTTP response compression (gzip/br/deflate). The backend registers compression unless `ENABLE_COMPRESSION=false`; the Docker stack sets `false` because nginx handles compression instead. |
 | `TZ` | IANA timezone | `UTC` | Timezone for scheduled tasks and log timestamps. Use values like `America/New_York`, `Europe/London`, `Asia/Tokyo`. |
-| `LOG_LEVEL` | `trace` \| `debug` \| `info` \| `warn` \| `error` | `info` | Pino log level. `trace` includes all HTTP request details; `error` only shows errors. |
+| `LOG_LEVEL` | `trace` \| `debug` \| `info` \| `warn` \| `error` | `info` | Pino log level. `trace` includes all HTTP request details; `error` only shows errors. Note: stock `catalyst-docker/docker-compose.yml` hardcodes `LOG_LEVEL: info`; editing `.env` alone does not change it without a Compose edit. |
+| `TRUST_PROXY` | `true` \| `false` | `true` | Trust `X-Forwarded-*` headers from nginx/reverse proxy. Set to `false` only on direct exposure. |
+| `DOCS_ENABLED` | `true` \| `false` | `404` in production unless `true` | Enables runtime Swagger UI at `GET /docs`. |
+| `ALLOW_DATA_LOSS` | `0` \| `1` | `0` | Entrypoint only: `1` permits destructive `prisma db push`. Never set in normal operation. |
 | `APP_NAME` | String | `Catalyst` | Panel name shown in emails, auth issuer claims, and UI. |
 
 ### Public URL & Addresses
@@ -112,7 +115,7 @@ Better Auth uses the same origin list (via `buildTrustedOrigins()`) for its `tru
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
 | `DATABASE_URL` | PostgreSQL connection string | **Required** | Full connection string: `postgresql://user:password@host:5432/dbname`. No default — must be set. The application **will not start** without this. |
-| `DB_POOL_MAX` | Integer | `50` | PostgreSQL connection pool max size. Default 20 for dev; raise to 50+ for production under load. |
+| `DB_POOL_MAX` | Integer | `15` | PostgreSQL connection pool max size. Raise for production under load. |
 | `DB_STATEMENT_TIMEOUT_MS` | Integer | `30000` | **Reserved for future use.** Statement timeout per query in milliseconds. Currently hardcoded in Prisma config. |
 
 ::: warning DATABASE_URL
@@ -124,6 +127,7 @@ The application crashes on startup if `DATABASE_URL` is not set. Use the Docker 
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
 | `BETTER_AUTH_SECRET` | 32-byte base64 | **Required** | Cryptographic secret for Better Auth sessions, JWT signing, and CSRF protection. Generate with: `openssl rand -base64 32`. **Rotate carefully** — rotating invalidates all existing sessions. |
+| `API_KEY_SECRET` | Base64 string | Falls back to `BETTER_AUTH_SECRET` | HMAC secret for hashing panel/agent API keys. If unset, falls back to `BETTER_AUTH_SECRET` (same as Docker Compose). Set a dedicated value for key-rotation isolation: `openssl rand -base64 32`. |
 | `BETTER_AUTH_URL` | Full URL | `http://localhost:3000` | Better Auth base URL. Defaults to `PUBLIC_URL` if set. Override only for split internal/external setups. |
 | `PASSKEY_RP_ID` | Hostname | `localhost` | Passkey (WebAuthn) relying party ID. Must match the hostname portion of `PUBLIC_URL`. For `https://panel.example.com`, set `PASSKEY_RP_ID=panel.example.com`. |
 
@@ -146,44 +150,42 @@ Do not commit OAuth secrets to version control. Use secret managers, Docker secr
 
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
-| `CONSOLE_OUTPUT_BYTE_LIMIT_BYTES` | Integer | `262144` (256 KB/s) | Per-server WebSocket console output cap in bytes/second. Clamped to range 65536–2097152. Reduce for low-bandwidth connections; increase for high-traffic game servers. |
-| `MAX_DISK_MB` | Integer | `10240` (10 GB) | Maximum disk usage per server in megabytes. Used by the scheduler to enforce storage quotas. |
+| `CONSOLE_OUTPUT_BYTE_LIMIT_BYTES` | Integer | `262144` (256 KB) in code; Docker stack sets `524288` | Per-server console output cap in bytes. Clamped to range 65536–2097152. |
+| `MAX_DISK_MB` | Integer | Unset (no cap) unless set | Maximum disk usage per server in megabytes, enforced only when set. The Docker stack sets a high default; the backend example uses `10240`. |
 
 ### Suspension Policies
 
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
 | `SUSPENSION_ENFORCED` | `true` \| `false` | `true` | Enforce suspension across all server operations. Set to `false` to disable suspension checks (not recommended). |
-| `SUSPENSION_DELETE_POLICY` | `block` \| `delete` | `block` | What to do when a suspended server needs disk cleanup: `block` prevents deletion; `delete` removes files. |
-| `SUSPENSION_DELETE_BLOCKED` | `true` \| `false` | `true` | Whether to block file deletion while a server is suspended. |
+| `SUSPENSION_DELETE_POLICY` | `block` \| `keep` \| `delete` | Code treats `block` as block | What to do when a suspended server needs disk cleanup. Only the exact value `block` blocks in code; compose ships `keep`. |
+| `SUSPENSION_DELETE_BLOCKED` | `true` \| `false` | `true` in code (blocked unless `false`); compose ships `false` | Whether to block file deletion while a server is suspended. |
 
 ### Database Hosts (MySQL)
 
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
-| `DATABASE_HOST_PORT_DEFAULT` | Integer | `3306` | Default MySQL port for provisioned database hosts. |
 | `DATABASE_HOST_CONNECT_TIMEOUT_MS` | Integer | `5000` | Connection timeout when creating new MySQL database host connections, in milliseconds. |
 
-### SFTP Server
+> `DATABASE_HOST_PORT_DEFAULT` appears in some examples but is not read by the backend — only `DATABASE_HOST_CONNECT_TIMEOUT_MS` is.
+
+### Server Data
 
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
-| `SFTP_ENABLED` | `true` \| `false` | `true` | Enable the JWT-authenticated SFTP server for server file access. |
-| `SFTP_PORT` | Integer | `2022` | SFTP listen port. |
 | `SERVER_DATA_DIR` | Filesystem path | `/var/lib/catalyst/servers` | Root directory for server data. All server files live under this path. |
-| `SFTP_HOST_KEY` | Filesystem path | `./sftp_host_key` | Path to SSH host private key for SFTP authentication. |
-| `SFTP_HOST_KEY_BASE64` | Base64 string | — | Alternative to `SFTP_HOST_KEY`. Provide a base64-encoded private key directly. Useful for Docker/Kubernetes secrets. |
-| `SFTP_MAX_FILE_SIZE` | Integer (bytes) | `104857600` (100 MB) | Maximum single file upload size for SFTP uploads. |
 
-::: tip Docker SFTP Key
-In Docker Compose, set `SFTP_HOST_KEY=` (empty) to let the backend auto-generate a host key on first startup, or set `SFTP_HOST_KEY_BASE64` with the key contents.
+::: tip SFTP Runs on the Agent
+SFTP is hosted by the **node agent** (default port `2022`), not the panel or backend. The per-node SFTP port is configured in the panel (Admin → Nodes) and written into the agent's `config.toml` by the deploy script. The panel only issues short-lived SFTP tokens (`/api/sftp/connection-info`).
+
+SFTP file size is the panel Admin → Security **Max upload size**, not an environment variable.
 :::
 
 ### Plugins
 
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
-| `PLUGINS_DIR` | Filesystem path | `./plugins` | Directory where installed plugins are loaded from. |
+| `PLUGINS_DIR` | Filesystem path | `/var/lib/catalyst/plugins` in Docker (`./plugins` in the backend example) | Directory where installed plugins are loaded from. |
 | `PLUGIN_HOT_RELOAD` | `true` \| `false` | `false` | Enable live reload of plugins on file changes. Disable in production. |
 | `AGENT_TARGET_DIR` | Filesystem path | `/opt/catalyst-agent` | Target directory for agent deployment on game server nodes. |
 | `DEPLOY_SCRIPT_PATH` | Filesystem path | — | Path to a custom agent deployment script. Uses the built-in script if not set. |
@@ -196,7 +198,7 @@ In Docker Compose, set `SFTP_HOST_KEY=` (empty) to let the backend auto-generate
 | `BACKUP_STORAGE_MODE` | `local` \| `s3` \| `stream` | `local` | Default backup storage backend. Change to `s3` for S3-compatible storage. |
 | `BACKUP_STREAM_DIR` | Temp path | `/tmp/catalyst-backup-stream` | Temporary directory for streaming backup operations. |
 | `BACKUP_TRANSFER_DIR` | Temp path | `/tmp/catalyst-backup-transfer` | Temporary directory for backup file transfers. |
-| `BACKUP_CREDENTIALS_ENCRYPTION_KEY` | 32-byte hex/key | **Required for S3** | Key used to encrypt backup credentials stored in the database. Generate with: `openssl rand -hex 32`. |
+| `BACKUP_CREDENTIALS_ENCRYPTION_KEY` | 32-byte key | **Required for S3** | Key used to encrypt backup credentials stored in the database. `install.sh` generates base64 (`openssl rand -base64 32`). Note: `routes/backups.ts` also reads a legacy `BACKUP_ENCRYPTION_KEY` — use `BACKUP_CREDENTIALS_ENCRYPTION_KEY`. |
 
 #### S3 Backup Variables (when `BACKUP_STORAGE_MODE=s3`)
 
@@ -227,7 +229,6 @@ These variables are **reserved for future implementation** and currently have no
 |----------|------|---------|-------------|
 | `WEBHOOK_URLS` | Comma-separated URLs | — | Comma-separated list of webhook endpoints for global notifications. Example: `WEBHOOK_URLS=https://discord.example.com/hook,https://slack.example.com/hook`. |
 | `WEBHOOK_SECRET` | Hex string | Auto-generated | Secret for HMAC-signing all outbound webhook payloads. If not set, a random 32-byte hex key is generated at startup (changes on restart). For reliable signature verification, set this explicitly. Generate with: `openssl rand -hex 32`. |
-| `API_KEY_SECRET` | Base64 string | Auto-generated | Secret for signing API keys. If not set, a random 32-byte base64 key is generated at startup. Generate with: `openssl rand -base64 32`. |
 
 ::: tip Webhook Signing
 Webhooks include an `X-Webhook-Signature` header with an HMAC-SHA256 hash of the payload, signed using `WEBHOOK_SECRET`. Recipients should verify this signature to ensure authenticity.
@@ -237,7 +238,7 @@ Webhooks include an `X-Webhook-Signature` header with an HMAC-SHA256 hash of the
 
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
-| `REDIS_URL` | Redis connection string | — | Redis connection string for optional caching/session storage. Leave empty to disable. Example: `redis://:password@localhost:6379/0`. |
+| `REDIS_URL` | Redis connection string | — | Reserved. There is currently no Redis client in the backend (`REDIS_URL` is never read); Redis runs in Compose but is inert. Leave as Compose sets it. Example: `redis://:password@localhost:6379/0`. |
 
 ### Performance & Scaling
 
@@ -246,7 +247,9 @@ Webhooks include an `X-Webhook-Signature` header with an HMAC-SHA256 hash of the
 | `MAX_AGENT_CONNECTIONS` | Integer | `1000` | Max concurrent WebSocket connections from agent nodes. |
 | `MAX_CLIENT_CONNECTIONS` | Integer | `10000` | Max concurrent connections from dashboard/API clients. |
 | `MAX_CONNECTIONS_PER_USER` | Integer | `10` | Max concurrent connections per authenticated user. |
-| `WORKERS` | Integer | `0` | Number of Bun worker processes. `0` = single process (cluster mode off). Set to a positive number for multi-process cluster mode. |
+| `WORKERS` | Integer | `0` | Number of **Node.js** cluster worker processes. `0` = single process (cluster mode off). Set to a positive number for multi-process cluster mode. |
+| `WS_MAX_PAYLOAD_BYTES` | Integer | `8388608` (8 MB) | Maximum accepted WebSocket message size (`fastify-websocket` `maxPayload`, registered in `catalyst-backend/src/index.ts`). Messages larger than this are rejected at the protocol level. Raise only if agents legitimately send larger single frames. |
+| `AGENT_BACKPRESSURE_BYTES` | Integer | `4194304` (4 MiB) | Outbound backpressure watermark per agent socket in `WebSocketGateway`. When an agent's unsent outbound buffer exceeds this, low-priority traffic to that agent is shed and bulk binary transfers abort instead of growing memory; control-plane power commands are always attempted. |
 | `METRICS_RETENTION_DAYS` | Integer | `30` | How long to retain server metrics data, in days. |
 
 ### Auto Updater
@@ -256,7 +259,7 @@ Webhooks include an `X-Webhook-Signature` header with an HMAC-SHA256 hash of the
 | `AUTO_UPDATE_ENABLED` | `true` \| `false` | `false` | Enable automatic update checking. The backend checks for new releases at regular intervals. |
 | `AUTO_UPDATE_INTERVAL_MS` | Integer | `3600000` (1 hour) | Interval between update checks, in milliseconds. |
 | `AUTO_UPDATE_AUTO_TRIGGER` | `true` \| `false` | `false` | Auto-trigger the update when a new version is available. If `false`, only send a notification (admin must approve). |
-| `AUTO_UPDATE_DOCKER_COMPOSE_PATH` | Filesystem path | `/app/docker-compose.yml` | Path to `docker-compose.yml` for Docker-based auto-update. Used to restart the stack after updating. |
+| `AUTO_UPDATE_DOCKER_COMPOSE_PATH` | Filesystem path | `${CATALYST_COMPOSE_DIR:-/opt/catalyst-docker}/docker-compose.yml` in Docker | Path to `docker-compose.yml` for Docker-based auto-update. Used to restart the stack after updating. |
 
 ### Bootstrap / Seeding (Dev Only)
 
@@ -291,8 +294,7 @@ cp catalyst-docker/.env.example catalyst-docker/.env
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
 | `FRONTEND_PORT` | Host:Container binding | `0.0.0.0:8080` | Port binding for the frontend service. For podman (rootless), use a port ≥ 1024 (e.g., `0.0.0.0:8080`). |
-| `BACKEND_PORT` | Host:Container binding | `0.0.0.0:3000` | Port binding for the backend service. |
-| `SFTP_PORT` | Host:Container binding | `0.0.0.0:2022` | Port binding for the SFTP service. |
+| `BACKEND_PORT` | Host:Container binding | `127.0.0.1:3000` (compose default) | Host publish for the backend API. Compose defaults to **localhost-only**; the process still listens on `0.0.0.0` inside the container. |
 
 ::: tip Restricting Bind Addresses
 Set the prefix to `127.0.0.1:` to restrict access to localhost only. Example: `FRONTEND_PORT=127.0.0.1:8080`.
@@ -301,9 +303,9 @@ Set the prefix to `127.0.0.1:` to restrict access to localhost only. Example: `F
 
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
-| `POSTGRES_USER` | String | `catalyst` | PostgreSQL superuser name. |
+| `POSTGRES_USER` | String | `catalyst` | PostgreSQL superuser name. Hardcoded to `catalyst` in `catalyst-docker/docker-compose.yml`; `.env` values do not interpolate. |
 | `POSTGRES_PASSWORD` | String | **Required** | PostgreSQL superuser password. **Must be changed from the default before production use.** |
-| `POSTGRES_DB` | String | `catalyst_db` | PostgreSQL database name. |
+| `POSTGRES_DB` | String | `catalyst_db` | PostgreSQL database name. Hardcoded to `catalyst_db` in Compose; `.env` values do not interpolate. |
 | `POSTGRES_PORT` | Host:Container binding | `127.0.0.1:5432` | Port mapping for exposing PostgreSQL to the host (e.g., for pgAdmin or local tools). |
 
 ::: tip PostgreSQL Security
@@ -313,7 +315,7 @@ The PostgreSQL port is **not exposed by default**. To connect from the host, set
 
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
-| `REDIS_PASSWORD` | String | — | Redis authentication password. Leave empty for no password (acceptable when Redis is not exposed externally). |
+| `REDIS_PASSWORD` | String | — | Redis authentication password. The Docker stack requires it (`redis-server --requirepass ${REDIS_PASSWORD:?...}` refuses to boot without it; `install.sh` auto-generates it). Leave empty only in non-Docker dev setups where Redis is not exposed externally. |
 | `REDIS_PORT` | Host:Container binding | — | Port mapping for exposing Redis to the host. Leave commented to keep Redis internal to the Docker network. |
 
 ### TLS/Reverse Proxy
@@ -344,8 +346,8 @@ Frontend variables are defined in `catalyst-frontend/.env.example` and consumed 
 |----------|------|---------|-------------|
 | `VITE_API_URL` | Full URL | — | Base URL for API requests. Empty = use Vite dev proxy in development, relative paths in production. |
 | `VITE_BETTER_AUTH_URL` | Full URL | Auto from `VITE_API_URL` | Base URL for Better Auth client. Defaults to `VITE_API_URL` if not set. |
-| `VITE_PASSKEY_RP_ID` | Hostname | — | Passkey relying party ID for the frontend. Must match `PASSKEY_RP_ID` from the backend. |
-| `SKIP_WEB_SERVER` | `true` \| `false` | `false` | Set to `true` in CI environments to skip starting the frontend dev server during Playwright E2E tests. |
+| `VITE_PASSKEY_RP_ID` | Hostname | — | Only affects Vite dev-server `allowedHosts` in `vite.config.ts`; it is not read by frontend `src` code. Set the backend `PASSKEY_RP_ID` to match your domain. |
+| `SKIP_WEB_SERVER` | `true` \| `false` | `false` | Playwright Node-side flag (read in `playwright.config.ts`), not a Vite browser variable. Set to `true` in CI to skip starting the frontend dev server during E2E tests. |
 
 ::: tip Vite Environment Variables
 Frontend env vars are prefixed with `VITE_` because Vite only exposes variables with this prefix to the browser bundle. They are baked into the JavaScript at build time, not read at runtime.
@@ -372,14 +374,17 @@ Agent variables are set on the node/server where the agent runs. They are NOT se
 
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
-| `BACKEND_URL` | WebSocket URL | `ws://localhost:3000/ws` | WebSocket URL for the backend gateway. Use `ws://` for development, `wss://` for production. |
+| `BACKEND_URL` | WebSocket URL | `wss://localhost:3000/ws` in code (`ws://` in the TOML example header) | Backend gateway URL for the agent. Use `ws://` for loopback/RFC1918 development, `wss://` for production. |
 | `DATA_DIR` | Filesystem path | `/var/lib/catalyst` | Root directory for container volumes and agent data. |
 | `CONTAINERD_SOCKET` | Filesystem path | `/run/containerd/containerd.sock` | Path to the containerd Unix socket. |
 | `CONTAINERD_NAMESPACE` | String | `catalyst` | containerd namespace for Catalyst containers. |
 | `LOG_LEVEL` | `trace` \| `debug` \| `info` \| `warn` \| `error` | `info` | Rust tracing log level. |
 | `HOSTNAME` | String | Auto-detected | Human-readable hostname for this node. Defaults to the OS hostname. |
-| `MAX_CONNECTIONS` | Integer | `100` | Maximum concurrent WebSocket connections for this agent instance. |
-| `CATALYST_ALLOW_INSECURE_WS` | `1` or unset | Unset | Set to `1` to allow `ws://` (insecure) connections. **For development only** — never set in production. |
+| `MAX_CONNECTIONS` | Integer | `100` | Maximum servers managed by this agent instance (server-count enforcement, capped at 1000). |
+| `SFTP_ENABLED` | `true` \| `false` | `true` | Set to `false`/`0` to disable the agent SFTP server. |
+| `SFTP_PORT` | Integer | `2022` | Agent SFTP listen port. |
+| `SFTP_HOST_KEY` | Filesystem path | `/opt/catalyst-agent/sftp_host_key` | Agent SFTP host key path. |
+| `CATALYST_ALLOW_INSECURE_WS` | `1` or unset | Unset | Set to `1` to allow `ws://` to public hosts. Loopback and RFC1918 private LAN IPs (`10/8`, `172.16/12`, `192.168/16`) are already allowed without this. **Never set for public internet backends.** |
 
 ::: tip Node Deployment
 When deploying a node, `NODE_ID` and `NODE_API_KEY` are generated by the Catalyst backend and injected via the deployment script. You rarely need to set these manually.
@@ -540,12 +545,15 @@ These settings are **hardcoded** in the source code and **cannot** be changed vi
 | `auditRetentionDays` | `90` | Same | Audit log retention period |
 | `maxBufferMb` | `50` | Same | Max buffer size per server |
 | `fileTunnelRateLimitMax` | `100` | Same | File tunnel request rate limit |
-| `fileTunnelMaxUploadMb` | `100` | Same | Max upload size per tunnel request |
+| `fileTunnelMaxUploadMb` | `500` | Same | Max single-file size for the file browser and SFTP on every agent |
 | `fileTunnelMaxPendingPerNode` | `50` | Same | Max pending tunnel requests per node |
 | `fileTunnelConcurrentMax` | `10` | Same | Max concurrent tunnels per node |
 | JWT expiration | `7 days` | `auth.ts` | Better Auth JWT token lifetime |
 | Session cookie cache maxAge | `300` (5 min) | `auth.ts` | Session data cache in cookies |
-| Global rate limit | `600`/min | `index.ts` | Max requests per IP/user |
+| Global rate limit | `1200`/min | `index.ts` | Max requests per IP/user |
+| Auth dynamic default | `60`/min | `mailer.ts` (`authRateLimitMax`) | Auth endpoint default before Admin → Security overrides |
+| File operations default | `180`/min | `mailer.ts` (`fileRateLimitMax`) | File route default |
+| Console input default | `120`/min | `mailer.ts` (`consoleRateLimitMax`) | Console input default |
 | Better Auth internal rate limit | `30`/60s | `auth.ts` | Default better-auth rate limit |
 | Better Auth `/sign-in/email` | `5`/60s | `auth.ts` | Login attempt limit |
 | Better Auth `/sign-up/email` | `5`/60s | `auth.ts` | Registration attempt limit |
@@ -581,7 +589,8 @@ openssl rand -base64 32
 
 | Variable | Risk if Compromised | Rotation Impact |
 |----------|---------------------|-----------------|
-| `BETTER_AUTH_SECRET` | Full session takeover, auth bypass | **Invalidates ALL user sessions.** Rotate during maintenance window. |
+| `BETTER_AUTH_SECRET` | Full session takeover, auth bypass | **Invalidates ALL user sessions.** Rotate during maintenance window. If `API_KEY_SECRET` is unset and was falling back to this value, also re-hash or re-issue API keys. |
+| `API_KEY_SECRET` | Forgeable panel/agent API keys | **Invalidates all existing API keys** (hashes no longer match). Re-issue keys after rotation. |
 | `DATABASE_URL` (contains password) | Full database access | Change password and update. |
 | `POSTGRES_PASSWORD` | Full database access | Change in Docker Compose. |
 | `BACKUP_CREDENTIALS_ENCRYPTION_KEY` | Unencrypted backup credential access | **Backup credentials become unreadable.** Must rotate with credential re-encryption. |
@@ -593,13 +602,14 @@ openssl rand -base64 32
 1. ✅ `NODE_ENV=production`
 2. ✅ `PUBLIC_URL` set to the real domain
 3. ✅ `BETTER_AUTH_SECRET` set (not the example value)
-4. ✅ `DATABASE_URL` pointing to a secured PostgreSQL instance
-5. ✅ `POSTGRES_PASSWORD` changed from default
-6. ✅ `BACKUP_CREDENTIALS_ENCRYPTION_KEY` generated (if using backups)
-7. ✅ `WEBHOOK_SECRET` set explicitly (not auto-generated)
-8. ✅ `PASSKEY_RP_ID` matching your domain
-9. ✅ `SUSPENSION_ENFORCED=true`
-10. ✅ `AUTO_UPDATE_ENABLED=true` with `AUTO_UPDATE_AUTO_TRIGGER=false` (review before updating)
+4. ✅ `API_KEY_SECRET` set (or intentionally relying on `BETTER_AUTH_SECRET` fallback)
+5. ✅ `DATABASE_URL` pointing to a secured PostgreSQL instance
+6. ✅ `POSTGRES_PASSWORD` changed from default
+7. ✅ `BACKUP_CREDENTIALS_ENCRYPTION_KEY` generated (if using backups)
+8. ✅ `WEBHOOK_SECRET` set explicitly (not auto-generated)
+9. ✅ `PASSKEY_RP_ID` matching your domain
+10. ✅ `SUSPENSION_ENFORCED=true`
+11. ✅ `AUTO_UPDATE_ENABLED=true` with `AUTO_UPDATE_AUTO_TRIGGER=false` (review before updating)
 
 ---
 
@@ -618,7 +628,7 @@ openssl rand -base64 32
 | Symptom | Cause | Fix |
 |---------|-------|-----|
 | Agent can't connect | `BACKEND_URL` wrong or `ws://` in production | Set `BACKEND_URL=wss://panel.example.com:3000/ws` |
-| Insecure connection blocked | `CATALYST_ALLOW_INSECURE_WS` not set in dev | Set to `1` for `ws://` development only |
+| Insecure connection blocked | `ws://` to a public host | Use a private LAN / loopback IP, switch to `wss://`, or set `CATALYST_ALLOW_INSECURE_WS=1` for public hosts only |
 
 ### "Passkey authentication fails"
 
@@ -640,9 +650,11 @@ openssl rand -base64 32
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| Can't connect to SFTP | `SFTP_ENABLED=false` | Set `SFTP_ENABLED=true` |
-| Port mismatch | `SFTP_PORT` differs from client config | Verify the port in your SFTP client matches `SFTP_PORT` |
-| Docker port not mapped | `SFTP_PORT` variable not reflected in Compose | Check `docker-compose.yml` port mapping includes `SFTP_PORT` |
+| Can't connect to SFTP | Agent down or SFTP disabled for the node | Check `systemctl status catalyst-agent` on the node; enable SFTP in Admin → Nodes |
+| Port mismatch | Node SFTP port differs from client config | Use the host/port from the panel's SFTP Connection Info (default `2022`) |
+| Node firewall blocks SFTP | SFTP port closed on the node | Open the node's SFTP port in its firewall |
+
+> SFTP is hosted by the node agent — there is no `SFTP_PORT`/`SFTP_ENABLED` variable for the panel compose stack. (The agent itself honors `SFTP_ENABLED`, `SFTP_PORT`, and `SFTP_HOST_KEY`.)
 
 ### "Plugin hot-reload not working"
 
@@ -678,4 +690,4 @@ openssl rand -base64 32
 
 ---
 
-*Last updated: 2026-05-04*
+*Last updated: 2026-08-26*

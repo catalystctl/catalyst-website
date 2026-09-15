@@ -93,7 +93,7 @@ The agent connects back to the panel and reports its status. You should see it a
 3. Choose your node, set the resource limits (memory, CPU, disk), and pick your Minecraft version
 4. Click Create
 
-The server will start automatically. You can watch the console output in real-time through the Catalyst panel - with sub-10ms latency, you'll see log lines appear almost instantly.
+The server will start automatically. You can watch the console output in real-time through the Catalyst panel - with live streaming, you'll see log lines appear almost instantly.
 
 ## Step 5: Port forwarding
 

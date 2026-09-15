@@ -1,13 +1,13 @@
 ---
-title: Development Guide
-description: Set up a local dev environment, write tests, follow code style, and submit pull requests.
+title: "Development Guide"
+description: "Set up a local dev environment, write tests, follow code style, and submit pull requests."
 order: 0
 keywords:
-  - catalyst development
-  - contributing
-  - local dev setup
-  - testing
-  - PR process
+  - "catalyst development"
+  - "contributing"
+  - "local dev setup"
+  - "testing"
+  - "PR process"
 ---
 
 > How to set up a local development environment, write tests, follow code style, and submit pull requests.
@@ -17,9 +17,9 @@ keywords:
 
 | Tool | Minimum Version | Purpose |
 |------|----------------|---------|
-| **Bun** | 1.0+ | JavaScript/TypeScript runtime (monorepo package manager) |
+| **pnpm** | 9+ (repo uses pnpm 11 workspace settings) | JavaScript/TypeScript package manager for the monorepo |
 | **Node.js** | 20+ | Peer dependency resolution |
-| **Rust** | 1.70+ | Catalyst agent (cross-compiled targets) |
+| **Rust** | **1.95.0** (see `catalyst-agent/rust-toolchain.toml`) | Catalyst agent (cross-compiled targets) |
 | **cargo** | Latest stable | Rust package manager & build tool |
 | **Docker** | 24+ or **Podman** | Development infra (PostgreSQL, Redis) |
 | **PostgreSQL** | 14+ | Primary database (provided via Docker/Podman) |
@@ -50,7 +50,7 @@ export PATH="$HOME/.local/bin:$PATH"
 
 ## Repository Structure
 
-Catalyst is a multi-package monorepo managed via Bun workspaces:
+Catalyst is a multi-package monorepo managed via **pnpm** workspaces (`pnpm-workspace.yaml`):
 
 ```
 catalyst/
@@ -59,12 +59,10 @@ catalyst/
 │   ├── prisma/                # Database schema & migrations
 │   ├── tests/                 # Bash integration tests
 │   └── package.json
-├── catalyst-frontend/         # React 18 + Vite SPA
+├── catalyst-frontend/         # React 19 + Vite SPA (csync server state)
 │   ├── src/                   # React components, pages, hooks
 │   ├── e2e/                   # Playwright E2E tests
 │   └── package.json
-├── catalyst-shared/           # Shared TypeScript types (types-only package)
-│   └── types.ts
 ├── catalyst-agent/            # Rust daemon (Tokio + containerd gRPC)
 │   ├── src/                   # Rust source code
 │   ├── Cargo.toml             # Rust dependencies
@@ -72,7 +70,7 @@ catalyst/
 ├── catalyst-plugins/          # Bundled plugins
 │   ├── egg-explorer/          # Game egg metadata browser
 │   ├── example-plugin/        # Plugin system demonstration
-│   └── ticketing-plugin/      # WHMCS ticket integration
+│   └── ticketing-plugin/      # Support ticketing (SLA, comments, bulk ops)
 ├── packages/plugin-sdk/       # Official Plugin SDK
 │   ├── cli/                   # CLI scaffolding tool
 │   ├── src/                   # SDK source types & helpers
@@ -100,13 +98,13 @@ pnpm run dev:infra
 
 # 3. Seed the database
 pnpm run db:seed
-pnpm run db:seed:admin   # Creates admin@example.com / password123
+pnpm run db:seed:admin   # Creates admin@example.com / admin123
 
 # 4. Start both dev servers in parallel
 pnpm run dev
 
 # Navigate to http://localhost:5173
-# Login: admin@example.com / password123
+# Login: admin@example.com / admin123
 ```
 
 ### Alternative: Manual Start
@@ -263,7 +261,7 @@ catalyst-frontend/src/
 │   ├── layout/              # Sidebar, header, navigation
 │   └── ...
 ├── pages/                   # Page components (mirrors routes)
-├── hooks/                   # React hooks (TanStack Query wrappers)
+├── hooks/                   # React hooks (Catalyst Sync wrappers)
 │   ├── useServers.ts
 │   ├── useAuth.ts
 │   └── ...
@@ -278,7 +276,7 @@ catalyst-frontend/src/
 
 ### Key Architecture Patterns
 
-**State Management** — Zustand for global UI state, TanStack Query for server state:
+**State Management** — Zustand for global UI state, Catalyst Sync for server state:
 
 ```typescript
 // Fetch with automatic caching and refetch
@@ -331,9 +329,9 @@ Manages sidebar state, modals, and transient UI elements.
 
 ---
 
-### Frontend Hooks (React + TanStack Query)
+### Frontend Hooks (React + Catalyst Sync)
 
-Hooks are in `catalyst-frontend/src/hooks/`. They wrap API calls with TanStack Query for caching, refetching, and transitional state handling.
+Hooks are in `catalyst-frontend/src/hooks/`. They wrap API calls with Catalyst Sync for caching, refetching, and transitional state handling.
 
 #### `useAuth` — Authentication Operations
 
@@ -570,7 +568,7 @@ Deprecated alias to `themeStore`. Use `themeStore` directly.
 
 ## Frontend Hooks Reference
 
-Hooks live in `catalyst-frontend/src/hooks/`. All hooks are TanStack Query wrappers over the API services.
+Hooks live in `catalyst-frontend/src/hooks/`. All hooks are Catalyst Sync wrappers over the API services.
 
 ### Admin Hooks (`hooks/useAdmin.ts`)
 
@@ -1021,7 +1019,7 @@ pnpm run db:seed
 pnpm run db:seed:admin
 ```
 
-Default seeded credentials: `admin@example.com` / `password123`
+Default seeded credentials: `admin@example.com` / `admin123`
 
 ---
 
@@ -1040,7 +1038,7 @@ Each PR runs automated checks:
 
 | Job | Scope | Checks |
 |-----|-------|--------|
-| **Backend CI** | `catalyst-backend/**`, `catalyst-shared/**` | Lint, build, Prisma generate, security audit (pnpm audit) |
+| **Backend CI** | `catalyst-backend/**` | Lint, build, Prisma generate, security audit (pnpm audit) |
 | **Agent CI** | `catalyst-agent/**` | `cargo fmt --check`, `cargo check`, `cargo clippy -- -D warnings`, unit tests |
 | **Docker Publish** | Changes in backend or frontend | Conditional Docker image build & push to GHCR |
 
@@ -1077,7 +1075,7 @@ chore: update dependencies
 
 - [Architecture Overview](/docs/reference/architecture/) — System design, data flow, and component responsibilities
 - [API Reference](/docs/api-reference/api-reference/) — Complete REST API endpoint reference for integration
-- Plugin System Analysis — Internal plugin system internals (deep dive)
+- [Plugin System Guide](/docs/plugins/plugins/) — Internal plugin system internals (deep dive)
 - [Automation Guide](/docs/automation/automation/) — API integration examples (WHMCS, Python, Node.js)
 
 ---
@@ -1136,7 +1134,7 @@ docker compose logs -f frontend   # Tail frontend only
 
 ### Frontend
 
-- **Transitional states auto-refetch** — Servers in `installing`, `starting`, `stopping`, or `transferring` states are polled every 1 second via TanStack Query. Don't override this behavior.
+- **Transitional states auto-refetch** — Servers in `installing`, `starting`, `stopping`, or `transferring` states are polled every 1 second via Catalyst Sync. Don't override this behavior.
 - **Plugin frontend components share the bundle** — Plugin frontend code is compiled with the main app. Ensure plugin components don't leak state.
 - **Modals must be dismissed properly** — Use Escape key or explicit close buttons. Don't rely on route changes to close dialogs.
 

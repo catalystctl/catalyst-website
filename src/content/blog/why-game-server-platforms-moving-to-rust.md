@@ -25,23 +25,19 @@ The problems emerge when you scale:
 
 ### Concurrency
 
-PHP's traditional request-per-process model means every concurrent user consumes a separate process with its own memory space. 500 users viewing their consoles simultaneously? That's 500 PHP-FPM workers, each using 30-50MB of RAM. You're at 15-25GB of memory just for the panel process - before any game servers start.
+Panels are connection-heavy: consoles, metrics, and file streams stay open. Both PHP-FPM and Node.js panels need careful tuning for many concurrent sockets. Catalyst splits the problem: TypeScript panel for API/UX, Rust agent for node-local container work.
 
-PHP 8 introduced fiber-based concurrency, and Laravel Octane supports long-running workers. These help, but they're retrofitting concurrency onto a runtime that was designed for the request-response web, not for persistent WebSocket connections.
+PHP 8 introduced fiber-based concurrency, and Laravel Octane supports long-running workers. These help for PHP panels.
 
 ### WebSocket handling
 
-Game server panels need real-time console streaming. Every connected player and admin needs a persistent WebSocket connection to see server logs and send commands.
+Game server panels need live console streaming. Pterodactyl handles node-side streaming in Wings (Go). Catalyst handles node-side streaming in its Rust agent, relayed through the TypeScript panel gateway — not “no hop,” but a panel + agent split.
 
-In PHP, WebSocket handling requires a separate Node.js process (that's why Pterodactyl uses Wings as a WebSocket relay). This adds latency, complexity, and another process to manage on every node.
+In Rust, the agent can hold many concurrent container streams with a small static binary. That helps node density, but panel capacity still depends on PostgreSQL, Redis, and Node tuning.
 
-In Rust, WebSocket handling is native. The same process that serves the REST API also handles thousands of concurrent WebSocket connections - no relay, no extra daemon, no added latency.
+### Memory use at scale
 
-### Memory safety at scale
-
-PHP is memory-safe by default (garbage collected), which is great for developer productivity. But at scale, PHP's memory usage per connection is significantly higher than Rust's. A Rust server handling 10,000 concurrent WebSocket connections might use 100MB total. A PHP-FPM setup handling the same load needs 15-25GB.
-
-This isn't a theoretical difference. For a hosting provider running 500 servers, the panel memory overhead directly affects how many servers fit on each node - which directly affects margins.
+Do not size hosts from marketing tables. Panel memory depends on Node.js, PostgreSQL, and Redis working set; node overhead depends on containerd and game workloads. Measure with your games and concurrency.
 
 ## Why Rust, specifically?
 
@@ -55,61 +51,47 @@ Rust's type system and ownership model let you write high-level code that compil
 
 Rust's ownership model prevents data races at compile time. This means you can write highly concurrent code (thousands of WebSocket connections, parallel API requests, concurrent container operations) without worrying about subtle race conditions that cause crashes or data corruption at 3 AM.
 
-### Single binary deployment
+### Single binary deployment (agent)
 
-Rust compiles to a single static binary. No runtime, no interpreter, no dependency hell. Deploying a Rust application is copying one file and running it. Compare this to a PHP deployment: PHP-FPM, Composer, Laravel, vendor directory, extensions, configuration files - and then Wings separately for WebSocket handling.
+The Rust agent compiles to a single static binary. Deploying the agent is copying one file and running it against containerd. The panel itself is TypeScript on Node.js with PostgreSQL + Redis via Docker Compose — not a single binary.
 
-### containerd-native
+### containerd-native (nodes)
 
-Rust has excellent containerd bindings, which means Catalyst can talk directly to the container runtime that powers Kubernetes. No Docker daemon in the middle, no extra layers of abstraction. Direct access to containerd's API means faster container operations and lower overhead per container.
+Rust has containerd bindings, which means the Catalyst agent can talk directly to the container runtime that powers Kubernetes. No Docker daemon on game nodes. The panel itself still ships via Docker Compose.
 
 ### Startup time
 
-A Rust binary starts in milliseconds. A PHP application needs to boot the runtime, load Composer's autoloader, initialize Laravel's service container, and warm up caches. This matters for:
-- **Auto-scaling:** When you need a new panel instance, Rust is ready in under a second. PHP takes 5+ seconds.
-- **Crash recovery:** If the panel process crashes, Rust is back online almost instantly. PHP needs time to warm up again.
-- **Development velocity:** Faster restarts mean faster iteration cycles.
+A static Rust agent binary starts fast with no interpreter. The Catalyst panel itself is TypeScript on Node.js with PostgreSQL and Redis, so panel startup still depends on those services. Fast agent restarts help:
+- **Node recovery:** agent reconnects to containerd and resumes console streams.
+- **Development velocity:** small agent binary means quick deploys to nodes.
 
-## Real-world performance comparison
+## Honest performance note
 
-These numbers come from benchmarking Catalyst (Rust) against Pterodactyl (PHP) in identical environments:
+This repo contains no published benchmark backing panel memory, latency, or throughput multiples. Treat “10x” tables as marketing, not measurement. What you can verify in code:
 
-| Metric | Pterodactyl (PHP) | Catalyst (Rust) | Improvement |
-|--------|-------------------|-----------------|-------------|
-| Panel startup | ~5s | <1s | 5x |
-| Panel memory at rest | ~200MB | ~50MB | 4x |
-| Console WebSocket latency | ~100ms | <10ms | 10x |
-| API response time (avg) | ~50ms | ~5ms | 10x |
-| Concurrent WebSocket connections | ~1,000 | 10,000+ | 10x |
-| Max API requests/second | ~200 | ~2,000 | 10x |
+| What | Pterodactyl | Catalyst |
+|--------|-------------|----------|
+| Panel | PHP (Laravel) | TypeScript (Fastify, PostgreSQL + Redis) |
+| Node agent | Wings (Go) | Rust static binary + containerd-client |
+| Nodes runtime | Docker via Wings | containerd native (panel ships via Docker Compose) |
+| Live console | Via Wings | Via panel gateway + Rust agent |
+| API | REST + WebSocket | 200+ route handlers with RBAC |
 
-These aren't synthetic benchmarks. They're measured with real game server workloads - console streaming, server start/stop cycles, file operations, and concurrent API usage.
+Choose on ops fit and verified features — not on latency headlines.
 
 ## What this means for different users
 
 ### For hobbyists
 
-The performance difference is nice but not critical. You'll notice faster console responses and lower memory usage, but it won't change your life. The bigger benefit is the simpler deployment - one command to install, no Wings to configure.
+The stack difference is nice but not critical for a few servers. The bigger benefit is ops shape: one-command panel install, containerd-native nodes, and native plugins if you outgrow basics.
 
 ### For hosting providers
 
-This is where it matters most. The numbers above translate directly to your bottom line:
-
-- **4x less panel memory** means you can run the panel on a smaller (cheaper) VPS
-- **10x more WebSocket connections** means one panel instance handles 10x the concurrent users
-- **10x faster API** means your WHMCS integration and automation scripts run faster
-- **containerd's efficiency** means more servers per node, improving your margin
-
-For a 500-server host, the difference between Pterodactyl and Catalyst on infrastructure costs can be $200-500/month - just from panel overhead and node efficiency.
+What matters is automation and access control: 200+ API route handlers, 50+ RBAC permissions, cron tasks, S3-compatible/SFTP backups, and Pterodactyl import. Test infrastructure costs with your workload — do not budget on “$200-500/month” headlines without measuring.
 
 ### For enterprises
 
-Enterprises care about reliability, security, and compliance. Rust delivers:
-
-- **Memory safety guarantees** - No buffer overflows, use-after-free, or null pointer dereferences. Entire classes of vulnerabilities are eliminated at compile time.
-- **Predictable performance** - No garbage collection pauses. Latency is consistent and measured in single-digit milliseconds.
-- **Minimal attack surface** - Single binary, no runtime dependencies, fewer moving parts to exploit.
-- **Audit-friendly** - Rust's type system makes code review and security auditing more effective.
+Enterprises care about reliability, security, and compliance. What Catalyst actually ships: audit logs with actor/IP, scoped expiring API keys, 2FA/passkey, TLS-ready examples, and role-scoped routes. Review the code and run your own security review before production.
 
 ## The ecosystem shift
 

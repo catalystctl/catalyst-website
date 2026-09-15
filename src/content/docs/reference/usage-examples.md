@@ -1,12 +1,12 @@
 ---
-title: Usage Examples
-description: Quick-start copy-paste examples for common Catalyst API operations.
-order: 0
+title: "Usage Examples"
+description: "Quick-start copy-paste examples for common Catalyst API operations."
+order: 3
 keywords:
-  - catalyst usage examples
-  - API examples
-  - curl examples
-  - server operations
+  - "catalyst usage examples"
+  - "API examples"
+  - "curl examples"
+  - "server operations"
 ---
 
 Quick-start copy-paste examples for common Catalyst operations. For deep-dive guides, see [automation](/docs/automation/automation/).
@@ -461,7 +461,7 @@ curl http://localhost:3000/api/servers/srv_xyz789/files/list \
 
 ## Admin Operations
 
-> **Scope:** Admin-only endpoints require `admin` role or the `allPermissions` flag. See [admin-guide](/docs/admin-guide/admin-guide/).
+> **Scope:** Admin-only endpoints require sufficient role permissions (for example `admin.write` or `*`). An API key with `allPermissions: true` only carries the **owning user’s live permissions**, not a synthetic superuser grant. See [admin-guide](/docs/admin-guide/admin-guide/).
 
 ### List Users
 

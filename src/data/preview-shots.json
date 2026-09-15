@@ -1,6 +1,10 @@
 {
   "shots": [
     {
+      "src": "/img/screenshots/user/404-not-found.png",
+      "alt": "Catalyst 404 not found"
+    },
+    {
       "src": "/img/screenshots/user/dashboard.png",
       "alt": "Catalyst dashboard"
     },
@@ -9,13 +13,9 @@
       "alt": "Catalyst profile"
     },
     {
-      "src": "/img/screenshots/user/server-test.png",
-      "alt": "Catalyst server test"
-    },
-    {
-      "src": "/img/screenshots/user/servers.png",
-      "alt": "Catalyst servers"
+      "src": "/img/screenshots/user/server-shotbot-test-server-tab-activity.png",
+      "alt": "Catalyst server shotbot test server tab activity"
     }
   ],
-  "heroShot": "/img/screenshots/user/dashboard.png"
+  "heroShot": "/img/screenshots/user/404-not-found.png"
 }

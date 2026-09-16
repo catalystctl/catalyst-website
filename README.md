@@ -11,7 +11,8 @@
 <p align="center">
   <a href="https://catalystctl.com/">Live Site</a> ·
   <a href="https://github.com/catalystctl/catalyst">Catalyst Panel</a> ·
-  <a href="https://catalystctl.com/screenshots/">Screenshots</a>
+  <a href="https://demo.catalystctl.com/">Live Demo</a> ·
+  <a href="https://docs.catalystctl.com/">Docs</a>
 </p>
 
 ---
@@ -22,11 +23,11 @@ The website is built with [Astro](https://astro.build) and [Tailwind CSS](https:
 
 | Page | Description |
 |------|-------------|
-| **[Homepage](https://catalystctl.com/)** | Overview with features, quick start, architecture diagram, and screenshot previews |
+| **[Homepage](https://catalystctl.com/)** | Overview with features, quick start, architecture diagram, and live demo CTA |
 | **[Pterodactyl Alternative](https://catalystctl.com/pterodactyl-alternative/)** | Why switch + detailed Catalyst vs Pterodactyl comparison tables |
 | **[Migrate from Pterodactyl](https://catalystctl.com/migrate-from-pterodactyl/)** | Step-by-step migration guide with auto-migration tool details |
-| **[Screenshots](https://catalystctl.com/screenshots/)** | Full gallery of all panel screenshots organized by section (auth, user, admin) |
-| **[Documentation](https://catalystctl.com/docs/)** | Installation, configuration, nodes, plugins, and API reference |
+| **[Live Demo](https://demo.catalystctl.com/)** | Interactive demo panel with a mock Minecraft server (hosted separately) |
+| **[Documentation](https://docs.catalystctl.com/)** | Hosted separately at docs.catalystctl.com |
 
 ## Tech Stack
 
@@ -45,14 +46,9 @@ The site uses the same design language as the Catalyst panel:
 - **Components:** Mirrors panel patterns (PageHeader, StatsCard, Sidebar section labels, BrandFooter)
 - **Tokens:** All CSS variables and Tailwind config values are pulled from the panel source
 
-## Screenshots
+## Product Tour
 
-Screenshots are sourced from the [catalyst](https://github.com/catalystctl/catalyst) repository via a git submodule with sparse checkout (only `docs/screenshots` is pulled). At build time, `scripts/copy-screenshots.sh` copies them into `public/img/screenshots/`.
-
-```sh
-# Update screenshots from the main repo
-git submodule update --remote catalyst
-```
+Instead of static screenshots, the site links to the [live demo](https://demo.catalystctl.com/) — an interactive demo panel with a mock Minecraft server. Old `/screenshots/` URLs 301-redirect to the demo (see `astro.config.mjs` and `public/_redirects`).
 
 ## Development
 
@@ -60,7 +56,7 @@ git submodule update --remote catalyst
 # Install dependencies
 npm install
 
-# Start dev server (screenshots are copied automatically)
+# Start dev server
 npm run dev
 
 # Build for production
@@ -97,13 +93,12 @@ gh variable set CLOUDFLARE_ACCOUNT_ID -R catalystctl/catalyst-website -b "<accou
 npm run deploy   # build + wrangler deploy
 ```
 
-The `wrangler.jsonc` configures the Cloudflare adapter. Static pages are prerendered at build time; the docs index uses SSR for dynamic content collection rendering.
+The `wrangler.jsonc` configures the Cloudflare adapter. Static pages are prerendered at build time.
 
 ## Project Structure
 
 ```
 ├── .github/                      # GitHub config
-├── catalyst/                     # Git submodule → docs/screenshots
 ├── public/
 │   ├── favicon.ico               # Legacy favicon
 │   ├── favicon.svg               # Modern SVG favicon
@@ -111,31 +106,21 @@ The `wrangler.jsonc` configures the Cloudflare adapter. Static pages are prerend
 │   ├── og-default.png            # Default Open Graph image (1200x630)
 │   ├── og-default.svg            # OG image source
 │   ├── robots.txt                # Search engine crawl directives
-│   ├── _redirects                # Cloudflare Pages redirects
-│   ├── _headers                  # Cloudflare Pages cache/security headers
-│   └── img/screenshots/          # Copied at build time (gitignored)
+│   ├── _redirects                # Redirects (docs + screenshots moves)
+│   └── _headers                  # Cloudflare cache/security headers
 ├── scripts/
-│   ├── copy-screenshots.sh       # Copies submodule screenshots → public/
-│   ├── sync-docs.sh              # Syncs documentation from catalyst repo
-│   ├── generate-screenshot-data.js  # Generates screenshot JSON data
+│   ├── generate-github-stats.js  # Generates GitHub stats JSON data
 │   ├── render-og.mjs             # Renders OG SVG → PNG
-│   └── setup.sh                  # Initial project setup
 ├── src/
-│   ├── content/docs/             # Documentation markdown files
-│   ├── data/                     # JSON data files for screenshots
+│   ├── content/blog/             # Blog markdown files
+│   ├── data/                     # JSON data files (GitHub stats)
 │   ├── layouts/
-│   │   ├── Layout.astro          # Shared layout (header, footer, SEO, JSON-LD)
-│   │   └── DocsLayout.astro      # Documentation layout (sidebar, TOC)
+│   │   └── Layout.astro          # Shared layout (header, footer, SEO, JSON-LD)
 │   ├── pages/
 │   │   ├── 404.astro             # Custom 404 page
 │   │   ├── index.astro           # Homepage
-│   │   ├── screenshots.astro     # Screenshot gallery
 │   │   ├── pterodactyl-alternative.astro  # Pterodactyl alternative + comparison
-│   │   ├── vs-pterodactyl.astro  # Redirect → /pterodactyl-alternative/
-│   │   ├── migrate-from-pterodactyl.astro # Migration guide
-│   │   └── docs/
-│   │       ├── index.astro       # Docs landing page
-│   │       └── [...slug].astro   # Individual doc pages
+│   │   └── migrate-from-pterodactyl.astro # Migration guide
 │   ├── styles/global.css         # Tailwind + Obsidian design tokens
 │   └── content.config.ts         # Content collection schema
 ├── astro.config.mjs              # Astro configuration (hybrid + Cloudflare)

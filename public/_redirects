@@ -3,4 +3,12 @@
 /vs-pterodactyl  /pterodactyl-alternative  301
 /vs-pterodactyl/  /pterodactyl-alternative/  301
 
+# Docs moved to docs.catalystctl.com
+/docs  https://docs.catalystctl.com/  301
+/docs/*  https://docs.catalystctl.com/:splat  301
+
+# Screenshots replaced by the live demo
+/screenshots  https://demo.catalystctl.com/  301
+/screenshots/*  https://demo.catalystctl.com/  301
+
 # HTTP to HTTPS is handled automatically by Cloudflare Pages

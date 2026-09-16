@@ -6,14 +6,11 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "prebuild": "scripts/sync-docs.sh && scripts/copy-screenshots.sh && node scripts/generate-screenshot-data.js && node scripts/generate-github-stats.js",
-    "predev": "scripts/sync-docs.sh && scripts/copy-screenshots.sh",
+    "prebuild": "node scripts/generate-github-stats.js",
     "dev": "astro dev",
     "build": "astro build",
     "preview": "npm run build && wrangler dev",
     "astro": "astro",
-    "screenshots": "scripts/copy-screenshots.sh",
-    "docs": "scripts/sync-docs.sh",
     "generate-types": "wrangler types",
     "deploy": "npm run build && wrangler deploy"
   },

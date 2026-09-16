@@ -1,18 +1,8 @@
 ---
-export const prerender = true;
+export const prerender = false;
 
-import DocsLayout from '../../layouts/DocsLayout.astro';
-import { getCollection, render } from 'astro:content';
-
-export async function getStaticPaths() {
-  const entries = await getCollection('docs');
-  return entries.map(entry => ({
-    params: { slug: entry.id },
-    props: { entry, entries },
-  }));
-}
-
-const { entry, entries } = Astro.props;
+const slug = Astro.params.slug ?? "";
+const path = slug ? `${slug}/` : "";
+const target = `https://docs.catalystctl.com/${path}${Astro.url.search}`;
+return Astro.redirect(target, 301);
 ---
-
-<DocsLayout entry={entry} entries={entries} />

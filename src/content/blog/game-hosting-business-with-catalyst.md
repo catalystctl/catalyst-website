@@ -244,4 +244,4 @@ If you're building a hosting business, the differences matter:
 
 Migrating from Pterodactyl? Our [migration guide for 50+ servers](/blog/migrate-50-servers-from-pterodactyl/) and the [automated import walkthrough](/migrate-from-pterodactyl/) cover the full cutover.
 
-Catalyst is free, open source, and GPLv3. There are no licensing costs or per-server fees. [Get started](/docs/getting-started/quickstart/) and have your first server running in under a minute. For enterprise requirements, see [enterprise management and compliance](/blog/enterprise-game-server-management/).
+Catalyst is free, open source, and GPLv3. There are no licensing costs or per-server fees. [Get started](https://docs.catalystctl.com/getting-started/quickstart/) and have your first server running in under a minute. For enterprise requirements, see [enterprise management and compliance](/blog/enterprise-game-server-management/).

@@ -11,6 +11,10 @@ export default defineConfig({
   trailingSlash: "always",
   output: "server",
   compressHTML: true,
+  redirects: {
+    "/docs/": "https://docs.catalystctl.com/",
+    "/screenshots/": "https://demo.catalystctl.com/",
+  },
 
   build: {
     inlineStylesheets: "auto",
@@ -38,10 +42,7 @@ export default defineConfig({
         else if (url === 'https://catalystctl.com/blog/' || url === 'https://catalystctl.com/blog') item.priority = 0.85;
         else if (url.includes('/migrate-from-pterodactyl')) item.priority = 0.85;
         else if (url.includes('/about')) item.priority = 0.8;
-        else if (url === 'https://catalystctl.com/docs/' || url === 'https://catalystctl.com/docs') item.priority = 0.8;
         else if (url.includes('/blog/')) item.priority = 0.75;
-        else if (url.includes('/docs/')) item.priority = 0.7;
-        else if (url.includes('/screenshots')) item.priority = 0.6;
         // Per-page lastmod is handled by a custom sitemap reading
         // content collections (blog pubDate/updatedDate). Don't set a build-time
         // new Date() here — it stamps every URL identically and kills freshness signals.

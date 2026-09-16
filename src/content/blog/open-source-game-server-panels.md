@@ -165,6 +165,6 @@ All four panels are open source and free to use. That means:
 
 ## Getting started
 
-If you're new to game server panels, start with Catalyst's [quick start guide](/docs/getting-started/quickstart/). One command installs the panel; game nodes need containerd plus the agent.
+If you're new to game server panels, start with Catalyst's [quick start guide](https://docs.catalystctl.com/getting-started/quickstart/). One command installs the panel; game nodes need containerd plus the agent.
 
 For a broader comparison, check out [every Pterodactyl alternative in the 2026 buyer's guide](/blog/pterodactyl-alternatives-2026/) and the [three-way Pterodactyl vs Pelican vs Catalyst comparison](/blog/pterodactyl-vs-pelican-vs-catalyst/). For the infrastructure angle, see [why platforms are moving to Rust](/blog/why-game-server-platforms-moving-to-rust/).

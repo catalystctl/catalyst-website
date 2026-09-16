@@ -42,12 +42,14 @@ const fullTitle = title === "Home"
   : title.includes("Catalyst") ? title : `${title} - Catalyst`;
 const ogImageUrl = ogImage ? new URL(ogImage, siteUrl).toString() : siteUrl + B + "og-default.png";
 
+const DOCS_URL = "https://docs.catalystctl.com/";
+const DEMO_URL = "https://demo.catalystctl.com/";
 const navLinks = [
   { href: B, label: "Home", match: (p: string) => p === B || p === "/" },
   { href: B + "pterodactyl-alternative/", label: "Compare", match: (p: string) => p.includes("pterodactyl-alternative") || p.includes("migrate-from-pterodactyl") },
   { href: B + "blog/", label: "Blog", match: (p: string) => p.includes("/blog") },
-  { href: B + "docs/", label: "Docs", match: (p: string) => p.includes("/docs") },
-  { href: B + "screenshots/", label: "Screenshots", match: (p: string) => p.includes("/screenshots") },
+  { href: DOCS_URL, label: "Docs", match: (_p: string) => false },
+  { href: DEMO_URL, label: "Demo", match: (_p: string) => false },
 ];
 
 const path = Astro.url.pathname.endsWith("/") ? Astro.url.pathname : Astro.url.pathname + "/";
@@ -61,14 +63,10 @@ const articleType = schemaType || (isArticle ? "TechArticle" : "Article");
 // Determine isPartOf URL based on article context
 const isPartOfUrl = Astro.url.pathname.includes("/blog/")
   ? siteUrl + B + "blog/"
-  : Astro.url.pathname.includes("/docs/")
-    ? siteUrl + B + "docs/"
-    : siteUrl + B;
+  : siteUrl + B;
 const isPartOfName = Astro.url.pathname.includes("/blog/")
   ? "Catalyst Blog"
-  : Astro.url.pathname.includes("/docs/")
-    ? "Catalyst Documentation"
-    : "Catalyst";
+  : "Catalyst";
 
 const jsonLd = isArticle
   ? {
@@ -443,7 +441,7 @@ const breadcrumbLd = breadcrumbItems && breadcrumbItems.length > 0
             <ul class="space-y-2">
               <li><a href={B + "pterodactyl-alternative/"} class="text-sm text-zinc-500 hover:text-zinc-200 transition-colors">Compare</a></li>
               <li><a href={B + "migrate-from-pterodactyl/"} class="text-sm text-zinc-500 hover:text-zinc-200 transition-colors">Migrate</a></li>
-              <li><a href={B + "screenshots/"} class="text-sm text-zinc-500 hover:text-zinc-200 transition-colors">Screenshots</a></li>
+              <li><a href={DEMO_URL} target="_blank" rel="noopener noreferrer" class="text-sm text-zinc-500 hover:text-zinc-200 transition-colors">Demo</a></li>
               <li><a href={B + "#install"} class="text-sm text-zinc-500 hover:text-zinc-200 transition-colors">Install</a></li>
             </ul>
           </div>
@@ -451,7 +449,7 @@ const breadcrumbLd = breadcrumbItems && breadcrumbItems.length > 0
           <div>
             <h2 class="text-xs font-semibold text-zinc-300 mb-3">Resources</h2>
             <ul class="space-y-2">
-              <li><a href={B + "docs/"} class="text-sm text-zinc-500 hover:text-zinc-200 transition-colors">Docs</a></li>
+              <li><a href={DOCS_URL} class="text-sm text-zinc-500 hover:text-zinc-200 transition-colors">Docs</a></li>
               <li><a href={B + "blog/"} class="text-sm text-zinc-500 hover:text-zinc-200 transition-colors">Blog</a></li>
               <li><a href="https://github.com/catalystctl/catalyst/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer" class="text-sm text-zinc-500 hover:text-zinc-200 transition-colors">Contributing</a></li>
             </ul>

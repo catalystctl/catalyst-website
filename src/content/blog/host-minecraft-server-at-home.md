@@ -166,4 +166,4 @@ If you outgrow your home setup, the same Catalyst panel can manage remote nodes 
 
 Want to compare Catalyst before you commit? See [how Catalyst compares to Pterodactyl](/pterodactyl-alternative/#comparison). Existing Pterodactyl user? Our [migration guide](/migrate-from-pterodactyl/) walks through the import.
 
-Ready to get started? [Install Catalyst](/docs/getting-started/quickstart/) and have your server running in under five minutes.
+Ready to get started? [Install Catalyst](https://docs.catalystctl.com/getting-started/quickstart/) and have your server running in under five minutes.

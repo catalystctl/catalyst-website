@@ -1,24 +1,24 @@
 {
   "repo": "catalystctl/catalyst",
   "repoUrl": "https://github.com/catalystctl/catalyst",
-  "commits": 1311,
-  "releases": 237,
+  "commits": 1317,
+  "releases": 240,
   "contributors": 8,
   "stars": 27,
   "forks": 6,
-  "lastPushedAt": "2026-09-16T02:10:25Z",
+  "lastPushedAt": "2026-09-16T22:27:09Z",
   "latestRelease": {
-    "tag": "v1.58.1",
-    "publishedAt": "2026-09-16T01:56:55Z",
-    "url": "https://github.com/catalystctl/catalyst/releases/tag/v1.58.1"
+    "tag": "v1.59.2",
+    "publishedAt": "2026-09-16T22:21:51Z",
+    "url": "https://github.com/catalystctl/catalyst/releases/tag/v1.59.2"
   },
   "ci": {
     "state": "passing",
     "label": "Passing",
     "conclusion": "success",
-    "workflow": "Code Quality: Scheduled",
-    "finishedAt": "2026-09-16T18:42:30Z",
-    "url": "https://github.com/catalystctl/catalyst/actions/runs/35135894925"
+    "workflow": "Code Quality: Push on main",
+    "finishedAt": "2026-09-16T22:23:00Z",
+    "url": "https://github.com/catalystctl/catalyst/actions/runs/35157252034"
   },
-  "fetchedAt": "2026-09-16T22:03:43.274Z"
+  "fetchedAt": "2026-09-17T00:25:21.773Z"
 }

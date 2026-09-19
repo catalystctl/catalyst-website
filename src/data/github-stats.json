@@ -1,24 +1,24 @@
 {
   "repo": "catalystctl/catalyst",
   "repoUrl": "https://github.com/catalystctl/catalyst",
-  "commits": 1336,
-  "releases": 249,
+  "commits": 1338,
+  "releases": 250,
   "contributors": 8,
   "stars": 27,
   "forks": 6,
-  "lastPushedAt": "2026-09-18T18:31:54Z",
+  "lastPushedAt": "2026-09-19T01:19:27Z",
   "latestRelease": {
-    "tag": "v1.62.1",
-    "publishedAt": "2026-09-18T18:30:32Z",
-    "url": "https://github.com/catalystctl/catalyst/releases/tag/v1.62.1"
+    "tag": "v1.62.2",
+    "publishedAt": "2026-09-19T01:17:56Z",
+    "url": "https://github.com/catalystctl/catalyst/releases/tag/v1.62.2"
   },
   "ci": {
     "state": "passing",
     "label": "Passing",
     "conclusion": "success",
-    "workflow": "github_actions in / for actions/checkout - Update #1582266700",
-    "finishedAt": "2026-09-18T18:31:54Z",
-    "url": "https://github.com/catalystctl/catalyst/actions/runs/35380645750"
+    "workflow": "cargo in /catalyst-agent for aes-gcm - Update #1582719997",
+    "finishedAt": "2026-09-19T01:19:31Z",
+    "url": "https://github.com/catalystctl/catalyst/actions/runs/35412246218"
   },
-  "fetchedAt": "2026-09-19T00:12:06.038Z"
+  "fetchedAt": "2026-09-19T05:44:18.107Z"
 }

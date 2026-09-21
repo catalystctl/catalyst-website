@@ -6,19 +6,19 @@
   "contributors": 8,
   "stars": 27,
   "forks": 6,
-  "lastPushedAt": "2026-09-19T01:19:27Z",
+  "lastPushedAt": "2026-09-21T09:27:05Z",
   "latestRelease": {
     "tag": "v1.62.2",
     "publishedAt": "2026-09-19T01:17:56Z",
     "url": "https://github.com/catalystctl/catalyst/releases/tag/v1.62.2"
   },
   "ci": {
-    "state": "failing",
-    "label": "Failing",
-    "conclusion": "failure",
-    "workflow": "E2E LXC Minecraft",
-    "finishedAt": "2026-09-20T08:13:37Z",
-    "url": "https://github.com/catalystctl/catalyst/actions/runs/35498938862"
+    "state": "running",
+    "label": "Running",
+    "conclusion": "success",
+    "workflow": "npm_and_yarn in / for @fastify/helmet, @fastify/multipart, fastify, uuid, react-router-dom, zustand - Update #1585107438",
+    "finishedAt": "2026-09-21T09:22:20Z",
+    "url": "https://github.com/catalystctl/catalyst/actions/runs/35582367816"
   },
-  "fetchedAt": "2026-09-21T06:10:48.241Z"
+  "fetchedAt": "2026-09-21T13:56:52.636Z"
 }

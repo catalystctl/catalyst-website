@@ -1,7 +1,8 @@
 ---
 title: "containerd vs Docker for Game Servers: Why the Runtime Matters"
-description: "A technical deep dive into why containerd is replacing Docker as the container runtime for game servers. Performance benchmarks, memory overhead comparison, and what this means for hosting providers."
+description: "A technical look at why containerd is replacing Docker as the container runtime for game servers. Performance benchmarks, memory overhead comparison, and what this means for hosting providers."
 pubDate: 2026-04-05
+updatedDate: 2026-09-25
 author: "Catalyst Team"
 audience: ["enterprises", "hosting-providers", "businesses"]
 keywords:
@@ -11,9 +12,22 @@ keywords:
   - docker overhead
   - game server performance
   - kubernetes game server
+faqs:
+  - q: "Is containerd faster than Docker for game servers?"
+    a: "containerd removes the Docker daemon from the critical path, so container start, stop, and restart operations go through fewer layers. Catalyst has not published an independent head-to-head benchmark, so measure container start time and memory on your own hardware and games rather than assuming a multiple."
+  - q: "Can containerd run existing Docker images?"
+    a: "Yes. containerd runs the same OCI images as Docker, so most game server images work unchanged. The practical exception is Docker Compose-specific behaviour inside a container, which does not apply when the node talks to containerd directly. That affects a small minority of images."
+  - q: "Can I run Pterodactyl Docker images on Catalyst's containerd nodes?"
+    a: "Yes. Catalyst imports Pterodactyl eggs and converts them into templates, and Pterodactyl's Docker images run under containerd because they are OCI images. Review eggs that depend on Docker-only features or Compose files before moving them to production."
+  - q: "Do I need to uninstall Docker to use Catalyst?"
+    a: "Game nodes need containerd plus the Catalyst agent, not the Docker daemon. The panel itself ships as a Docker Compose stack with four containers (frontend, backend, PostgreSQL, and Redis), so Docker stays on the panel host and disappears from game nodes."
+  - q: "Is Docker still fine for game servers?"
+    a: "Yes for small deployments. Under roughly 50 servers per host the daemon overhead is negligible, and Docker remains convenient for development and staging because of its CLI and Compose tooling. The containerd advantage grows with node density and multi-tenant security requirements."
+  - q: "What is the security difference between Docker and containerd for game hosting?"
+    a: "containerd exposes no user-facing REST API socket, so there is no Docker socket to grant root-equivalent access, and its daemon is a much smaller target. Both runtimes use the same Linux namespaces and cgroups for container isolation, so the difference is the daemon's attack surface, not the isolation mechanism."
 ---
 
-If you're running game servers in containers, you're probably using Docker. It's the default - every major game server panel (Pterodactyl, Pelican, PufferPanel) uses Docker as its container runtime.
+If you're running game servers in containers, you're probably using Docker. It's the default: every major game server panel (Pterodactyl, Pelican, PufferPanel) uses Docker as its container runtime.
 
 But there's a shift happening. Kubernetes moved to containerd as its default runtime in 2022. Cloud providers are dropping the Docker daemon in favor of containerd. And Catalyst is the first game server panel built directly on containerd, without Docker in the middle.
 
@@ -60,10 +74,10 @@ Catalyst talks directly to containerd. No Docker daemon, no extra API layer, no 
 ### What this means in practice
 
 Every layer adds:
-- **Memory overhead** - Each daemon process uses RAM
-- **Latency** - API calls go through more hops
-- **Attack surface** - More code running means more potential vulnerabilities
-- **Failure points** - More processes that can crash
+- **Memory overhead**: Each daemon process uses RAM
+- **Latency**: API calls go through more hops
+- **Attack surface**: More code running means more potential vulnerabilities
+- **Failure points**: More processes that can crash
 
 ## Performance benchmarks
 
@@ -78,7 +92,7 @@ We ran identical game server workloads on Docker and containerd, measuring the d
 | 50 containers total | ~480MB | ~170MB | 65% |
 | 200 containers total | ~1.7GB | ~620MB | 64% |
 
-The Docker daemon itself uses 60MB more than containerd at baseline. The per-container overhead is smaller but adds up - 200 containers saves over 1GB of RAM with containerd.
+The Docker daemon itself uses 60MB more than containerd at baseline. The per-container overhead is smaller but adds up: 200 containers saves over 1GB of RAM with containerd.
 
 **What this means for hosting providers:** On a 64GB node running 200 Minecraft servers, containerd gives you 1GB more RAM for actual game servers. That's 4-5 additional servers per node, which is $20-50/month of additional revenue per node.
 
@@ -116,14 +130,14 @@ Image pulling is similar because both use the same underlying image distribution
 - Single lightweight process (`containerd`) per node
 - No daemon-level API that exposes container management to unauthorized users
 - Updates to containerd can be done without restarting running containers
-- Smaller attack surface - no Docker socket, no REST API on the daemon
+- Smaller attack surface: no Docker socket, no REST API on the daemon
 
 ### Kubernetes alignment
 
 If you're running or planning to run Kubernetes alongside your game servers (for web services, billing, monitoring, etc.), containerd is the standard runtime. Using containerd for game servers means:
 
 - **Consistent tooling** across your infrastructure
-- **Shared operational knowledge** - your team already knows how to manage containerd
+- **Shared operational knowledge**: your team already knows how to manage containerd
 - **Easier migration** if you want to run game servers inside Kubernetes in the future
 
 ### Image compatibility
@@ -149,7 +163,7 @@ containerd has a smaller codebase, no user-facing API socket, and fewer historic
 
 ### Container isolation
 
-Both Docker and containerd use the same Linux namespace and cgroup mechanisms for isolation. The isolation quality is identical - the difference is in the daemon's attack surface, not the container's isolation properties.
+Both Docker and containerd use the same Linux namespace and cgroup mechanisms for isolation. The isolation quality is identical; the difference is in the daemon's attack surface, not the container's isolation properties.
 
 ## When Docker is fine
 
@@ -173,18 +187,18 @@ The containerd advantage grows with scale:
 
 ## Catalyst's containerd implementation
 
-Catalyst doesn't just use containerd - it's designed around containerd's strengths:
+Catalyst doesn't just use containerd; it's designed around containerd's strengths:
 
 - **Direct gRPC communication** with containerd for all container operations
 - **Per-server namespace isolation** matching Kubernetes best practices
 - **Overlayfs snapshots** for efficient image and container storage
 - **Resource management** via cgroups v2 for accurate per-server limits
-- **No Docker dependency** - the node agent is a single Rust binary that talks to containerd directly
+- **No Docker dependency**: the node agent is a single Rust binary that talks to containerd directly
 
 The result is a game server panel that uses less RAM per server, starts containers faster, and has a smaller attack surface than any Docker-based alternative.
 
 ## The bottom line
 
-Docker is a developer convenience tool that adds overhead for production workloads. containerd is a production runtime designed for scale. For game server management at any serious scale, containerd is the better choice - and Catalyst is the only panel that uses it natively.
+Docker is a developer convenience tool that adds overhead for production workloads. containerd is a production runtime designed for scale. For game server management at any serious scale, containerd is the better choice, and Catalyst is the only panel that uses it natively.
 
 [See how Catalyst's performance compares](/pterodactyl-alternative/#comparison) to Docker-based panels, or [try it yourself](https://docs.catalystctl.com/getting-started/quickstart/) with a one-line install. For the compliance and RBAC story that enterprises pair with this, see [enterprise management](/blog/enterprise-game-server-management/).

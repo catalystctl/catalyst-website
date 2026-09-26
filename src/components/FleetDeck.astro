@@ -1,0 +1,243 @@
+---
+/**
+ * FleetDeck: the panel's server ledger, reproduced for the marketing site.
+ * Filter tabs, inline search, mono resource meters, status LEDs and a
+ * keyboard-hint status bar. Static data; filtering runs client-side.
+ */
+const GAME_HUE: Record<string, string> = {
+  minecraft: "var(--game-minecraft)",
+  cs: "var(--game-cs)",
+  rust: "var(--game-rust)",
+  ark: "var(--game-ark)",
+  valheim: "var(--game-valheim)",
+  generic: "var(--game-generic)",
+};
+
+type State = "running" | "stopped" | "starting";
+
+interface Server {
+  name: string;
+  game: string;
+  badge: string;
+  hue: keyof typeof GAME_HUE;
+  address: string;
+  state: State;
+  owned: boolean;
+  cpu: number | null;
+  ram: number | null;
+  disk: number | null;
+}
+
+const servers: Server[] = [
+  { name: "demo-paper-01", game: "PaperMC", badge: "MC", hue: "minecraft", address: "203.0.113.10:25565", state: "running", owned: true, cpu: 23, ram: 54, disk: 30 },
+  { name: "demo-forge-01", game: "Forge", badge: "MC", hue: "minecraft", address: "203.0.113.10:25566", state: "stopped", owned: true, cpu: null, ram: null, disk: null },
+  { name: "demo-vanilla-01", game: "Vanilla", badge: "MC", hue: "minecraft", address: "198.51.100.20:25567", state: "starting", owned: true, cpu: 2, ram: 0, disk: 0 },
+  { name: "demo-cs16-01", game: "Counter-Strike 1.6", badge: "CS", hue: "cs", address: "203.0.113.10:27015", state: "running", owned: false, cpu: 11, ram: 9, disk: 10 },
+];
+
+const STATE_TONE: Record<State, string> = {
+  running: "text-success",
+  stopped: "text-muted-foreground",
+  starting: "text-warning",
+};
+const STATE_LED: Record<State, string> = {
+  running: "bg-success",
+  stopped: "bg-muted-foreground/50",
+  starting: "bg-warning",
+};
+
+const counts = {
+  all: servers.length,
+  owned: servers.filter((s) => s.owned).length,
+  other: servers.filter((s) => !s.owned).length,
+  running: servers.filter((s) => s.state === "running").length,
+  stopped: servers.filter((s) => s.state === "stopped").length,
+};
+
+const COLS = "grid-cols-1 md:grid-cols-[minmax(0,1fr)_7rem_9rem_5.5rem_4.5rem] xl:grid-cols-[minmax(0,1fr)_6.5rem_5rem_5rem_5rem_9.5rem_5.5rem_4.5rem]";
+---
+
+<div class="deck-panel overflow-hidden" data-fleet-deck>
+  <!-- Toolbar -->
+  <div class="deck-toolbar">
+    <div class="deck-tabs" role="tablist" aria-label="Server scope">
+      <button type="button" class="deck-tab is-active" role="tab" aria-selected="true" data-filter="all">
+        <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>
+        <span>All</span>
+        <span class="deck-tab-count">{counts.all}</span>
+      </button>
+      <button type="button" class="deck-tab" role="tab" aria-selected="false" data-filter="owned">
+        <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>
+        <span>Owned</span>
+        <span class="deck-tab-count">{counts.owned}</span>
+      </button>
+      <button type="button" class="deck-tab" role="tab" aria-selected="false" data-filter="other">
+        <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+        <span>Other</span>
+        <span class="deck-tab-count">{counts.other}</span>
+      </button>
+    </div>
+
+    <label class="deck-field">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.34-4.34"/></svg>
+      <input type="search" class="deck-input" placeholder="Search by name or node..." aria-label="Search servers" data-search />
+    </label>
+
+    <select class="deck-select" aria-label="All statuses" data-status>
+      <option value="__all__">All statuses</option>
+      <option value="running">Running</option>
+      <option value="stopped">Stopped</option>
+      <option value="starting">Starting</option>
+    </select>
+  </div>
+
+  <!-- Header -->
+  <div class:list={["deck-row hidden md:grid border-b border-border/50 bg-surface-1/40", COLS]} role="row">
+    <span class="deck-th" role="columnheader">Server</span>
+    <span class="deck-th hidden md:block" role="columnheader">Game</span>
+    <span class="deck-th hidden justify-end xl:flex" role="columnheader">CPU</span>
+    <span class="deck-th hidden justify-end xl:flex" role="columnheader">RAM</span>
+    <span class="deck-th hidden justify-end xl:flex" role="columnheader">Disk</span>
+    <span class="deck-th hidden md:block" role="columnheader">Address</span>
+    <span class="deck-th hidden md:block" role="columnheader">State</span>
+    <span class="deck-th text-right" role="columnheader">Actions</span>
+  </div>
+
+  <!-- Rows -->
+  <div data-rows>
+    {servers.map((s) => (
+      <div
+        class:list={["deck-row border-b border-border/40 last:border-b-0 focus-visible:bg-primary/10 outline-none", COLS]}
+        role="row"
+        tabindex="0"
+        data-name={`${s.name} ${s.game}`.toLowerCase()}
+        data-state={s.state}
+        data-owned={s.owned ? "1" : "0"}
+      >
+        <!-- Identity -->
+        <div class="flex min-w-0 items-center gap-2">
+          <span class="led-wrap" aria-hidden="true">
+            {s.state === "running" && <span class:list={["led-pulse", STATE_LED[s.state]]}></span>}
+            <span class:list={["led", STATE_LED[s.state]]}></span>
+          </span>
+          <span class="game-badge" style={`--game:${GAME_HUE[s.hue]}`} title={s.game}>{s.badge}</span>
+          <div class="flex min-w-0 flex-col leading-tight">
+            <a href="https://demo.catalystctl.com/servers" target="_blank" rel="noopener noreferrer" class="entity-link -my-0.5 min-h-6">
+              <span class="truncate">{s.name}</span>
+            </a>
+            <span class="flex items-center gap-2 text-micro text-muted-foreground md:hidden">
+              <span class="truncate font-mono">{s.address}</span>
+              <span class:list={["shrink-0 uppercase", STATE_TONE[s.state]]}>{s.state}</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Game -->
+        <span class="hidden min-w-0 md:block">
+          <span class="block truncate text-micro text-muted-foreground">{s.game}</span>
+        </span>
+
+        <!-- Meters -->
+        {[s.cpu, s.ram, s.disk].map((v) => (
+          <span class="hidden items-center justify-end gap-2 xl:flex">
+            <span class="meter" aria-hidden="true">
+              <span class="meter-fill" style={`width:${v ?? 0}%`}></span>
+            </span>
+            <span class="min-w-[3rem] text-right font-mono text-micro tabular-nums text-foreground">{v === null ? "-" : `${v}%`}</span>
+          </span>
+        ))}
+
+        <!-- Address -->
+        <span class="hidden min-w-0 md:block">
+          <a href="https://demo.catalystctl.com/servers" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 font-mono text-micro text-muted-foreground hover:text-primary transition-colors">
+            <svg class="h-3 w-3 shrink-0 opacity-60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            <span class="truncate">{s.address}</span>
+          </a>
+        </span>
+
+        <!-- State -->
+        <span class="hidden md:block">
+          <span class:list={["type-overline", STATE_TONE[s.state]]}>{s.state}</span>
+        </span>
+
+        <!-- Actions -->
+        <span class="flex items-center justify-end gap-1">
+          <span class="deck-icon-btn" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg></span>
+          <span class="deck-icon-btn" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></span>
+          <span class="deck-icon-btn" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 17l6-6-6-6"/><path d="M12 19h8"/></svg></span>
+        </span>
+      </div>
+    ))}
+  </div>
+
+  <div class="hidden px-3 py-6 text-center text-mini text-muted-foreground" data-empty>No servers match this filter.</div>
+
+  <!-- Status bar -->
+  <div class="deck-statusbar">
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
+      <span class="flex items-center gap-1.5">
+        <span class="led bg-success"></span>
+        <span class="font-mono text-micro tabular-nums text-muted-foreground">{counts.running}</span>
+        <span class="type-overline">Running</span>
+      </span>
+      <span class="flex items-center gap-1.5">
+        <span class="led bg-muted-foreground/50"></span>
+        <span class="font-mono text-micro tabular-nums text-muted-foreground">{counts.stopped}</span>
+        <span class="type-overline">Stopped</span>
+      </span>
+      <span class="flex items-center gap-1.5">
+        <span class="led bg-warning"></span>
+        <span class="font-mono text-micro tabular-nums text-muted-foreground">1</span>
+        <span class="type-overline">Issues</span>
+      </span>
+    </div>
+    <div class="hidden flex-wrap items-center gap-x-3 gap-y-1 sm:flex">
+      <span class="deck-keyhint"><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
+      <span class="deck-keyhint"><kbd>↵</kbd> open</span>
+      <span class="deck-keyhint"><kbd>⌘</kbd> actions</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-fleet-deck]');
+  if (root) {
+    const tabs = [...root.querySelectorAll<HTMLElement>('[data-filter]')];
+    const search = root.querySelector<HTMLInputElement>('[data-search]');
+    const status = root.querySelector<HTMLSelectElement>('[data-status]');
+    const rows = [...root.querySelectorAll<HTMLElement>('[data-name]')];
+    const empty = root.querySelector<HTMLElement>('[data-empty]');
+    let filter = 'all';
+
+    const apply = () => {
+      const q = (search?.value || '').trim().toLowerCase();
+      const st = status?.value || '__all__';
+      let shown = 0;
+      rows.forEach((row) => {
+        const scopeOk =
+          filter === 'all' ||
+          (filter === 'owned' ? row.dataset.owned === '1' : row.dataset.owned === '0');
+        const nameOk = !q || (row.dataset.name || '').includes(q);
+        const stateOk = st === '__all__' || row.dataset.state === st;
+        const ok = scopeOk && nameOk && stateOk;
+        row.hidden = !ok;
+        if (ok) shown++;
+      });
+      if (empty) empty.classList.toggle('hidden', shown > 0);
+    };
+
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        filter = tab.dataset.filter || 'all';
+        tabs.forEach((t) => {
+          const on = t === tab;
+          t.classList.toggle('is-active', on);
+          t.setAttribute('aria-selected', on ? 'true' : 'false');
+        });
+        apply();
+      });
+    });
+    search?.addEventListener('input', apply);
+    status?.addEventListener('change', apply);
+  }
+</script>

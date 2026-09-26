@@ -2,6 +2,7 @@
 title: "How to Build a Game Hosting Business with Catalyst"
 description: "A practical guide to launching a game server hosting business using Catalyst. Covers infrastructure planning, pricing, billing integration, support workflows, and scaling from 0 to 500 servers."
 pubDate: 2026-05-05
+updatedDate: 2026-09-25
 author: "Catalyst Team"
 audience: ["businesses", "hosting-providers"]
 keywords:
@@ -11,11 +12,24 @@ keywords:
   - catalyst hosting
   - game panel business
   - minecraft hosting business
+faqs:
+  - q: "How much does it cost to start a game hosting business?"
+    a: "A realistic first phase is roughly $100-200 per month: a small VPS for the panel and PostgreSQL, two or three nodes with good CPU and RAM, and storage for backups. The panel software is free under GPLv3 and there are no per-server licence fees, so infrastructure and your time are the real costs."
+  - q: "How do I integrate WHMCS with Catalyst?"
+    a: "Two ways. You can call the Catalyst REST API directly to create, suspend, unsuspend, and delete servers, or you can write a TypeScript plugin that listens for server events and calls your billing system. Both avoid depending on a community-maintained third-party module."
+  - q: "Is Catalyst free for commercial game hosting?"
+    a: "Yes. The panel is GPLv3 and the Rust node agent is MIT/Apache-2.0, with no paid tiers or feature gates and no per-server fees. If you modify the GPLv3 panel and distribute it, you must publish those modifications under the same licence."
+  - q: "How many game servers can one node run?"
+    a: "It depends on the games, their memory limits, and player counts, so measure with your own workload instead of budgeting on density headlines. A node with 64GB of RAM running small Minecraft servers fits far more instances than one running modpacks or ARK. Monitor node memory and CPU in the panel and add capacity before you saturate."
+  - q: "How should I price game server hosting?"
+    a: "Per-resource pricing, such as a rate per GB of RAM plus a CPU allocation, is the most transparent and keeps revenue aligned with your infrastructure costs. Plan tiers are simpler to market, and per-player-slot pricing suits Minecraft communities. Whatever model you choose, price above your real node cost plus payment fees."
+  - q: "Do I need support staff to run a game hosting business?"
+    a: "Not at first, but support is where small hosts spend most of their time. Catalyst's 59-permission RBAC lets you hire support staff with narrow access, such as restarting servers and viewing consoles without permission to delete servers or manage nodes."
 ---
 
-Starting a game server hosting business is more accessible than ever. The demand is real - Minecraft, Counter-Strike 2, Rust, ARK, Palworld, and dozens of other games have thriving communities that need reliable servers. The challenge is doing it profitably at scale.
+Starting a game server hosting business is practical for small teams today. The demand is real: Minecraft, Counter-Strike 2, Rust, ARK, Palworld, and dozens of other games have thriving communities that need reliable servers. The challenge is doing it profitably at scale.
 
-Catalyst was built with hosting providers in mind. Its API-driven architecture, granular permissions, and plugin system make it possible to automate the things that eat your time as a host - provisioning, billing, support, and monitoring.
+Catalyst was built with hosting providers in mind. Its API-driven architecture, granular permissions, and plugin system make it possible to automate the work that eats your time as a host: provisioning, billing, support, and monitoring.
 
 This guide covers the practical steps to launch and grow a game hosting business using Catalyst.
 
@@ -25,11 +39,11 @@ This guide covers the practical steps to launch and grow a game hosting business
 
 A game hosting setup has three components:
 
-1. **The panel** - The web interface where customers manage their servers
-2. **The API** - The backend that handles server operations, user management, and automation
-3. **The nodes** - The machines that actually run the game servers
+1. **The panel:** The web interface where customers manage their servers
+2. **The API:** The backend that handles server operations, user management, and automation
+3. **The nodes:** The machines that actually run the game servers
 
-With Catalyst, the panel and API are a single Rust binary. The nodes run the Catalyst agent (also a Rust binary). All three communicate over your network.
+With Catalyst, the panel and API run as a TypeScript service (Fastify with PostgreSQL and Redis). The nodes run the Catalyst agent, a Rust static binary that talks to containerd. They communicate over your network.
 
 ### Starting small
 
@@ -48,7 +62,7 @@ As you grow, you add more nodes and distribute the load:
 - **Phase 2 (100-500 servers):** Separate the database onto its own server. Add nodes in multiple regions. Set up a load balancer in front of the panel.
 - **Phase 3 (500+ servers):** Run multiple panel instances behind a load balancer. Use managed PostgreSQL. Consider bare-metal nodes for cost efficiency at scale.
 
-Catalyst game nodes run directly on containerd (panel ships via Docker Compose). Test node density with your games — do not budget on efficiency headlines.
+Catalyst game nodes run directly on containerd (panel ships via Docker Compose). Test node density with your games instead of budgeting on efficiency headlines.
 
 ## Setting up billing
 
@@ -64,11 +78,11 @@ With Catalyst, you have two better options:
 
 Catalyst's 200+ API route handlers cover everything a billing system needs:
 
-- **Create server:** `POST /api/servers` - allocate resources, assign a template, start the server
-- **Suspend server:** `POST /api/servers/{id}/suspend` - stop the server without deleting data
-- **Unsuspend server:** `POST /api/servers/{id}/unsuspend` - restore service
-- **Delete server:** `DELETE /api/servers/{id}` - remove the server and free resources
-- **List servers by user:** `GET /api/users/{id}/servers` - for customer dashboards
+- **Create server:** `POST /api/servers` (allocate resources, assign a template, start the server)
+- **Suspend server:** `POST /api/servers/{id}/suspend` (stop the server without deleting data)
+- **Unsuspend server:** `POST /api/servers/{id}/unsuspend` (restore service)
+- **Delete server:** `DELETE /api/servers/{id}` (remove the server and free resources)
+- **List servers by user:** `GET /api/users/{id}/servers` (for customer dashboards)
 
 You can write a WHMCS module or billing integration in a few hours using these endpoints. The API is consistent, well-documented, and returns proper status codes.
 
@@ -102,7 +116,7 @@ export default {
 };
 ```
 
-This approach is more reliable than an external module because the plugin runs inside the panel process - no network hops, no synchronization issues.
+This approach is more reliable than an external module, because the plugin runs inside the panel process: no network hops, no synchronization issues.
 
 ## Pricing your services
 
@@ -136,7 +150,7 @@ Your primary costs are:
 
 ### The ticket problem
 
-Support is where most small hosts spend their time. "My server won't start," "I can't connect," "My server is lagging" - these tickets come in daily.
+Support is where most small hosts spend their time. "My server won't start," "I can't connect," "My server is lagging": these tickets come in daily.
 
 Catalyst helps you handle them efficiently:
 
@@ -162,7 +176,7 @@ This means you can hire support staff without giving them full admin access.
 ### Common support scenarios
 
 **"My server won't start"**
-- Check the console in Catalyst - the error is usually right there
+- Check the console in Catalyst; the error is usually right there
 - Common causes: port conflict, insufficient RAM, corrupted world file
 - Catalyst's auto crash detection will flag recurring issues
 
@@ -172,7 +186,7 @@ This means you can hire support staff without giving them full admin access.
 - Check node connectivity from the admin panel
 
 **"My server is lagging"**
-- Check resource graphs in Catalyst - is the server hitting its memory limit?
+- Check resource graphs in Catalyst. Is the server hitting its memory limit?
 - Suggest switching from Vanilla to Paper for better performance
 - If the node is overloaded, migrate the server to a less busy node
 
@@ -201,7 +215,7 @@ Catalyst's plugin system can send these alerts to Discord, Slack, or PagerDuty.
 
 ### Automated backups
 
-Configure Catalyst to back up every server daily to S3-compatible storage. This protects you and your customers from data loss - and reduces support tickets when someone accidentally deletes their world.
+Configure Catalyst to back up every server daily to S3-compatible storage. This protects you and your customers from data loss, and reduces support tickets when someone accidentally deletes their world.
 
 ## Growing from 0 to 500 servers
 

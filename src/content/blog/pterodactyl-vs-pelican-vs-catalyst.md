@@ -1,7 +1,8 @@
 ---
 title: "Pterodactyl vs Pelican vs Catalyst: Which Game Server Panel Should You Use?"
-description: "An honest, side-by-side comparison of the three most popular game server panels - Pterodactyl, Pelican, and Catalyst. Architecture, performance, features, and when to pick each one."
+description: "A side-by-side comparison of the three most popular game server panels: Pterodactyl, Pelican, and Catalyst. Architecture, performance, features, and when to pick each one."
 pubDate: 2026-05-10
+updatedDate: 2026-09-25
 author: "Catalyst Team"
 audience: ["hobbyists", "businesses", "hosting-providers"]
 keywords:
@@ -11,27 +12,40 @@ keywords:
   - pelican panel
   - catalyst vs pterodactyl
   - best game server panel
+faqs:
+  - q: "Is Pelican a fork of Pterodactyl?"
+    a: "Yes. Pelican is a community fork of Pterodactyl, so it shares the same PHP (Laravel) panel, Go Wings daemon, and Docker runtime. The projects differ in governance and roadmap, not architecture, which means Pelican inherits Pterodactyl's strengths and its limitations, including no native plugin API."
+  - q: "What is the main difference between Pterodactyl and Pelican?"
+    a: "Governance. Both use the same codebase and the same PHP plus Docker-and-Wings architecture. Pelican is maintained by a different team with a community-driven model. If you want a structurally different panel, you need an alternative such as Catalyst rather than a fork."
+  - q: "Is Catalyst faster than Pterodactyl?"
+    a: "Catalyst has not published a head-to-head benchmark, so treat latency claims with caution. What is verifiable is architectural: Catalyst nodes talk directly to containerd instead of going through the Docker daemon, and the panel is TypeScript on Fastify with PostgreSQL and Redis. Benchmark your own workload before assuming a speed difference."
+  - q: "Which game server panel has the best API?"
+    a: "Catalyst exposes 200+ API route handlers with bearer-token auth, scoped and expiring API keys, and RBAC-aware permissions, which suits billing and automation integrations. Pterodactyl and Pelican offer a solid REST plus WebSocket API that covers the core server lifecycle but has fewer endpoints and coarser permission scoping."
+  - q: "Does Catalyst support Pterodactyl eggs?"
+    a: "Yes. Catalyst can import Pterodactyl eggs and convert them into Catalyst templates, transferring startup commands, environment variables, and install scripts. Review eggs that depend on Docker-specific behaviour, because Catalyst game nodes run containerd rather than Docker."
+  - q: "Can I switch from Pterodactyl to Pelican?"
+    a: "Because Pelican is a fork, migration is closer to an upgrade than an import, and it keeps the same database and Wings node model. Moving from Pterodactyl or Pelican to Catalyst uses the built-in migration tool, which imports nodes, allocations, users, eggs, servers, and files."
 ---
 
 > **TL;DR:** **Catalyst** is on a different ops model (TypeScript panel + Rust agent + containerd nodes) with native plugins and built-in Pterodactyl import. **Pterodactyl** and **Pelican** are the same PHP + Go Wings + Docker codebase with different teams. Pick Catalyst for containerd-native nodes and extensibility in early testing; Pterodactyl for maturity; Pelican for Pterodactyl governance without migration.
 
 Choosing a game server panel used to be simple: you picked Pterodactyl and moved on. But with Pelican emerging as a fork and Catalyst building an entirely new architecture, you now have a real decision to make.
 
-This comparison cuts through the noise. We'll look at architecture, performance, features, operations, and ecosystem - so you can pick the panel that actually fits your needs, not just the one with the most GitHub stars. For all alternatives in one place, see our [buyer's guide to every Pterodactyl alternative](/blog/pterodactyl-alternatives-2026/).
+This comparison sticks to what the code and the docs actually show. We'll look at architecture, performance, features, operations, and ecosystem, so you can pick the panel that actually fits your needs, not just the one with the most GitHub stars. For all alternatives in one place, see our [buyer's guide to every Pterodactyl alternative](/blog/pterodactyl-alternatives-2026/).
 
 ## The three contenders
 
-### Pterodactyl - The incumbent
+### Pterodactyl: the incumbent
 
 Pterodactyl has been the standard for game server management since the mid-2010s. It's built with PHP (Laravel) on the backend, React on the frontend, and uses Docker for container management via the Wings daemon.
 
-### Pelican - The fork
+### Pelican: the fork
 
 Pelican is a community fork of Pterodactyl. Same codebase, same architecture, but with a different governance model and development roadmap. It was created as an alternative to Pterodactyl's original maintainer model.
 
-### Catalyst - The different ops model
+### Catalyst: the different ops model
 
-Catalyst is built from scratch with TypeScript (Fastify, PostgreSQL + Redis) on the panel, TypeScript (React + Vite) on the frontend, and a Rust agent that talks directly to containerd on game nodes instead of Docker. It's not a fork - it's a fundamentally different ops model, currently in early testing.
+Catalyst is built from scratch with TypeScript (Fastify, PostgreSQL + Redis) on the panel, TypeScript (React + Vite) on the frontend, and a Rust agent that talks directly to containerd on game nodes instead of Docker. It's not a fork; it's a fundamentally different ops model, currently in early testing.
 
 ## Architecture comparison
 
@@ -50,15 +64,15 @@ Pelican and Pterodactyl share the same architecture because Pelican is a fork. C
 
 **Why architecture matters:**
 
-- **Panel stack:** Catalyst's panel is TypeScript on Fastify with PostgreSQL and Redis. Pterodactyl is PHP on Laravel. Both need a database and careful ops — neither is zero-maintenance.
+- **Panel stack:** Catalyst's panel is TypeScript on Fastify with PostgreSQL and Redis. Pterodactyl is PHP on Laravel. Both need a database and careful ops; neither is zero-maintenance.
 
-- **Docker vs containerd:** Docker is a convenience layer on top of containerd. Catalyst game nodes talk directly to containerd - the same runtime that powers Kubernetes. The panel itself still ships as Docker Compose.
+- **Docker vs containerd:** Docker is a convenience layer on top of containerd. Catalyst game nodes talk directly to containerd, the same runtime that powers Kubernetes. The panel itself still ships as Docker Compose.
 
 - **Wings vs Rust agent:** Wings (Go) runs on every Pterodactyl node. Catalyst's node agent is a single static Rust binary that talks to containerd, with console, files, SFTP, backups, and metrics.
 
 ## What to compare
 
-Skip unverified latency and memory shootouts — no public benchmark in this repo backs them. Compare what you can verify in code:
+Skip unverified latency and memory shootouts, since no public benchmark in this repo backs them. Compare what you can verify in code:
 
 | What | Pterodactyl | Pelican | Catalyst |
 |--------|-------------|---------|----------|
@@ -88,7 +102,7 @@ Catalyst's advantage is structural (containerd-native nodes, native plugins, 50+
 | Built-in migration tool | No | No | Yes (from Pterodactyl) |
 | Scheduled tasks | Schedules | Schedules | Cron tasks |
 
-The plugin system is the biggest differentiator. With Pterodactyl or Pelican, if you need custom API routes, new UI components, or integration with external services, you fork the project and maintain a separate codebase. With Catalyst, you write a TypeScript plugin that registers hooks, adds routes, and runs scheduled tasks - all without touching core code.
+The plugin system is the biggest differentiator. With Pterodactyl or Pelican, if you need custom API routes, new UI components, or integration with external services, you fork the project and maintain a separate codebase. With Catalyst, you write a TypeScript plugin that registers hooks, adds routes, and runs scheduled tasks, all without touching core code.
 
 The RBAC difference matters for hosting providers. Pterodactyl and Pelican give you admin or user. Catalyst lets you create precise roles: "support staff" can restart servers but not delete them; "billing admin" can view allocations but not access consoles; "node operator" can manage their assigned nodes but not others.
 
@@ -125,10 +139,12 @@ Pterodactyl has the largest community and the most third-party resources. Pelica
 
 ## Can you switch later?
 
-Yes. Catalyst has a built-in migration tool that imports Pterodactyl (and by extension, Pelican) nodes, allocations, users, eggs, servers, and file data. The migration runs from the admin panel - no manual scripting required.
+Yes. Catalyst has a built-in migration tool that imports Pterodactyl (and by extension, Pelican) nodes, allocations, users, eggs, servers, and file data. The migration runs from the admin panel. No manual scripting required.
 
 Check out the [migration guide](/migrate-from-pterodactyl/) for details.
 
 ## The bottom line
 
-Pterodactyl and Pelican are the same architecture with different teams. If you want "Pterodactyl but different governance," pick Pelican. If you want a structurally different panel — containerd-native nodes, native plugins, 50+ permissions — and you accept early testing, Catalyst is the one. The [side-by-side comparison](/pterodactyl-alternative/#comparison) tells the full story. Migrating? Our [migration playbook for 50+ servers](/blog/migrate-50-servers-from-pterodactyl/) walks through a real-world rollout.
+Pterodactyl and Pelican are the same architecture with different teams. If you want "Pterodactyl but different governance," pick Pelican. If you want a structurally different panel (containerd-native nodes, native plugins, 50+ permissions) and you accept early testing, Catalyst is the one. The [side-by-side comparison](/pterodactyl-alternative/#comparison) tells the full story. Migrating? Our [migration playbook for 50+ servers](/blog/migrate-50-servers-from-pterodactyl/) walks through a real-world rollout.
+
+For the underlying details, read the [panel and Wings requirements](/blog/pterodactyl-panel-requirements/) and the [API guide](/blog/pterodactyl-panel-api-guide/), or start from [what the Pterodactyl panel is](/blog/what-is-pterodactyl-panel/).

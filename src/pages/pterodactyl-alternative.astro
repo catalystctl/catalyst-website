@@ -11,32 +11,32 @@ const reasons = [
   {
     title: "Live console via agent",
     description: "Console streams from the Rust agent through the panel gateway, with file manager, SFTP, and metrics in the same view. No Docker daemon on game nodes.",
-    icon: `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" /></svg>`,
+    icon: `<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" /></svg>`,
   },
   {
-    title: "TypeScript panel + Rust agent, not PHP",
+    title: "TypeScript panel and Rust agent",
     description: "Panel is TypeScript on Fastify with PostgreSQL + Redis. Game nodes run a single static Rust binary that talks directly to containerd.",
-    icon: `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" /></svg>`,
+    icon: `<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" /></svg>`,
   },
   {
     title: "containerd on game nodes",
     description: "Nodes talk straight to containerd, the runtime behind Kubernetes. The panel itself ships as Docker Compose. No Docker daemon on game nodes.",
-    icon: `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 01-3-3m3 3a3 3 0 100 6h13.5a3 3 0 100-6m-16.5-3a3 3 0 013-3h13.5a3 3 0 013 3m-19.5 0a4.5 4.5 0 01.9-2.7L5.737 5.1a3.375 3.375 0 012.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 01.9 2.7m0 0a3 3 0 01-3 3m0 3h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008zm-3 6h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008z" /></svg>`,
+    icon: `<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 01-3-3m3 3a3 3 0 100 6h13.5a3 3 0 100-6m-16.5-3a3 3 0 013-3h13.5a3 3 0 013 3m-19.5 0a4.5 4.5 0 01.9-2.7L5.737 5.1a3.375 3.375 0 012.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 01.9 2.7m0 0a3 3 0 01-3 3m0 3h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008zm-3 6h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008z" /></svg>`,
   },
   {
     title: "Native plugin system",
-    description: "Pterodactyl has no native plugin API and custom work usually means a fork. Catalyst lets you register TypeScript hooks, REST routes, and scheduled tasks without forking core.",
-    icon: `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.25 9.75L16.5 12l-2.25 2.25m-4.5 0L7.5 12l2.25-2.25M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" /></svg>`,
+    description: "Pterodactyl has no native plugin API, so custom work usually means a fork. Catalyst lets you register TypeScript hooks, REST routes, and scheduled tasks without forking core.",
+    icon: `<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.25 9.75L16.5 12l-2.25 2.25m-4.5 0L7.5 12l2.25-2.25M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" /></svg>`,
   },
   {
     title: "50+ granular permissions",
-    description: "Not just admin vs user. Servers, nodes, templates, users, backups, files, console, databases, and alerts each have scoped permissions for precise roles.",
-    icon: `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg>`,
+    description: "Permissions go beyond admin and user. Servers, nodes, templates, users, backups, files, console, databases, and alerts each have scoped permissions for precise roles.",
+    icon: `<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg>`,
   },
   {
     title: "200+ API route handlers",
-    description: "Servers, nodes, users, files, backups, schedules, templates, and plugins over Fastify with RBAC on routes. Early testing — API may still change.",
-    icon: `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" /></svg>`,
+    description: "Servers, nodes, users, files, backups, schedules, templates, and plugins over Fastify with RBAC on routes. Early testing, so the API may still change.",
+    icon: `<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" /></svg>`,
   },
 ];
 
@@ -79,7 +79,7 @@ const comparisons = [
       { feature: "Panel install", catalyst: "Single script (Docker Compose)", pterodactyl: "Manual panel setup", winner: "catalyst" },
       { feature: "Node setup", catalyst: "Rust agent + containerd", pterodactyl: "Wings + Docker", winner: "tie" },
       { feature: "TLS / HTTPS", catalyst: "TLS-ready (Caddy/Traefik examples)", pterodactyl: "Manual TLS", winner: "catalyst" },
-      { feature: "Pterodactyl import", catalyst: "Built-in migration job", pterodactyl: "—", winner: "catalyst" },
+      { feature: "Pterodactyl import", catalyst: "Built-in migration job", pterodactyl: "None", winner: "catalyst" },
     ],
   },
 ];
@@ -101,7 +101,7 @@ const verdicts = [
       "You want live console, files, SFTP, and backups in one panel",
       "You prefer a one-command panel install (Docker Compose)",
       "You need granular RBAC with 50+ permissions",
-      "You want 200+ API route handlers for automation — and accept early-testing churn",
+      "You want 200+ API route handlers for automation and accept early-testing churn",
     ],
   },
   {
@@ -118,8 +118,8 @@ const verdicts = [
 
 const lookFor = [
   {
-    title: "Honest stack fit",
-    body: "Catalyst is a TypeScript Fastify panel (PostgreSQL + Redis) with a Rust agent on game nodes. Pterodactyl is PHP + Go Wings with Docker. Pick the ops model your team wants to run — Catalyst trades maturity for containerd-native nodes and native plugins.",
+    title: "Stack fit",
+    body: "Catalyst is a TypeScript Fastify panel (PostgreSQL + Redis) with a Rust agent on game nodes. Pterodactyl is PHP + Go Wings with Docker. Pick the ops model your team wants to run. Catalyst trades maturity for containerd-native nodes and native plugins.",
   },
   {
     title: "A real plugin architecture",
@@ -127,22 +127,29 @@ const lookFor = [
   },
   {
     title: "Modern container runtime",
-    body: "containerd is the runtime behind Kubernetes. Catalyst runs game workloads directly on containerd (panel itself ships via Docker Compose), which lines up with cloud-native ops.",
+    body: "containerd is the runtime behind Kubernetes. Catalyst runs game workloads directly on containerd (the panel itself ships via Docker Compose), which lines up with cloud-native ops.",
   },
   {
     title: "API coverage",
-    body: "At scale everything is automated. Aim for broad coverage across servers, nodes, users, files, backups, and permissions. Catalyst ships 200+ route handlers with RBAC.",
+    body: "Hosting operations automate most work. Aim for broad coverage across servers, nodes, users, files, backups, and permissions. Catalyst ships 200+ route handlers with RBAC.",
   },
   {
     title: "Security by default",
     body: "Granular RBAC, scoped expiring keys, audit logs, 2FA/passkey, and TLS-ready examples should ship day one. Catalyst exposes 50+ permissions so roles like support stay precise.",
   },
 ];
+
+const heroStats = [
+  { value: "Live", label: "Console + SFTP", live: true },
+  { value: "200+", label: "API route handlers", live: false },
+  { value: "50+", label: "RBAC permissions", live: false },
+  { value: "258", label: "Egg definitions", live: false },
+];
 ---
 
 <Layout
-  title="Pterodactyl Alternative: Honest Comparison"
-  description="Catalyst in early testing: TypeScript panel with Rust agent and containerd nodes, native plugins, 200+ API route handlers. Honest comparison with Pterodactyl."
+  title="Pterodactyl Alternative for Game Server Hosts"
+  description="Catalyst in early testing: TypeScript panel with Rust agent and containerd nodes, native plugins, 200+ API route handlers. A direct comparison with Pterodactyl."
   canonicalUrl="https://catalystctl.com/pterodactyl-alternative/"
   breadcrumbItems={[{ name: "Pterodactyl Alternative" }]}
 >
@@ -158,149 +165,117 @@ const lookFor = [
     document.querySelectorAll('[data-reveal], [data-reveal-stagger]').forEach((el) => observer.observe(el));
   </script>
 
-  <!-- Hero: asymmetric -->
-  <section class="relative overflow-hidden" aria-label="Pterodactyl alternative overview">
-    <div class="pointer-events-none absolute inset-0" aria-hidden="true">
-      <div class="absolute top-0 left-0 h-80 w-80 glow-orb text-primary/[0.09]"></div>
-      <div class="absolute top-1/3 right-0 h-64 w-64 glow-orb text-primary/[0.04]"></div>
-    </div>
-
-    <div class="relative max-w-6xl mx-auto px-4 pt-10 sm:pt-14 pb-10">
-      <nav class="text-xs text-zinc-600 mb-6" aria-label="Breadcrumb">
-        <a href={B} class="hover:text-zinc-400 transition-colors">Home</a>
-        <span class="mx-1.5 text-zinc-700">/</span>
-        <span class="text-zinc-400">Pterodactyl Alternative</span>
+  <!-- Hero -->
+  <section aria-label="Pterodactyl alternative overview">
+    <div class="max-w-6xl mx-auto px-4 pt-10 sm:pt-14 pb-10">
+      <nav class="mb-6 flex items-center gap-1.5 font-mono text-micro text-muted-foreground/70" aria-label="Breadcrumb">
+        <a href={B} class="hover:text-foreground transition-colors">Home</a>
+        <span class="text-muted-foreground/40">/</span>
+        <span>Pterodactyl Alternative</span>
       </nav>
 
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-end" data-reveal>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start" data-reveal>
         <div class="lg:col-span-7">
-          <h1 class="font-display font-bold text-foreground tracking-tight leading-[1.08] text-balance" style="font-size: clamp(2.1rem, 5.5vw, 3.75rem);">
-            The Pterodactyl alternative in <span class="text-primary">early testing</span>.
+          <div class="flex items-center gap-2">
+            <span class="led-wrap"><span class="led-pulse bg-warning"></span><span class="led bg-warning"></span></span>
+            <span class="type-overline">Early testing</span>
+          </div>
+          <h1 class="mt-4 font-display text-[1.9rem] sm:text-[2.4rem] font-semibold text-foreground tracking-tight leading-[1.12] text-balance">
+            A Pterodactyl alternative built on <span class="text-primary">containerd</span>.
           </h1>
-          <p class="mt-5 max-w-xl text-base sm:text-lg text-zinc-400 leading-relaxed text-pretty">
+          <p class="mt-4 max-w-xl text-data sm:text-base text-muted-foreground leading-relaxed text-pretty">
             TypeScript panel, Rust agent, containerd nodes, native plugins, live console. Panel GPLv3, agent MIT/Apache-2.0.
           </p>
-          <div class="mt-7 flex flex-wrap items-center gap-3">
-            <a href={B + "#install"} class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary-600 active:scale-[0.98] min-h-11 shadow-[0_0_0_1px_hsl(29_47%_50%/0.3),0_8px_28px_-8px_hsl(29_47%_56%/0.45)]">
-              Install panel
-            </a>
-            <a href={B + "migrate-from-pterodactyl/"} class="inline-flex items-center gap-2 rounded-lg border border-zinc-700/80 bg-surface-1/60 px-5 py-3 text-sm font-medium text-zinc-200 transition-all duration-200 hover:bg-surface-2 active:scale-[0.98] min-h-11">
-              Open migration guide
-            </a>
+          <div class="mt-6 flex flex-wrap items-center gap-2">
+            <a href={B + "#install"} class="btn btn-md btn-primary">Install panel</a>
+            <a href={B + "migrate-from-pterodactyl/"} class="btn btn-md btn-outline">Open migration guide</a>
           </div>
         </div>
 
-        <div class="lg:col-span-5">
-          <div class="rounded-xl border border-zinc-800/60 bg-surface-1/80 p-5 grid grid-cols-2 gap-4">
-            <div>
-              <div class="font-display text-2xl font-bold text-foreground tabular-nums">Live</div>
-              <div class="text-xs text-zinc-500 mt-0.5">Console + SFTP</div>
-            </div>
-            <div>
-              <div class="font-display text-2xl font-bold text-foreground tabular-nums">200+</div>
-              <div class="text-xs text-zinc-500 mt-0.5">API route handlers</div>
-            </div>
-            <div>
-              <div class="font-display text-2xl font-bold text-foreground tabular-nums">50+</div>
-              <div class="text-xs text-zinc-500 mt-0.5">RBAC permissions</div>
-            </div>
-            <div>
-              <div class="font-display text-2xl font-bold text-foreground">258</div>
-              <div class="text-xs text-zinc-500 mt-0.5">Egg definitions</div>
-            </div>
+        <div class="lg:col-span-5 w-full">
+          <div class="deck-panel overflow-hidden grid grid-cols-2 gap-px bg-border/40">
+            {heroStats.map((stat) => (
+              <div class="bg-card p-4">
+                <div class="flex items-center gap-1.5">
+                  {stat.live && <span class="led-wrap"><span class="led-pulse bg-success"></span><span class="led bg-success"></span></span>}
+                  <span class="type-overline">{stat.label}</span>
+                </div>
+                <div class="mt-1.5 font-mono text-lg font-semibold text-foreground tabular-nums">{stat.value}</div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- AEO definition block -->
-  <section class="max-w-6xl mx-auto px-4 py-8" aria-label="What is Catalyst" data-speakable>
-    <div class="max-w-3xl rounded-xl border border-zinc-800/60 bg-surface-1/60 px-6 py-5" data-reveal>
-      <p class="text-sm sm:text-base text-zinc-300 leading-relaxed">
-        <strong class="text-foreground font-semibold">Catalyst</strong> is an open-source game server panel in early testing: a TypeScript panel with a Rust node agent and containerd on game nodes — with live console, native plugin system, 50+ RBAC permissions, and one-command panel install. Panel GPLv3, agent MIT/Apache-2.0. Migration from Pterodactyl is via built-in import, not drop-in.
+  <!-- Definition block -->
+  <section class="max-w-6xl mx-auto px-4 py-6" aria-label="What is Catalyst" data-speakable>
+    <div class="max-w-3xl deck-panel px-4 py-4" data-reveal>
+      <p class="text-mini sm:text-data text-chalk/85 leading-relaxed">
+        <strong class="text-foreground font-semibold">Catalyst</strong> is an open-source game server panel in early testing: a TypeScript panel with a Rust node agent and containerd on game nodes. It includes a live console, a native plugin system, 50+ RBAC permissions, and a one-command panel install. Panel GPLv3, agent MIT/Apache-2.0. Migration from Pterodactyl is via built-in import, not drop-in.
       </p>
     </div>
   </section>
 
-  <!-- Reasons: featured + list, not equal 6-card grid -->
-  <section class="max-w-6xl mx-auto px-4 py-16 sm:py-20" aria-label="Why Catalyst is the best alternative">
-    <div class="mb-10 max-w-xl" data-reveal>
+  <!-- Reasons -->
+  <section class="max-w-6xl mx-auto px-4 py-14 sm:py-16" aria-label="Why Catalyst is an alternative to Pterodactyl">
+    <div class="mb-6 max-w-xl" data-reveal>
       <h2 class="font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight text-balance">
-        Six reasons hosts switch.
+        Why hosts consider switching.
       </h2>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-3" data-reveal-stagger>
+    <div class="deck-panel overflow-hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-border/40" data-reveal-stagger>
       {reasons.map((r, i) => (
-        <div class:list={[
-          "group rounded-xl border p-5 sm:p-6 transition-all duration-200 hover:border-zinc-700",
-          i === 0
-            ? "md:col-span-2 border-primary/25 bg-gradient-to-br from-primary/[0.1] via-surface-1 to-surface-0"
-            : i % 2 === 0
-              ? "border-zinc-800/60 bg-surface-2/60 hover:bg-surface-2"
-              : "border-zinc-800/60 bg-surface-1 hover:bg-surface-2",
-        ]}>
-          <div class="flex items-start gap-4">
-            <div class:list={[
-              "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors",
-              i === 0 ? "bg-primary/20 text-primary" : "bg-zinc-800 text-zinc-400 group-hover:text-primary group-hover:bg-primary/15",
-            ]}>
-              <Fragment set:html={r.icon} />
-            </div>
-            <div>
-              <h3 class:list={["font-semibold text-foreground", i === 0 ? "text-lg" : "text-[15px]"]}>{r.title}</h3>
-              <p class="mt-1.5 text-sm text-zinc-500 leading-relaxed max-w-2xl">{r.description}</p>
-            </div>
+        <div class:list={["bg-card p-4 flex items-start gap-3", i === 0 && "sm:col-span-2 lg:col-span-3 bg-primary/[0.05]"]}>
+          <span class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-sm border border-border/70 bg-surface-1 text-muted-foreground">
+            <Fragment set:html={r.icon} />
+          </span>
+          <div class="min-w-0">
+            <h3 class="font-display text-data font-semibold text-foreground tracking-tight">{r.title}</h3>
+            <p class="mt-1 text-micro text-muted-foreground leading-relaxed">{r.description}</p>
           </div>
         </div>
       ))}
     </div>
   </section>
 
-  <!-- Landscape table -->
-  <section class="max-w-6xl mx-auto px-4 py-16" aria-label="Alternative landscape">
-    <div class="mb-8 max-w-xl" data-reveal>
+  <!-- Landscape -->
+  <section class="max-w-6xl mx-auto px-4 py-14 sm:py-16" aria-label="Alternative landscape">
+    <div class="mb-6 max-w-xl" data-reveal>
       <h2 class="font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight text-balance">
-        How the alternatives stack up.
+        Pterodactyl, Pelican, PufferPanel, and Catalyst.
       </h2>
     </div>
 
-    <div class="rounded-xl border border-zinc-800/60 overflow-hidden" data-reveal>
-      <table class="w-full text-left border-collapse">
-        <thead>
-          <tr class="bg-surface-1">
-            <th class="py-3.5 px-5 text-sm font-medium text-zinc-500">Platform</th>
-            <th class="py-3.5 px-5 text-sm font-medium text-zinc-500">Stack</th>
-            <th class="py-3.5 px-5 text-sm font-medium text-zinc-500 hidden sm:table-cell">Notes</th>
-          </tr>
-        </thead>
-        <tbody>
-          {competitors.map((c) => (
-            <tr class:list={[
-              "border-t border-zinc-800/40 transition-colors",
-              c.name === "Catalyst" ? "bg-primary/[0.06]" : "hover:bg-surface-1/40",
-            ]}>
-              <td class:list={["py-3.5 px-5 text-sm font-medium", c.name === "Catalyst" ? "text-primary" : "text-foreground"]}>
-                {c.name}
-              </td>
-              <td class="py-3.5 px-5 text-sm text-zinc-400 font-mono text-[12px]">{c.type}</td>
-              <td class="py-3.5 px-5 text-sm text-zinc-500 hidden sm:table-cell">{c.note}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div class="deck-panel overflow-hidden" data-reveal>
+      <div class="deck-row hidden grid-cols-[8rem_minmax(0,1.2fr)_minmax(0,1.6fr)] border-b border-border/50 bg-surface-1/40 sm:grid">
+        <span class="deck-th">Platform</span>
+        <span class="deck-th">Stack</span>
+        <span class="deck-th">Notes</span>
+      </div>
+      {competitors.map((c) => (
+        <div class:list={[
+          "deck-row grid-cols-1 sm:grid-cols-[8rem_minmax(0,1.2fr)_minmax(0,1.6fr)] gap-y-1.5 border-b border-border/40 last:border-b-0",
+          c.name === "Catalyst" && "bg-primary/[0.05]",
+        ]}>
+          <span class:list={["font-display text-data font-semibold tracking-tight", c.name === "Catalyst" ? "text-primary" : "text-foreground"]}>{c.name}</span>
+          <span class="font-mono text-micro text-muted-foreground">{c.type}</span>
+          <span class="text-micro text-muted-foreground/80">{c.note}</span>
+        </div>
+      ))}
     </div>
 
-    <div class="mt-8 max-w-3xl space-y-4 text-sm sm:text-base text-zinc-400 leading-relaxed" data-reveal>
-      <h3 class="text-foreground font-semibold text-lg">Why not Pelican or PufferPanel?</h3>
+    <div class="mt-6 max-w-3xl space-y-3 text-mini sm:text-data text-muted-foreground leading-relaxed" data-reveal>
+      <h3 class="font-display text-data font-semibold text-foreground">Why hosts look past Pelican and PufferPanel</h3>
       <p>Pelican forks Pterodactyl with a new team but keeps the PHP + Go Wings + Docker stack. If you want containerd-native nodes with native plugins, Catalyst is the early-testing option with a TypeScript panel and Rust agent.</p>
       <p>PufferPanel is lighter and written in Go, a step up from PHP for small fleets. It still lacks Catalyst depth: no native plugin system, narrower API, thinner permissions.</p>
     </div>
   </section>
 
   <!-- Detailed comparison -->
-  <section id="comparison" class="max-w-6xl mx-auto px-4 py-16 space-y-12 scroll-mt-20" aria-label="Detailed comparison with Pterodactyl">
+  <section id="comparison" class="max-w-6xl mx-auto px-4 py-14 sm:py-16 space-y-8 scroll-mt-20" aria-label="Detailed comparison with Pterodactyl">
     <div class="max-w-xl" data-reveal>
       <h2 class="font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight text-balance">
         Feature-by-feature comparison.
@@ -308,79 +283,65 @@ const lookFor = [
     </div>
 
     {comparisons.map((section) => (
-      <div data-reveal>
-        <h3 class="font-display text-lg font-semibold text-foreground mb-4">{section.category}</h3>
+      <div class="deck-panel overflow-hidden" data-reveal>
+        <div class="deck-toolbar justify-between">
+          <span class="deck-label">{section.category}</span>
+          <span class="deck-keyhint"><kbd>Catalyst</kbd> vs <kbd>Pterodactyl</kbd></span>
+        </div>
 
-        <div class="sm:hidden space-y-2">
+        <div class="hidden sm:block">
+          <div class="deck-row grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_minmax(0,1.2fr)] border-b border-border/50 bg-surface-1/40">
+            <span class="deck-th">Feature</span>
+            <span class="deck-th">Catalyst</span>
+            <span class="deck-th">Pterodactyl</span>
+          </div>
           {section.rows.map((row) => (
-            <div class="rounded-xl border border-zinc-800/60 bg-surface-1 p-4">
-              <div class="text-sm font-medium text-zinc-300 mb-3">{row.feature}</div>
-              <div class="grid grid-cols-2 gap-2">
-                <div class="rounded-lg bg-primary/[0.08] border border-primary/20 p-2.5">
-                  <div class="text-[10px] text-primary font-semibold mb-0.5">Catalyst</div>
-                  <div class="text-sm font-medium text-foreground">{row.catalyst}</div>
-                </div>
-                <div class="rounded-lg bg-zinc-900/40 p-2.5">
-                  <div class="text-[10px] text-zinc-600 font-semibold mb-0.5">Pterodactyl</div>
-                  <div class="text-sm text-zinc-500">{row.pterodactyl}</div>
-                </div>
-              </div>
+            <div class="deck-row grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_minmax(0,1.2fr)] border-b border-border/40 last:border-b-0">
+              <span class="text-micro text-muted-foreground">{row.feature}</span>
+              <span class="flex items-center gap-2 text-data text-foreground">
+                {row.winner === "catalyst" && <span class="led bg-success shrink-0" aria-hidden="true"></span>}
+                {row.catalyst}
+              </span>
+              <span class="flex items-center gap-2 text-data text-muted-foreground/70">
+                {row.winner === "pterodactyl" && <span class="led bg-success shrink-0" aria-hidden="true"></span>}
+                {row.pterodactyl}
+              </span>
             </div>
           ))}
         </div>
 
-        <div class="hidden sm:block rounded-xl border border-zinc-800/60 overflow-hidden">
-          <table class="w-full text-left border-collapse">
-            <thead>
-              <tr class="bg-surface-1">
-                <th class="py-3 px-5 text-sm font-medium text-zinc-500 w-[30%]">Feature</th>
-                <th class="py-3 px-5 text-sm font-semibold text-primary w-[35%] bg-primary/[0.06]">Catalyst</th>
-                <th class="py-3 px-5 text-sm font-medium text-zinc-500 w-[35%]">Pterodactyl</th>
-              </tr>
-            </thead>
-            <tbody>
-              {section.rows.map((row) => (
-                <tr class="border-t border-zinc-800/40 hover:bg-surface-1/40 transition-colors">
-                  <td class="py-3.5 px-5 text-sm text-zinc-400">{row.feature}</td>
-                  <td class="py-3.5 px-5 text-sm font-medium text-foreground bg-primary/[0.04]">
-                    <span class="inline-flex items-center gap-1.5">
-                      {row.winner === "catalyst" && <span class="w-1.5 h-1.5 rounded-full bg-success shrink-0" aria-hidden="true" />}
-                      {row.catalyst}
-                    </span>
-                  </td>
-                  <td class="py-3.5 px-5 text-sm text-zinc-600">
-                    <span class="inline-flex items-center gap-1.5">
-                      {row.winner === "pterodactyl" && <span class="w-1.5 h-1.5 rounded-full bg-success shrink-0" aria-hidden="true" />}
-                      {row.pterodactyl}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div class="sm:hidden">
+          {section.rows.map((row) => (
+            <div class="px-3 py-2.5 border-b border-border/40 last:border-b-0">
+              <div class="deck-th">{row.feature}</div>
+              <div class="mt-2 grid grid-cols-1 gap-1.5">
+                <div class="flex items-center gap-2 text-data text-foreground">
+                  {row.winner === "catalyst" && <span class="led bg-success shrink-0" aria-hidden="true"></span>}
+                  <span class="w-16 shrink-0 font-mono text-micro text-muted-foreground/70">Catalyst</span>
+                  {row.catalyst}
+                </div>
+                <div class="flex items-center gap-2 text-mini text-muted-foreground/70">
+                  <span class="w-16 shrink-0 font-mono text-micro text-muted-foreground/70">Ptero.</span>
+                  {row.pterodactyl}
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     ))}
   </section>
 
   <!-- Verdict -->
-  <section class="max-w-6xl mx-auto px-4 py-16" aria-label="Verdict">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4" data-reveal-stagger>
+  <section class="max-w-6xl mx-auto px-4 py-14 sm:py-16" aria-label="Verdict">
+    <div class="deck-panel overflow-hidden grid grid-cols-1 lg:grid-cols-2 gap-px bg-border/40" data-reveal-stagger>
       {verdicts.map((v) => (
-        <div class:list={[
-          "rounded-xl border p-6 sm:p-7",
-          v.accent
-            ? "border-primary/25 bg-gradient-to-br from-primary/[0.08] to-surface-1"
-            : "border-zinc-800/60 bg-surface-1",
-        ]}>
-          <h3 class="font-display text-lg font-semibold text-foreground mb-4">{v.title}</h3>
-          <ul class="space-y-3">
+        <div class:list={["bg-card p-5", v.accent && "bg-primary/[0.05]"]}>
+          <h3 class="font-display text-data font-semibold text-foreground mb-3">{v.title}</h3>
+          <ul class="space-y-2">
             {v.points.map((p) => (
-              <li class="flex items-start gap-3 text-sm text-zinc-400">
-                <span class:list={[
-                  "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md",
-                  v.accent ? "bg-primary/15 text-primary" : "bg-zinc-800 text-zinc-500",
-                ]}>
+              <li class="flex items-start gap-2.5 text-mini text-chalk/70">
+                <span class:list={["mt-0.5 shrink-0", v.accent ? "text-primary" : "text-muted-foreground"]}>
                   <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
                 </span>
                 {p}
@@ -392,17 +353,17 @@ const lookFor = [
     </div>
   </section>
 
-  <!-- Long-form SEO -->
-  <section class="max-w-6xl mx-auto px-4 py-16" aria-label="What to look for in a Pterodactyl alternative">
+  <!-- Long-form -->
+  <section class="max-w-6xl mx-auto px-4 py-14 sm:py-16" aria-label="What to look for in a Pterodactyl alternative">
     <div class="max-w-3xl" data-reveal>
-      <h2 class="font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight mb-8 text-balance">
+      <h2 class="font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight mb-6 text-balance">
         What to look for in a Pterodactyl replacement
       </h2>
-      <div class="space-y-0">
+      <div>
         {lookFor.map((item) => (
-          <div class="border-b border-zinc-800/50 py-6 first:pt-0 last:border-0">
-            <h3 class="text-foreground font-semibold text-lg mb-2">{item.title}</h3>
-            <p class="text-zinc-400 leading-relaxed text-sm sm:text-base">{item.body}</p>
+          <div class="border-b border-border/50 py-5 first:pt-0 last:border-0">
+            <h3 class="font-display text-data font-semibold text-foreground mb-1.5">{item.title}</h3>
+            <p class="text-mini sm:text-data text-muted-foreground leading-relaxed">{item.body}</p>
           </div>
         ))}
       </div>
@@ -410,30 +371,20 @@ const lookFor = [
   </section>
 
   <!-- CTA -->
-  <section class="max-w-6xl mx-auto px-4 py-16" aria-label="Call to action">
-    <div class="relative rounded-2xl border border-primary/20 overflow-hidden p-8 sm:p-12 lg:p-14" data-reveal>
-      <div class="pointer-events-none absolute inset-0" aria-hidden="true">
-        <div class="absolute inset-x-0 top-0 h-56 hero-glow"></div>
-        <div class="absolute top-0 right-0 w-80 h-80 glow-orb text-primary/[0.12]"></div>
-        <div class="absolute bottom-0 left-0 w-56 h-56 glow-orb text-primary/[0.05]"></div>
-      </div>
-      <div class="relative max-w-xl">
-        <h2 class="font-display text-2xl sm:text-3xl font-bold text-foreground tracking-tight text-balance">
-          Ready to leave Pterodactyl behind?
+  <section class="max-w-6xl mx-auto px-4 py-14 sm:py-16" aria-label="Call to action">
+    <div class="panel-frame overflow-hidden" data-reveal>
+      <div class="p-6 sm:p-8">
+        <span class="deck-label">Get started</span>
+        <h2 class="mt-3 font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight text-balance">
+          Install Catalyst or import an existing fleet.
         </h2>
-        <p class="mt-3 text-base text-zinc-400">
-          Free, open source, deployable in a minute. Import your fleet when you are ready.
+        <p class="mt-3 text-mini sm:text-data text-muted-foreground">
+          Free and open source, deployed in about a minute. Import your fleet when you are ready.
         </p>
-        <div class="mt-7 flex flex-wrap gap-3">
-          <a href={B + "#install"} class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary-600 active:scale-[0.98] min-h-11 shadow-[0_0_0_1px_hsl(29_47%_50%/0.3),0_8px_28px_-8px_hsl(29_47%_56%/0.45)]">
-            Install panel
-          </a>
-          <a href={B + "migrate-from-pterodactyl/"} class="inline-flex items-center gap-2 rounded-lg border border-zinc-700/80 px-5 py-3 text-sm font-medium text-zinc-300 transition-all duration-200 hover:bg-surface-2 hover:text-zinc-100 active:scale-[0.98] min-h-11">
-            Open migration guide
-          </a>
-          <a href={DISCORD_URL} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-lg border border-zinc-700/80 px-5 py-3 text-sm font-medium text-zinc-300 transition-all duration-200 hover:bg-surface-2 hover:text-zinc-100 active:scale-[0.98] min-h-11">
-            Join Discord
-          </a>
+        <div class="mt-5 flex flex-wrap gap-2">
+          <a href={B + "#install"} class="btn btn-md btn-primary">Install panel</a>
+          <a href={B + "migrate-from-pterodactyl/"} class="btn btn-md btn-outline">Open migration guide</a>
+          <a href={DISCORD_URL} target="_blank" rel="noopener noreferrer" class="btn btn-md btn-quiet">Join Discord</a>
         </div>
       </div>
     </div>

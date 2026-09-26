@@ -2,10 +2,10 @@
 export const prerender = true;
 
 import Layout from "../layouts/Layout.astro";
-import '@fontsource-variable/jetbrains-mono';
 import githubStats from "../data/github-stats.json";
 import { formatCount } from "../lib/github-stats.mjs";
 import HeroPanel from "../components/HeroPanel.astro";
+import FleetDeck from "../components/FleetDeck.astro";
 
 const B = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "") + "/";
 const GITHUB_URL = "https://github.com/catalystctl/catalyst";
@@ -29,81 +29,64 @@ const steps = [
   {
     n: "03",
     title: "Deploy from a template.",
-    body: "258 egg definitions across 167 games — Minecraft Java/Bedrock, CS2, ARK, Terraria, Valheim, Palworld — plus custom templates. Console, files, and backups included.",
+    body: "258 egg definitions across 167 games, including Minecraft Java/Bedrock, CS2, ARK, Terraria, Valheim, and Palworld. Custom templates, console, files, and backups are included.",
     code: "> Server created · console streaming live",
   },
 ];
 
 const bigStats = [
-  { value: "Live", label: "Console, files, and metrics", hint: "WebSocket console via panel gateway to the Rust agent, plus SFTP and file manager.", live: true },
-  { value: "1 cmd", label: "Panel install", hint: "One script with Docker Compose for panel, PostgreSQL, and Redis." },
-  { value: "200+", label: "API route handlers", hint: "Fastify + Prisma across servers, nodes, users, files, backups, and plugins. RBAC-aware." },
-  { value: "50+", label: "Granular RBAC permissions", hint: "Roles across servers, nodes, templates, users, backups, files, and alerts." },
-];
-
-// Deterministic pseudo-random CPU baseline per node so the grid looks live but stable
-const cpuFor = (name: string) => {
-  const h = [...name].reduce((a, c) => (a * 31 + c.charCodeAt(0)) % 997, 7);
-  return 12 + (h % 55);
-};
-
-const fleetNodes = [
-  { name: "eu-west-1", kind: "bare-metal", ping: 4 },
-  { name: "eu-west-2", kind: "bare-metal", ping: 5 },
-  { name: "us-east-1", kind: "kvm", ping: 12 },
-  { name: "us-east-2", kind: "kvm", ping: 14 },
-  { name: "ap-south-1", kind: "kvm", ping: 38 },
-  { name: "ap-northeast-1", kind: "bare-metal", ping: 52 },
-  { name: "sa-east-1", kind: "kvm", ping: 44 },
-  { name: "edge-hel-01", kind: "container", ping: 9 },
+  { value: "Live", label: "Console, files, and metrics", hint: "WebSocket console via panel gateway to the Rust agent, plus SFTP and file manager.", live: true, meter: null },
+  { value: "1 cmd", label: "Panel install", hint: "One script with Docker Compose for panel, PostgreSQL, and Redis.", live: false, meter: null },
+  { value: "200+", label: "API route handlers", hint: "Fastify + Prisma across servers, nodes, users, files, backups, and plugins. RBAC-aware.", live: false, meter: null },
+  { value: "50+", label: "Granular RBAC permissions", hint: "Roles across servers, nodes, templates, users, backups, files, and alerts.", live: false, meter: null },
 ];
 
 const features = [
   {
     title: "Create Server",
     description: "Deploy from a template in seconds with automatic environment provisioning.",
-    icon: `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>`,
+    icon: `<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>`,
   },
   {
     title: "Enterprise Security",
     description: "RBAC with 50+ permissions, scoped expiring API keys, audit logging, 2FA/passkey, and TLS-ready defaults.",
-    icon: `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg>`,
+    icon: `<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg>`,
   },
   {
     title: "Register Node",
     description: "Add bare-metal or VM nodes with the containerd-native Rust agent (single static binary).",
-    icon: `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 01-3-3m3 3a3 3 0 100 6h13.5a3 3 0 100-6m-16.5-3a3 3 0 013-3h13.5a3 3 0 013 3m-19.5 0a4.5 4.5 0 01.9-2.7L5.737 5.1a3.375 3.375 0 012.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 01.9 2.7m0 0a3 3 0 01-3 3m0 3h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008zm-3 6h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008z" /></svg>`,
+    icon: `<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 01-3-3m3 3a3 3 0 100 6h13.5a3 3 0 100-6m-16.5-3a3 3 0 013-3h13.5a3 3 0 013 3m-19.5 0a4.5 4.5 0 01.9-2.7L5.737 5.1a3.375 3.375 0 012.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 01.9 2.7m0 0a3 3 0 01-3 3m0 3h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008zm-3 6h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008z" /></svg>`,
   },
   {
     title: "Plugin System",
     description: "Extend the API with custom routes, hooks, and scheduled background tasks.",
-    icon: `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.25 9.75L16.5 12l-2.25 2.25m-4.5 0L7.5 12l2.25-2.25M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" /></svg>`,
+    icon: `<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.25 9.75L16.5 12l-2.25 2.25m-4.5 0L7.5 12l2.25-2.25M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" /></svg>`,
   },
   {
     title: "View Alerts",
     description: "Customizable alerts and monitoring dashboards across every node in your fleet.",
-    icon: `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>`,
+    icon: `<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>`,
   },
   {
     title: "Scheduled Tasks",
     description: "Automate restarts, backups, and maintenance windows with built-in cron scheduling.",
-    icon: `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`,
+    icon: `<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`,
   },
   {
     title: "Audit Logging",
     description: "Every administrative action recorded with actor, IP, and timestamp.",
-    icon: `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" /></svg>`,
+    icon: `<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" /></svg>`,
   },
 ];
 
 const comparison = [
-  { feature: "Runtime (nodes)", catalyst: "containerd (native)", pterodactyl: "Docker via Wings" },
-  { feature: "Backend", catalyst: "TypeScript (Fastify) + Rust agent", pterodactyl: "PHP (Laravel) + Go (Wings)" },
-  { feature: "Live console", catalyst: "WebSocket via panel + agent", pterodactyl: "Live console via Wings" },
-  { feature: "API endpoints", catalyst: "200+ route handlers", pterodactyl: "REST API" },
-  { feature: "Plugin system", catalyst: "Native hooks + routes", pterodactyl: "No native plugin API" },
-  { feature: "RBAC permissions", catalyst: "50+ granular", pterodactyl: "Basic roles" },
-  { feature: "Install", catalyst: "Single-script panel", pterodactyl: "Manual panel + Wings" },
+  { feature: "Runtime (nodes)", catalyst: "containerd (native)", pterodactyl: "Docker via Wings", winner: "catalyst" },
+  { feature: "Backend", catalyst: "TypeScript (Fastify) + Rust agent", pterodactyl: "PHP (Laravel) + Go (Wings)", winner: "tie" },
+  { feature: "Live console", catalyst: "WebSocket via panel + agent", pterodactyl: "Live console via Wings", winner: "tie" },
+  { feature: "API endpoints", catalyst: "200+ route handlers", pterodactyl: "REST API", winner: "catalyst" },
+  { feature: "Plugin system", catalyst: "Native hooks + routes", pterodactyl: "No native plugin API", winner: "catalyst" },
+  { feature: "RBAC permissions", catalyst: "50+ granular", pterodactyl: "Basic roles", winner: "catalyst" },
+  { feature: "Install", catalyst: "Single-script panel", pterodactyl: "Manual panel + Wings", winner: "catalyst" },
 ];
 
 const gh = githubStats;
@@ -127,7 +110,7 @@ const faqs = [
   },
   {
     q: "What games does Catalyst support?",
-    a: "258 egg definitions across 167 games cover Minecraft Java/Bedrock, Counter-Strike 2, ARK Ascended/Evolved, Terraria, Valheim, Palworld, Factorio, Rust, and more — plus custom templates with variables, images, and install scripts.",
+    a: "258 egg definitions across 167 games cover Minecraft Java/Bedrock, Counter-Strike 2, ARK Ascended/Evolved, Terraria, Valheim, Palworld, Factorio, and Rust. Custom templates support variables, images, and install scripts.",
   },
   {
     q: "What are the system requirements?",
@@ -141,371 +124,341 @@ const archLayers = [
   { name: "containerd (nodes)", detail: "Native runtime on game nodes. Panel itself ships via Docker.", tone: "" },
   { name: "Linux", detail: "Panel: Docker hosts · Nodes: containerd + root", tone: "dim" },
 ];
+
+const ciTone = gh.ci?.state === "passing" ? "success" : gh.ci?.state === "failing" ? "danger" : "generic";
 ---
 
 <Layout title="Home" description="Catalyst is an open-source game server panel with a TypeScript panel, Rust node agent, and containerd runtime. 200+ API route handlers, 50+ RBAC permissions, 258 egg definitions. Early testing.">
 
   <!-- ═══ HERO ═══ -->
-  <section class="relative overflow-hidden" aria-label="Catalyst overview">
-    <div class="pointer-events-none absolute inset-0" aria-hidden="true">
-      <div class="absolute inset-x-0 top-0 h-[36rem] hero-glow"></div>
-      <div class="absolute top-0 left-1/2 -translate-x-1/2 h-[26rem] w-[46rem] glow-orb text-primary/[0.07]"></div>
+  <section aria-label="Catalyst overview">
+    <div class="max-w-6xl mx-auto px-4 pt-12 sm:pt-16 pb-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+        <div class="lg:col-span-7">
+          <div class="flex items-center gap-2" data-reveal>
+            <span class="led-wrap"><span class="led-pulse bg-success"></span><span class="led bg-success"></span></span>
+            <span class="type-overline">Open source · GPLv3 · early testing</span>
+          </div>
+
+          <h1 class="mt-4 font-display text-[2rem] sm:text-[2.6rem] font-semibold text-foreground tracking-tight leading-[1.1] text-balance" data-reveal>
+            The open-source game server panel built on <span class="text-primary">containerd.</span>
+          </h1>
+
+          <p class="mt-4 max-w-lg text-data sm:text-base text-muted-foreground leading-relaxed" data-reveal>
+            An open-source game server panel built on a TypeScript panel, a Rust node agent, and a containerd-native runtime. Live console, file manager, and a one-command panel install.
+          </p>
+
+          <div class="mt-6 flex flex-wrap items-center gap-2" data-reveal>
+            <a href="#install" class="btn btn-md btn-primary">
+              Install Catalyst
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7" /></svg>
+            </a>
+            <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" class="btn btn-md btn-outline">
+              GitHub
+              <svg class="w-3.5 h-3.5 text-muted-foreground" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            </a>
+            <a href={DEMO_URL} target="_blank" rel="noopener noreferrer" class="btn btn-md btn-quiet">
+              Live demo
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
+            </a>
+          </div>
+
+          <p class="mt-5 font-mono text-micro text-muted-foreground/70" data-reveal>
+            panel <span class="text-muted-foreground/40">(TypeScript)</span> → agent <span class="text-muted-foreground/40">(Rust)</span> → <span class="text-primary/80">containerd</span>
+          </p>
+        </div>
+
+        <!-- Install console + live status: the panel's ruled surface language -->
+        <div class="lg:col-span-5 w-full" data-reveal>
+          <div class="deck-panel overflow-hidden">
+            <div class="deck-toolbar justify-between">
+              <span class="deck-label">Install</span>
+              <button class="copy-btn" data-copy={INSTALL_CMD} aria-label="Copy install command">
+                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5" /></svg>
+                Copy
+              </button>
+            </div>
+            <div class="px-3 py-3 font-mono text-micro sm:text-mini bg-surface-0 overflow-x-auto">
+              <span class="text-primary select-none">$</span> <span class="text-chalk/85 break-all">{INSTALL_CMD}</span>
+            </div>
+          </div>
+
+          <div class="deck-panel deck-statusbar mt-2 overflow-hidden">
+            <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
+              <a href={`${gh.repoUrl}/commits/main`} target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 hover:text-foreground">
+                <span class="led bg-muted-foreground/50"></span>
+                <span class="font-mono text-micro tabular-nums text-muted-foreground">{formatCount(gh.commits) ?? "?"}</span>
+                <span class="type-overline">Commits</span>
+              </a>
+              <a href={`${gh.repoUrl}/releases`} target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 hover:text-foreground">
+                <span class="led bg-muted-foreground/50"></span>
+                <span class="font-mono text-micro tabular-nums text-muted-foreground">{formatCount(gh.releases) ?? "?"}</span>
+                <span class="type-overline">Releases</span>
+              </a>
+              <a href={gh.ci?.url ?? `${gh.repoUrl}/actions`} target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 hover:text-foreground">
+                <span class={`led bg-${ciTone === "generic" ? "muted-foreground/50" : ciTone}`}></span>
+                <span class="type-overline">CI {gh.ci?.label ?? "unknown"}</span>
+              </a>
+              <a href={`${gh.repoUrl}/graphs/contributors`} target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 hover:text-foreground">
+                <span class="led bg-muted-foreground/50"></span>
+                <span class="font-mono text-micro tabular-nums text-muted-foreground">{formatCount(gh.contributors) ?? "?"}</span>
+                <span class="type-overline">Contributors</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="relative max-w-5xl mx-auto px-4 pt-20 pb-6 sm:pt-28 lg:pt-32 text-center">
-      <div class="inline-flex items-center gap-2 rounded-full border border-success/20 bg-success/[0.08] px-3 py-1 text-xs font-medium text-success mb-8" data-reveal>
-        <span class="status-dot status-dot-success"></span>
-        Open source · GPLv3 · early testing
-      </div>
-
-      <h1 class="font-display font-bold text-foreground tracking-tight leading-[1.04]" style="font-size: clamp(2.75rem, 7.5vw, 5rem);" data-reveal>
-        Game servers<br />
-        that feel <span class="text-primary">instant.</span>
-      </h1>
-
-      <p class="mt-6 mx-auto max-w-xl text-base sm:text-lg text-zinc-400 leading-relaxed text-balance" data-reveal>
-        The open-source game server panel. TypeScript panel with a Rust node agent and containerd-native runtime — live console, file manager, and one-command panel install.
-      </p>
-
-      <div class="mt-9 flex flex-wrap items-center justify-center gap-3" data-reveal>
-        <a href="#install" class="cta-primary inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary-600 active:scale-[0.98] min-h-11 shadow-[0_0_0_1px_hsl(29_47%_50%/0.3),0_8px_28px_-8px_hsl(29_47%_56%/0.45)]">
-          Install Catalyst
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3" /></svg>
-        </a>
-        <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-lg border border-zinc-700/80 bg-surface-1/60 px-6 py-3 text-sm font-medium text-zinc-200 transition-all duration-200 hover:bg-surface-2 hover:border-zinc-600 active:scale-[0.98] min-h-11">
-          GitHub
-          <svg class="w-3.5 h-3.5 text-zinc-400" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-        </a>
-      </div>
-
-      <!-- Inline install chip -->
-      <div class="mt-6 inline-flex max-w-full items-center gap-3 rounded-lg border border-zinc-800/70 bg-surface-1/70 pl-4 pr-1.5 py-1.5 font-mono text-xs sm:text-[13px]" data-reveal>
-        <span class="text-primary select-none shrink-0">$</span>
-        <code class="text-zinc-300 truncate">{INSTALL_CMD}</code>
-        <button class="copy-btn shrink-0" data-copy={INSTALL_CMD} aria-label="Copy install command">
-          Copy
-        </button>
-      </div>
-
-      <div class="mt-2 font-mono text-xs text-zinc-600 tracking-wide" data-reveal>
-        panel <span class="text-zinc-700">(TypeScript)</span> <span class="text-zinc-700">→</span> agent <span class="text-zinc-700">(Rust)</span> <span class="text-zinc-700">→</span> <span class="text-primary/80">containerd</span>
-      </div>
-
-      <!-- Social proof strip (live from GitHub) -->
-      <div class="mt-7 flex flex-wrap items-center justify-center gap-x-1 gap-y-1.5 font-mono text-[11px] text-zinc-500 tabular-nums" data-reveal>
-        <a href={`${gh.repoUrl}/commits/main`} target="_blank" rel="noopener noreferrer" class="px-1.5 py-0.5 rounded transition-colors hover:text-zinc-200 hover:bg-surface-2">{formatCount(gh.commits) ?? "?"} commits</a>
-        <span class="text-zinc-800">·</span>
-        <a href={`${gh.repoUrl}/releases`} target="_blank" rel="noopener noreferrer" class="px-1.5 py-0.5 rounded transition-colors hover:text-zinc-200 hover:bg-surface-2">{formatCount(gh.releases) ?? "?"} releases</a>
-        <span class="text-zinc-800">·</span>
-        <a href={gh.ci?.url ?? `${gh.repoUrl}/actions`} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-1.5 py-0.5 rounded transition-colors hover:text-zinc-200 hover:bg-surface-2">
-          <span class:list={["inline-block w-1.5 h-1.5 rounded-full", gh.ci?.state === "passing" ? "bg-success" : gh.ci?.state === "failing" ? "bg-danger" : "bg-zinc-600"]}></span>
-          CI {gh.ci?.label ?? "unknown"}
-        </a>
-        <span class="text-zinc-800">·</span>
-        <a href={`${gh.repoUrl}/graphs/contributors`} target="_blank" rel="noopener noreferrer" class="px-1.5 py-0.5 rounded transition-colors hover:text-zinc-200 hover:bg-surface-2">{formatCount(gh.contributors) ?? "?"} contributors</a>
-      </div>
-    </div>
-
-    <!-- Live panel demo -->
-    <div class="relative max-w-5xl mx-auto px-4 mt-10 sm:mt-14" data-reveal>
+    <!-- Live panel -->
+    <div class="max-w-6xl mx-auto px-4 mt-4" data-reveal>
       <HeroPanel />
     </div>
   </section>
 
+  <div class="rule max-w-6xl mx-auto mt-14"></div>
+
   <!-- ═══ ZERO TO RUNNING ═══ -->
-  <section class="relative overflow-hidden max-w-6xl mx-auto px-4 py-24 sm:py-28" aria-label="Getting started">
-    <div class="pointer-events-none absolute top-0 right-0 h-72 w-72 glow-orb text-primary/[0.05]" aria-hidden="true"></div>
-    <div class="mb-12 max-w-xl" data-reveal>
-      <h2 class="font-display text-sm font-semibold tracking-[0.18em] uppercase text-zinc-500">From zero to running</h2>
-      <h3 class="mt-4 font-display text-3xl sm:text-4xl font-semibold text-foreground tracking-tight text-balance">
-        Three steps. One command to start.
-      </h3>
+  <section class="max-w-6xl mx-auto px-4 py-14 sm:py-16" aria-label="Getting started">
+    <div class="mb-8 max-w-xl" data-reveal>
+      <span class="deck-label">From zero to running</span>
+      <h2 class="mt-3 font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight text-balance">
+        Three steps to a running server.
+      </h2>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-3" data-reveal-stagger>
+    <div class="deck-panel overflow-hidden grid grid-cols-1 md:grid-cols-3 gap-px bg-border/40" data-reveal-stagger>
       {steps.map((s) => (
-        <div class="spotlight-card group rounded-xl border border-zinc-800/60 bg-surface-1/50 p-6 sm:p-7 transition-colors duration-200 hover:border-zinc-700">
-          <div class="font-mono text-xs text-primary">{s.n}</div>
-          <h3 class="mt-3 font-display text-lg font-semibold text-foreground">{s.title}</h3>
-          <p class="mt-2 text-sm text-zinc-500 leading-relaxed">{s.body}</p>
-          <div class="mt-5 font-mono text-xs text-zinc-600 truncate transition-colors duration-200 group-hover:text-zinc-400">{s.code}</div>
+        <div class="bg-card p-4 sm:p-5 flex flex-col">
+          <span class="font-mono text-micro text-primary tabular-nums">{s.n}</span>
+          <h3 class="mt-2 font-display text-data font-semibold text-foreground">{s.title}</h3>
+          <p class="mt-1.5 text-mini text-muted-foreground leading-relaxed flex-1">{s.body}</p>
+          <div class="mt-3 pt-3 border-t border-border/40 font-mono text-micro text-muted-foreground/70 truncate">{s.code}</div>
         </div>
       ))}
     </div>
   </section>
 
-  <!-- ═══ BUILT TO FEEL FAST (big-type restraint) ═══ -->
-  <section class="relative overflow-hidden max-w-6xl mx-auto px-4 py-24 sm:py-28" aria-label="Performance">
-    <div class="pointer-events-none absolute top-0 left-0 h-72 w-72 glow-orb text-primary/[0.05]" aria-hidden="true"></div>
-    <div class="mb-12 max-w-xl" data-reveal>
-      <h2 class="font-display text-sm font-semibold tracking-[0.18em] uppercase text-zinc-500">Why containerd</h2>
-      <h3 class="mt-4 font-display text-3xl sm:text-4xl font-semibold text-foreground tracking-tight text-balance">
-        Less overhead where it counts.
-      </h3>
-      <p class="mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed">
-        Game nodes talk directly to containerd — the runtime behind Kubernetes — instead of layering through Docker. The panel stays as Docker Compose; the work happens natively on nodes.
+  <div class="rule max-w-6xl mx-auto"></div>
+
+  <!-- ═══ WHY CONTAINERD ═══ -->
+  <section class="max-w-6xl mx-auto px-4 py-14 sm:py-16" aria-label="Performance">
+    <div class="mb-8 max-w-xl" data-reveal>
+      <span class="deck-label">Why containerd</span>
+      <h2 class="mt-3 font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight text-balance">
+        Game nodes talk to containerd directly.
+      </h2>
+      <p class="mt-3 text-mini sm:text-data text-muted-foreground leading-relaxed">
+        Game nodes talk directly to containerd, the runtime behind Kubernetes, instead of layering through Docker. The panel still ships as Docker Compose; the workload runs natively on nodes.
       </p>
     </div>
 
-    <!-- Single shared grid: the value column is sized once from the widest
-         numeral, so every label starts at the same left edge. -->
-    <div class="grid grid-cols-1 sm:grid-cols-[auto_minmax(0,1fr)] items-center gap-x-8 lg:gap-x-14">
-      {bigStats.map((s, i) => (
-        <>
-          {i > 0 && <div class="col-span-full h-px bg-zinc-800/50" aria-hidden="true"></div>}
-          <div class="stat-value pt-8 pb-2 sm:py-10 font-display font-bold tracking-tighter tabular-nums leading-none whitespace-nowrap text-foreground" style="font-size: clamp(3.25rem, 8vw, 6.5rem);" data-reveal>
-            {s.value}
+    <div class="deck-panel overflow-hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border/40" data-reveal-stagger>
+      {bigStats.map((s) => (
+        <div class="bg-card p-4 flex flex-col">
+          <div class="flex items-center gap-1.5">
+            {s.live && <span class="led-wrap"><span class="led-pulse bg-success"></span><span class="led bg-success"></span></span>}
+            <span class="type-overline">{s.label}</span>
           </div>
-          <div class="max-w-md lg:max-w-sm pb-8 pt-2 sm:py-10" data-reveal>
-            <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
-              <span class="text-base sm:text-lg font-medium text-zinc-200 leading-snug">{s.label}</span>
-              {s.live && (
-                <span class="live-ms inline-flex items-center gap-1.5 rounded-full border border-success/25 bg-success/[0.08] px-2.5 py-0.5 font-mono text-[11px] font-medium text-success tabular-nums" title="Live console, files, and metrics">
-                  <span class="status-dot status-dot-success"></span>
-                  <span>live</span>
-                </span>
-              )}
-            </div>
-            <p class="mt-2 text-sm text-zinc-500 leading-relaxed">{s.hint}</p>
-          </div>
-        </>
+          <div class="mt-2 font-mono text-xl font-semibold tracking-tight text-foreground tabular-nums">{s.value}</div>
+          {s.meter !== null && (
+            <span class="meter mt-2 w-full"><span class="meter-fill bg-primary/60" style={`width:${s.meter}%`}></span></span>
+          )}
+          <p class="mt-2 text-micro text-muted-foreground leading-relaxed">{s.hint}</p>
+        </div>
       ))}
     </div>
   </section>
 
-  <!-- ═══ YOUR ENTIRE FLEET ═══ -->
-  <section class="relative overflow-hidden max-w-6xl mx-auto px-4 py-24 sm:py-28" aria-label="Fleet management">
-    <div class="pointer-events-none absolute top-0 right-0 h-72 w-72 glow-orb text-primary/[0.05]" aria-hidden="true"></div>
-    <div class="mb-12 max-w-xl" data-reveal>
-      <h2 class="font-display text-sm font-semibold tracking-[0.18em] uppercase text-zinc-500">Fleet overview</h2>
-      <h3 class="mt-4 font-display text-3xl sm:text-4xl font-semibold text-foreground tracking-tight text-balance">
-        Your entire fleet. One screen.
-      </h3>
-      <p class="mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed">
-        Nodes, servers, and health in one dashboard — with live status, metrics, and alerts. Illustration below; real data streams from your nodes.
+  <div class="rule max-w-6xl mx-auto"></div>
+
+  <!-- ═══ FLEET ═══ -->
+  <section class="max-w-6xl mx-auto px-4 py-14 sm:py-16" aria-label="Fleet management">
+    <div class="mb-8 max-w-xl" data-reveal>
+      <span class="deck-label">Fleet overview</span>
+      <h2 class="mt-3 font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight text-balance">
+        Nodes, servers, and health in one view.
+      </h2>
+      <p class="mt-3 text-mini sm:text-data text-muted-foreground leading-relaxed">
+        Nodes, servers, and health in one dashboard, with live status, metrics, and alerts. The table below is an illustration; real data streams from your nodes.
       </p>
     </div>
 
-    <div class="rounded-xl border border-zinc-800/70 overflow-hidden" data-reveal>
-      <div class="flex items-center justify-between px-4 py-2.5 border-b border-zinc-800/60 bg-surface-1/70">
-        <span class="font-mono text-[11px] text-zinc-500">nodes · fleet overview</span>
-        <span class="inline-flex items-center gap-1.5 text-[11px] text-success font-medium">
-          <span class="status-dot status-dot-success"></span> 8 online
-        </span>
-      </div>
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-px bg-zinc-800/40">
-        {fleetNodes.map((n, i) => (
-          <div class:list={["px-4 py-4 sm:py-5", i % 2 === 0 ? "bg-surface-1/90" : "bg-surface-0/40"]}>
-            <div class="flex items-center gap-2">
-              <span class="status-dot status-dot-success node-dot-live"></span>
-              <span class="font-mono text-xs text-zinc-200 truncate">{n.name}</span>
-              <span class="fleet-ping ml-auto font-mono text-[10px] text-zinc-500 tabular-nums shrink-0" data-ping={n.ping}>{n.ping}ms</span>
-            </div>
-            <div class="mt-2 flex items-center gap-2">
-              <div class="fleet-cpu-bar flex-1"><div class="fleet-cpu-fill" style={`width:${cpuFor(n.name)}%; animation-duration:${2.4 + (i % 4) * 0.7}s`}></div></div>
-              <span class="font-mono text-[9px] text-zinc-600 tabular-nums shrink-0">{cpuFor(n.name)}%</span>
-            </div>
-            <div class="mt-1.5 text-[9px] uppercase tracking-wider text-zinc-700">{n.kind}</div>
-          </div>
-        ))}
-      </div>
+    <div data-reveal>
+      <FleetDeck />
     </div>
   </section>
 
-  <!-- ═══ CONTAINERS WITHOUT DOCKER ═══ -->
-  <section class="relative overflow-hidden max-w-6xl mx-auto px-4 py-24 sm:py-28" aria-label="Architecture">
-    <div class="pointer-events-none absolute top-0 left-0 h-72 w-72 glow-orb text-primary/[0.05]" aria-hidden="true"></div>
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-      <div data-reveal>
-        <h2 class="font-display text-sm font-semibold tracking-[0.18em] uppercase text-zinc-500">Stack</h2>
-        <h3 class="mt-4 font-display text-3xl sm:text-4xl font-semibold text-foreground tracking-tight text-balance">
+  <div class="rule max-w-6xl mx-auto"></div>
+
+  <!-- ═══ ARCHITECTURE ═══ -->
+  <section class="max-w-6xl mx-auto px-4 py-14 sm:py-16" aria-label="Architecture">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+      <div class="lg:col-span-6" data-reveal>
+        <span class="deck-label">Stack</span>
+        <h2 class="mt-3 font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight text-balance">
           containerd on nodes, Docker for the panel.
-        </h3>
-        <p class="mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed max-w-md">
-          Game nodes talk directly to containerd — the runtime behind Kubernetes. The panel itself ships as Docker Compose with PostgreSQL and Redis. No Docker daemon on game nodes.
+        </h2>
+        <p class="mt-3 text-mini sm:text-data text-muted-foreground leading-relaxed max-w-md">
+          Game nodes talk directly to containerd, the runtime behind Kubernetes. The panel ships as Docker Compose with PostgreSQL and Redis. No Docker daemon runs on game nodes.
         </p>
       </div>
 
-      <div class="flex flex-col items-stretch max-w-sm w-full mx-auto" data-reveal>
-        {archLayers.map((layer, i) => (
-          <>
-            {i > 0 && (
-              <div class="flow-connector my-2" aria-hidden="true">
-                <span class="flow-packet"></span>
-              </div>
-            )}
-            <div class:list={[
-              "rounded-lg border px-5 py-4 text-center",
-              layer.tone === "hl"
-                ? "border-primary/35 bg-primary/[0.07] shadow-[0_0_28px_-10px_hsl(29_47%_56%/0.4)]"
-                : "border-zinc-800/70 bg-surface-1/60",
-              layer.tone === "dim" && "opacity-80",
-            ]}>
+      <div class="lg:col-span-6 w-full" data-reveal>
+        <div class="deck-panel overflow-hidden">
+          {archLayers.map((layer, i) => (
+            <>
+              {i > 0 && <div class="rule"></div>}
               <div class:list={[
-                "font-mono text-sm",
-                layer.tone === "hl" ? "text-primary" : "text-zinc-300",
-              ]}>{layer.name}</div>
-              <div class="mt-1 text-xs text-zinc-600">{layer.detail}</div>
-            </div>
-          </>
-        ))}
+                "flex items-center justify-between gap-3 px-3 py-2.5",
+                layer.tone === "hl" && "bg-primary/[0.05]",
+              ]}>
+                <div class="min-w-0">
+                  <div class:list={[
+                    "font-display text-data font-semibold tracking-tight",
+                    layer.tone === "hl" ? "text-primary" : "text-foreground",
+                    layer.tone === "dim" && "text-foreground/70",
+                  ]}>{layer.name}</div>
+                  <div class="mt-0.5 text-micro text-muted-foreground truncate">{layer.detail}</div>
+                </div>
+                {layer.tone === "hl" && <span class="led bg-primary shrink-0"></span>}
+              </div>
+            </>
+          ))}
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- ═══ BUILT FOR HOSTS (bento) ═══ -->
-  <section class="relative overflow-hidden max-w-6xl mx-auto px-4 py-24 sm:py-28" aria-label="Features">
-    <div class="pointer-events-none absolute top-0 right-0 h-72 w-72 glow-orb text-primary/[0.05]" aria-hidden="true"></div>
-    <div class="mb-10 max-w-lg" data-reveal>
-      <h2 class="font-display text-sm font-semibold tracking-[0.18em] uppercase text-zinc-500">Built for hosts</h2>
-      <h3 class="mt-4 font-display text-3xl sm:text-4xl font-semibold text-foreground tracking-tight text-balance">
-        Everything a hosting operation needs.
-      </h3>
+  <div class="rule max-w-6xl mx-auto"></div>
+
+  <!-- ═══ CAPABILITIES ═══ -->
+  <section class="max-w-6xl mx-auto px-4 py-14 sm:py-16" aria-label="Features">
+    <div class="mb-8 max-w-lg" data-reveal>
+      <span class="deck-label">Built for hosts</span>
+      <h2 class="mt-3 font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight text-balance">
+        What the panel ships with.
+      </h2>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-3" data-reveal-stagger>
-      <div class="md:col-span-2 group relative rounded-xl border border-primary/25 overflow-hidden p-6 sm:p-8 flex flex-col justify-between min-h-[280px] transition-all duration-300 hover:border-primary/40">
-        <div class="absolute inset-0 bg-gradient-to-br from-primary/[0.14] via-surface-1 to-surface-0 pointer-events-none"></div>
-        <div class="absolute bottom-0 right-0 w-48 h-48 glow-orb text-primary/[0.08] pointer-events-none"></div>
-        <div class="relative">
-          <div class="flex h-11 w-11 items-center justify-center rounded-lg bg-primary/20 text-primary">
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 011.06 0z" /></svg>
-          </div>
-          <h3 class="mt-5 font-display text-2xl font-semibold text-foreground text-balance">Live console, files, and SFTP.</h3>
-          <p class="mt-3 text-sm text-zinc-400 leading-relaxed max-w-md">
-            Console streams from the Rust agent through the panel gateway, with file manager, SFTP, backups, schedules, and metrics in the same view.
-          </p>
-        </div>
-        <div class="relative mt-8 font-mono text-[11px] text-zinc-600 space-y-1 hidden sm:block">
-          <div><span class="text-primary">ws</span> · console stream active</div>
-          <div class="text-zinc-700">panel gateway ↔ Rust agent ↔ containerd</div>
-        </div>
-      </div>
-
+    <div class="deck-panel overflow-hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-border/40" data-reveal-stagger>
       {features.map((f) => (
-        <div class="spotlight-card group rounded-xl border border-zinc-800/60 bg-surface-1 p-5 transition-colors duration-200 hover:border-zinc-700">
-          <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-800/80 text-zinc-400 transition-all duration-200 group-hover:text-primary group-hover:bg-primary/15 group-hover:-translate-y-0.5">
+        <div class="bg-card p-4 flex items-start gap-3">
+          <span class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-sm border border-border/70 bg-surface-1 text-muted-foreground">
             <Fragment set:html={f.icon} />
+          </span>
+          <div class="min-w-0">
+            <h3 class="font-display text-data font-semibold text-foreground tracking-tight">{f.title}</h3>
+            <p class="mt-1 text-micro text-muted-foreground leading-relaxed">{f.description}</p>
           </div>
-          <h3 class="mt-4 font-semibold text-foreground text-[15px]">{f.title}</h3>
-          <p class="mt-1.5 text-sm text-zinc-500 leading-relaxed">{f.description}</p>
         </div>
       ))}
     </div>
   </section>
 
+  <div class="rule max-w-6xl mx-auto"></div>
+
   <!-- ═══ COMPARISON ═══ -->
-  <section class="relative overflow-hidden max-w-6xl mx-auto px-4 py-24 sm:py-28" aria-label="Comparison with Pterodactyl">
-    <div class="pointer-events-none absolute top-0 left-0 h-72 w-72 glow-orb text-primary/[0.05]" aria-hidden="true"></div>
-    <div class="mb-8 max-w-xl" data-reveal>
-      <h2 class="font-display text-sm font-semibold tracking-[0.18em] uppercase text-zinc-500">Migration path</h2>
-      <h3 class="mt-4 font-display text-3xl sm:text-4xl font-semibold text-foreground tracking-tight text-balance">
-        Why hosts switch from Pterodactyl.
-      </h3>
-      <p class="mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed">
-        Same job, honest stack. TypeScript panel, Rust agent, containerd on nodes.
+  <section class="max-w-6xl mx-auto px-4 py-14 sm:py-16" aria-label="Comparison with Pterodactyl">
+    <div class="mb-6 max-w-xl" data-reveal>
+      <span class="deck-label">Migration path</span>
+      <h2 class="mt-3 font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight text-balance">
+        Catalyst compared with Pterodactyl.
+      </h2>
+      <p class="mt-3 text-mini sm:text-data text-muted-foreground leading-relaxed">
+        A TypeScript panel, a Rust agent, and containerd on game nodes.
       </p>
     </div>
 
-    <!-- Desktop: side-by-side comparison -->
-    <div class="hidden md:grid grid-cols-[1fr_auto_1fr] gap-4 items-stretch" data-reveal>
-      <!-- Pterodactyl (muted) -->
-      <div class="rounded-xl border border-zinc-800/60 bg-surface-1/40 overflow-hidden">
-        <div class="flex items-center gap-2 px-5 py-3.5 border-b border-zinc-800/50">
-          <span class="w-1.5 h-1.5 rounded-full bg-zinc-600"></span>
-          <span class="font-mono text-xs font-medium tracking-wider text-zinc-500 uppercase">Pterodactyl</span>
-          <span class="ml-auto text-[10px] font-mono text-zinc-700">PHP panel · Go Wings · Docker</span>
+    <div class="deck-panel overflow-hidden" data-reveal>
+      <div class="deck-toolbar justify-between">
+        <span class="deck-label">Stack comparison</span>
+        <span class="deck-keyhint"><kbd>Catalyst</kbd> vs <kbd>Pterodactyl</kbd></span>
+      </div>
+
+      <!-- Desktop -->
+      <div class="hidden md:block">
+        <div class="deck-row grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)_minmax(0,1.4fr)] border-b border-border/50 bg-surface-1/40">
+          <span class="deck-th">Feature</span>
+          <span class="deck-th">Catalyst</span>
+          <span class="deck-th">Pterodactyl</span>
         </div>
         {comparison.map((row) => (
-          <div class="flex items-baseline justify-between gap-4 px-5 py-3 border-b border-zinc-800/30 last:border-0">
-            <span class="font-mono text-[10px] uppercase tracking-wider text-zinc-700 shrink-0">{row.feature}</span>
-            <span class="text-sm text-zinc-600 text-right">{row.pterodactyl}</span>
+          <div class="deck-row grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)_minmax(0,1.4fr)] border-b border-border/40 last:border-b-0">
+            <span class="text-micro text-muted-foreground">{row.feature}</span>
+            <span class="flex items-center gap-2 text-data text-foreground">
+              {row.winner === "catalyst" && <span class="led bg-success shrink-0"></span>}
+              {row.catalyst}
+            </span>
+            <span class="flex items-center gap-2 text-data text-muted-foreground/70">{row.pterodactyl}</span>
           </div>
         ))}
       </div>
 
-      <!-- Arrow -->
-      <div class="flex flex-col items-center justify-center gap-2 px-1" aria-hidden="true">
-        <span class="font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-600 [writing-mode:vertical-rl]">switch</span>
-        <svg class="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-      </div>
-
-      <!-- Catalyst (warm) -->
-      <div class="rounded-xl border border-primary/30 bg-primary/[0.05] overflow-hidden shadow-[0_0_40px_-16px_hsl(29_47%_56%/0.35)]">
-        <div class="flex items-center gap-2 px-5 py-3.5 border-b border-primary/20 bg-primary/[0.08]">
-          <span class="status-dot status-dot-success"></span>
-          <span class="font-mono text-xs font-semibold tracking-wider text-primary uppercase">Catalyst</span>
-          <span class="ml-auto text-[10px] font-mono text-primary/50">TS panel · Rust agent · containerd</span>
-        </div>
+      <!-- Mobile -->
+      <div class="md:hidden">
         {comparison.map((row) => (
-          <div class="flex items-baseline justify-between gap-4 px-5 py-3 border-b border-primary/10 last:border-0">
-            <span class="font-mono text-[10px] uppercase tracking-wider text-primary/40 shrink-0">{row.feature}</span>
-            <span class="text-sm font-medium text-foreground text-right">{row.catalyst}</span>
+          <div class="px-3 py-2.5 border-b border-border/40 last:border-b-0">
+            <div class="deck-th">{row.feature}</div>
+            <div class="mt-2 grid grid-cols-1 gap-1.5">
+              <div class="flex items-center gap-2 text-data text-foreground">
+                {row.winner === "catalyst" && <span class="led bg-success shrink-0"></span>}
+                <span class="font-mono text-micro text-muted-foreground/70 w-16 shrink-0">Catalyst</span>
+                {row.catalyst}
+              </div>
+              <div class="flex items-center gap-2 text-mini text-muted-foreground/70">
+                <span class="font-mono text-micro text-muted-foreground/70 w-16 shrink-0">Ptero.</span>
+                {row.pterodactyl}
+              </div>
+            </div>
           </div>
         ))}
       </div>
-    </div>
 
-    <!-- Mobile: stacked, Catalyst first -->
-    <div class="md:hidden space-y-3" data-reveal>
-      <div class="rounded-xl border border-primary/30 bg-primary/[0.05] overflow-hidden">
-        <div class="flex items-center gap-2 px-4 py-3 border-b border-primary/20 bg-primary/[0.08]">
-          <span class="status-dot status-dot-success"></span>
-          <span class="font-mono text-xs font-semibold tracking-wider text-primary uppercase">Catalyst</span>
+      <div class="deck-statusbar">
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
+          <span class="flex items-center gap-1.5">
+            <span class="led bg-success"></span>
+            <span class="font-mono text-micro tabular-nums text-muted-foreground">{comparison.filter((r) => r.winner === "catalyst").length}</span>
+            <span class="type-overline">Catalyst edges</span>
+          </span>
+          <span class="flex items-center gap-1.5">
+            <span class="led bg-muted-foreground/50"></span>
+            <span class="font-mono text-micro tabular-nums text-muted-foreground">{comparison.filter((r) => r.winner === "tie").length}</span>
+            <span class="type-overline">Comparable</span>
+          </span>
         </div>
-        {comparison.map((row) => (
-          <div class="px-4 py-3 border-b border-primary/10 last:border-0">
-            <div class="font-mono text-[10px] uppercase tracking-wider text-primary/40 mb-1">{row.feature}</div>
-            <div class="text-sm font-medium text-foreground">{row.catalyst}</div>
-          </div>
-        ))}
-      </div>
-      <div class="rounded-xl border border-zinc-800/60 bg-surface-1/40 overflow-hidden">
-        <div class="flex items-center gap-2 px-4 py-3 border-b border-zinc-800/50">
-          <span class="w-1.5 h-1.5 rounded-full bg-zinc-600"></span>
-          <span class="font-mono text-xs font-medium tracking-wider text-zinc-500 uppercase">Pterodactyl</span>
+        <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <a href={B + "pterodactyl-alternative/"} class="deck-keyhint hover:text-foreground">Full comparison</a>
+          <a href={B + "migrate-from-pterodactyl/"} class="deck-keyhint hover:text-foreground">Migration guide</a>
         </div>
-        {comparison.map((row) => (
-          <div class="px-4 py-3 border-b border-zinc-800/30 last:border-0">
-            <div class="font-mono text-[10px] uppercase tracking-wider text-zinc-700 mb-1">{row.feature}</div>
-            <div class="text-sm text-zinc-600">{row.pterodactyl}</div>
-          </div>
-        ))}
       </div>
-    </div>
-
-    <div class="mt-6 flex flex-wrap gap-4" data-reveal>
-      <a href={B + "pterodactyl-alternative/"} class="text-sm font-medium text-primary hover:text-primary-400 transition-colors">
-        Open comparison
-      </a>
-      <a href={B + "migrate-from-pterodactyl/"} class="text-sm font-medium text-zinc-500 hover:text-zinc-300 transition-colors">
-        Open migration guide
-      </a>
     </div>
   </section>
 
-  <!-- ═══ INSTALL: ANIMATED TERMINAL ═══ -->
-  <section id="install" class="relative overflow-hidden max-w-4xl mx-auto px-4 py-24 sm:py-28 scroll-mt-20" aria-label="Quick start">
-    <div class="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 h-72 w-72 glow-orb text-primary/[0.06]" aria-hidden="true"></div>
-    <div class="mb-12" data-reveal>
-      <h2 class="font-display text-sm font-semibold tracking-[0.18em] uppercase text-zinc-500">Quick start</h2>
-      <h3 class="mt-4 font-display text-3xl sm:text-4xl font-semibold text-foreground tracking-tight text-balance">
-        One command. Done.
-      </h3>
+  <div class="rule max-w-6xl mx-auto"></div>
+
+  <!-- ═══ INSTALL CONSOLE ═══ -->
+  <section id="install" class="max-w-4xl mx-auto px-4 py-14 sm:py-16 scroll-mt-20" aria-label="Quick start">
+    <div class="mb-8" data-reveal>
+      <span class="deck-label">Quick start</span>
+      <h2 class="mt-3 font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight text-balance">
+        Install the panel with one command.
+      </h2>
     </div>
 
-    <div class="terminal shadow-elevated-dark" id="install-term" data-reveal>
-      <div class="terminal-header">
-        <div class="terminal-dot" style="background:#ec6b5e;"></div>
-        <div class="terminal-dot" style="background:#f3bf4f;"></div>
-        <div class="terminal-dot" style="background:#61c253;"></div>
-        <span class="text-[11px] text-zinc-600 font-mono ml-2">catalyst — installation</span>
-        <button class="copy-btn" data-copy={INSTALL_CMD} aria-label="Copy install command">
-          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5"/></svg>
-          Copy
-        </button>
+    <div class="deck-panel overflow-hidden" id="install-term" data-reveal>
+      <div class="deck-toolbar justify-between">
+        <span class="deck-label">Console</span>
+        <div class="flex items-center gap-2">
+          <span class="deck-keyhint"><span class="led bg-success"></span> install.sh</span>
+          <button class="copy-btn" data-copy={INSTALL_CMD} aria-label="Copy install command">
+            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5" /></svg>
+            Copy
+          </button>
+        </div>
       </div>
-      <div class="terminal-body whitespace-pre-wrap sm:whitespace-normal">
+      <div class="terminal-body whitespace-pre-wrap sm:whitespace-normal bg-surface-0">
         <p class="inst-line"><span class="prompt">$</span> <span class="cmd break-all">{INSTALL_CMD}</span></p>
         <p class="inst-line"><span class="success">✓</span> <span class="cmd">Checking system requirements (Docker)</span></p>
         <p class="inst-line"><span class="success">✓</span> <span class="cmd">Installing Catalyst panel + PostgreSQL + Redis</span></p>
@@ -515,59 +468,65 @@ const archLayers = [
       </div>
     </div>
 
-    <p class="mt-5 text-center text-sm text-zinc-600" data-reveal>
-      Panel install is one command. Game nodes need containerd plus the Rust agent — see <a href="https://docs.catalystctl.com/" class="text-zinc-400 hover:text-zinc-200 underline underline-offset-2 decoration-zinc-700 transition-colors">node setup in docs</a>.
+    <p class="mt-4 text-mini text-muted-foreground" data-reveal>
+      Panel install is one command. Game nodes need containerd plus the Rust agent; see <a href="https://docs.catalystctl.com/" class="text-chalk/85 hover:text-foreground underline underline-offset-2 decoration-border transition-colors">node setup in docs</a>.
     </p>
   </section>
 
+  <div class="rule max-w-6xl mx-auto"></div>
+
   <!-- ═══ LIVE DEMO ═══ -->
-  <section class="relative py-24 sm:py-28 overflow-hidden" aria-label="Live demo">
-    <div class="max-w-6xl mx-auto px-4" data-reveal>
-      <div class="relative rounded-2xl border border-primary/25 overflow-hidden p-8 sm:p-12 lg:p-14">
-        <div class="pointer-events-none absolute inset-0" aria-hidden="true">
-          <div class="absolute inset-0 bg-gradient-to-br from-primary/[0.12] via-surface-1 to-surface-0"></div>
-          <div class="absolute top-0 right-0 w-80 h-80 glow-orb text-primary/[0.1]"></div>
-        </div>
-        <div class="relative max-w-xl">
-          <h2 class="font-display text-sm font-semibold tracking-[0.18em] uppercase text-zinc-500">Product tour</h2>
-          <h3 class="mt-4 font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight text-balance">
-            Don't take our word for it. Click through it.
-          </h3>
-          <p class="mt-3 text-sm sm:text-base text-zinc-400 leading-relaxed">
-            A live demo panel with a mock Minecraft server — console, files, backups, schedules, and every tab, running in your browser. No install, no account.
+  <section class="max-w-6xl mx-auto px-4 py-14 sm:py-16" aria-label="Live demo">
+    <div class="panel-frame overflow-hidden" data-reveal>
+      <div class="grid grid-cols-1 lg:grid-cols-12">
+        <div class="lg:col-span-8 p-6 sm:p-8">
+          <span class="deck-label">Product tour</span>
+          <h2 class="mt-3 font-display text-xl sm:text-2xl font-semibold text-foreground tracking-tight text-balance">
+            Open the live demo panel.
+          </h2>
+          <p class="mt-3 text-mini sm:text-data text-muted-foreground leading-relaxed max-w-xl">
+            A live demo panel with a mock Minecraft server. Console, files, backups, schedules, and every tab run in your browser. No install and no account required.
           </p>
-          <div class="mt-7 flex flex-wrap gap-3">
-            <a href={DEMO_URL} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary-600 active:scale-[0.98] min-h-11 shadow-[0_0_0_1px_hsl(29_47%_50%/0.3),0_8px_28px_-8px_hsl(29_47%_56%/0.45)]">
+          <div class="mt-5 flex flex-wrap gap-2">
+            <a href={DEMO_URL} target="_blank" rel="noopener noreferrer" class="btn btn-md btn-primary">
               Open live demo
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
             </a>
           </div>
-          <p class="mt-4 font-mono text-xs text-zinc-600">demo.catalystctl.com · resets automatically</p>
+        </div>
+        <div class="lg:col-span-4 border-t lg:border-t-0 lg:border-l border-border/50 bg-surface-1/40 p-6 sm:p-8">
+          <span class="type-overline">Demo host</span>
+          <div class="mt-3 space-y-2 font-mono text-micro text-muted-foreground">
+            <div class="flex items-center justify-between gap-3"><span>endpoint</span><span class="text-chalk/85">demo.catalystctl.com</span></div>
+            <div class="flex items-center justify-between gap-3"><span>session</span><span class="text-chalk/85">read-only</span></div>
+            <div class="flex items-center justify-between gap-3"><span>reset</span><span class="text-chalk/85">automatic</span></div>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
+  <div class="rule max-w-6xl mx-auto"></div>
+
   <!-- ═══ FAQ ═══ -->
-  <section class="relative overflow-hidden max-w-6xl mx-auto px-4 py-24 sm:py-28" aria-label="Frequently asked questions">
-    <div class="pointer-events-none absolute top-0 right-0 h-72 w-72 glow-orb text-primary/[0.05]" aria-hidden="true"></div>
-    <div class="mb-10 max-w-lg" data-reveal>
-      <h2 class="font-display text-sm font-semibold tracking-[0.18em] uppercase text-zinc-500">FAQ</h2>
-      <h3 class="mt-4 font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight text-balance">
-        Common questions, plain answers.
-      </h3>
+  <section class="max-w-6xl mx-auto px-4 py-14 sm:py-16" aria-label="Frequently asked questions">
+    <div class="mb-8 max-w-lg" data-reveal>
+      <span class="deck-label">FAQ</span>
+      <h2 class="mt-3 font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight text-balance">
+        Frequently asked questions.
+      </h2>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-0" data-reveal>
+    <div class="deck-panel overflow-hidden grid grid-cols-1 lg:grid-cols-2 gap-px bg-border/40" data-reveal>
       {faqs.map((faq) => (
-        <details class="faq-item group border-b border-zinc-800/50 py-5">
-          <summary class="flex cursor-pointer list-none items-start justify-between gap-4 text-left">
-            <h3 class="font-semibold text-foreground text-[15px] leading-snug pr-2">{faq.q}</h3>
-            <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-zinc-800 text-zinc-500 transition-colors group-open:border-primary/40 group-open:text-primary group-open:bg-primary/10">
-              <svg class="w-3.5 h-3.5 transition-transform duration-200 group-open:rotate-45" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+        <details class="faq-item group bg-card">
+          <summary class="flex cursor-pointer list-none items-start justify-between gap-4 px-4 py-3">
+            <h3 class="text-data font-medium text-foreground leading-snug pr-2">{faq.q}</h3>
+            <span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border border-border/70 text-muted-foreground transition-colors group-open:border-primary/40 group-open:text-primary group-open:bg-primary/10">
+              <svg class="w-3 h-3 transition-transform duration-200 group-open:rotate-45" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
             </span>
           </summary>
-          <p class="mt-3 text-sm text-zinc-500 leading-relaxed max-w-prose pr-10">{faq.a}</p>
+          <p class="px-4 pb-4 text-mini text-muted-foreground leading-relaxed max-w-prose">{faq.a}</p>
         </details>
       ))}
     </div>
@@ -586,73 +545,70 @@ const archLayers = [
     })} />
   </section>
 
+  <div class="rule max-w-6xl mx-auto"></div>
+
   <!-- ═══ PATHS ═══ -->
-  <section class="max-w-6xl mx-auto px-4 py-24 sm:py-28" aria-label="Related pages">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-px rounded-xl border border-zinc-800/60 overflow-hidden bg-zinc-800/60" data-reveal-stagger>
-      <a href={B + "pterodactyl-alternative/#comparison"} class="spotlight-card group bg-surface-1 p-6 sm:p-7 transition-colors hover:bg-surface-2">
-        <h3 class="font-semibold text-foreground text-[15px] group-hover:text-primary transition-colors">Catalyst vs Pterodactyl</h3>
-        <p class="mt-2 text-sm text-zinc-500 leading-relaxed">Architecture, performance, and ops compared side by side.</p>
-        <span class="mt-4 inline-flex items-center gap-1 text-xs font-medium text-zinc-600 group-hover:text-primary transition-colors">
+  <section class="max-w-6xl mx-auto px-4 py-14 sm:py-16" aria-label="Related pages">
+    <div class="deck-panel overflow-hidden grid grid-cols-1 md:grid-cols-3 gap-px bg-border/40" data-reveal-stagger>
+      <a href={B + "pterodactyl-alternative/#comparison"} class="group bg-card p-4 sm:p-5 transition-colors hover:bg-surface-1/40">
+        <span class="type-overline">Compare</span>
+        <h3 class="mt-2 font-display text-data font-semibold text-foreground group-hover:text-primary transition-colors">Catalyst vs Pterodactyl</h3>
+        <p class="mt-1.5 text-micro text-muted-foreground leading-relaxed">Architecture, performance, and ops compared side by side.</p>
+        <span class="mt-3 inline-flex items-center gap-1 text-micro text-muted-foreground/70 group-hover:text-primary transition-colors">
           Open comparison
-          <svg class="w-3 h-3 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+          <svg class="w-3 h-3 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7" /></svg>
         </span>
       </a>
-      <a href={B + "migrate-from-pterodactyl/"} class="spotlight-card group bg-surface-1 p-6 sm:p-7 transition-colors hover:bg-surface-2">
-        <h3 class="font-semibold text-foreground text-[15px] group-hover:text-primary transition-colors">Migrate from Pterodactyl</h3>
-        <p class="mt-2 text-sm text-zinc-500 leading-relaxed">Move servers, eggs, and users without starting from scratch.</p>
-        <span class="mt-4 inline-flex items-center gap-1 text-xs font-medium text-zinc-600 group-hover:text-primary transition-colors">
+      <a href={B + "migrate-from-pterodactyl/"} class="group bg-card p-4 sm:p-5 transition-colors hover:bg-surface-1/40">
+        <span class="type-overline">Migrate</span>
+        <h3 class="mt-2 font-display text-data font-semibold text-foreground group-hover:text-primary transition-colors">Migrate from Pterodactyl</h3>
+        <p class="mt-1.5 text-micro text-muted-foreground leading-relaxed">Move servers, eggs, and users without starting from scratch.</p>
+        <span class="mt-3 inline-flex items-center gap-1 text-micro text-muted-foreground/70 group-hover:text-primary transition-colors">
           Open migration guide
-          <svg class="w-3 h-3 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+          <svg class="w-3 h-3 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7" /></svg>
         </span>
       </a>
-      <a href="https://docs.catalystctl.com/" class="spotlight-card group bg-surface-1 p-6 sm:p-7 transition-colors hover:bg-surface-2">
-        <h3 class="font-semibold text-foreground text-[15px] group-hover:text-primary transition-colors">Documentation</h3>
-        <p class="mt-2 text-sm text-zinc-500 leading-relaxed">Install, configure nodes, and wire up the API in one place.</p>
-        <span class="mt-4 inline-flex items-center gap-1 text-xs font-medium text-zinc-600 group-hover:text-primary transition-colors">
+      <a href="https://docs.catalystctl.com/" class="group bg-card p-4 sm:p-5 transition-colors hover:bg-surface-1/40">
+        <span class="type-overline">Docs</span>
+        <h3 class="mt-2 font-display text-data font-semibold text-foreground group-hover:text-primary transition-colors">Documentation</h3>
+        <p class="mt-1.5 text-micro text-muted-foreground leading-relaxed">Install, configure nodes, and wire up the API in one place.</p>
+        <span class="mt-3 inline-flex items-center gap-1 text-micro text-muted-foreground/70 group-hover:text-primary transition-colors">
           Read the docs
-          <svg class="w-3 h-3 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+          <svg class="w-3 h-3 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7" /></svg>
         </span>
       </a>
     </div>
   </section>
 
   <!-- ═══ FINAL CTA ═══ -->
-  <section class="max-w-6xl mx-auto px-4 pt-24 pb-10" aria-label="Call to action">
-    <div class="relative rounded-2xl border border-primary/20 overflow-hidden p-8 sm:p-12 lg:p-14" data-reveal>
-      <div class="pointer-events-none absolute inset-0" aria-hidden="true">
-        <div class="absolute inset-x-0 top-0 h-56 hero-glow"></div>
-        <div class="absolute top-0 right-0 w-80 h-80 glow-orb text-primary/[0.12]"></div>
-        <div class="absolute bottom-0 left-0 w-56 h-56 glow-orb text-primary/[0.05]"></div>
-      </div>
-
-      <div class="relative max-w-xl">
-        <h2 class="font-display text-sm font-semibold tracking-[0.18em] uppercase text-zinc-500">Get started</h2>
-        <h3 class="mt-4 font-display text-3xl sm:text-4xl font-bold text-foreground tracking-tight text-balance">
-          Spin up a panel tonight.
-        </h3>
-        <p class="mt-3 text-base text-zinc-400 max-w-md">
+  <section class="max-w-6xl mx-auto px-4 pt-14 sm:pt-16 pb-6" aria-label="Call to action">
+    <div class="panel-frame overflow-hidden" data-reveal>
+      <div class="p-6 sm:p-8">
+        <span class="deck-label">Get started</span>
+        <h2 class="mt-3 font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight text-balance">
+          Install Catalyst on your own hardware.
+        </h2>
+        <p class="mt-3 text-mini sm:text-data text-muted-foreground max-w-md">
           Open source in early testing. Panel GPLv3, agent MIT/Apache-2.0. One-command panel install.
         </p>
 
-        <div class="mt-8 flex flex-wrap items-center gap-3">
-          <a href="#install" class="cta-primary inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary-600 active:scale-[0.98] min-h-11 shadow-[0_0_0_1px_hsl(29_47%_50%/0.3),0_8px_28px_-8px_hsl(29_47%_56%/0.45)]">
+        <div class="mt-5 flex flex-wrap items-center gap-2">
+          <a href="#install" class="btn btn-md btn-primary">
             Install panel
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3" /></svg>
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7" /></svg>
           </a>
-          <a href={DISCORD_URL} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-lg border border-zinc-700/80 px-5 py-3 text-sm font-medium text-zinc-300 transition-all duration-200 hover:bg-surface-2 hover:text-zinc-100 active:scale-[0.98] min-h-11">
-            Join Discord
-          </a>
-          <a href="https://docs.catalystctl.com/" class="inline-flex items-center gap-2 rounded-lg border border-zinc-700/80 px-5 py-3 text-sm font-medium text-zinc-300 transition-all duration-200 hover:bg-surface-2 hover:text-zinc-100 active:scale-[0.98] min-h-11">
-            Read the docs
-          </a>
+          <a href={DISCORD_URL} target="_blank" rel="noopener noreferrer" class="btn btn-md btn-outline">Join Discord</a>
+          <a href="https://docs.catalystctl.com/" class="btn btn-md btn-quiet">Read the docs</a>
         </div>
 
-        <div class="mt-6 inline-flex max-w-full items-center gap-3 rounded-lg border border-zinc-800/70 bg-surface-0/80 pl-4 pr-1.5 py-1.5 font-mono text-xs" data-reveal>
-          <span class="text-primary select-none shrink-0">$</span>
-          <code class="text-zinc-300 truncate">{INSTALL_CMD}</code>
-          <button class="copy-btn shrink-0" data-copy={INSTALL_CMD} aria-label="Copy install command">
-            Copy
-          </button>
+        <div class="mt-5 deck-panel overflow-hidden">
+          <div class="deck-toolbar justify-between">
+            <span class="deck-label">Command</span>
+            <button class="copy-btn" data-copy={INSTALL_CMD} aria-label="Copy install command">Copy</button>
+          </div>
+          <div class="px-3 py-2.5 font-mono text-micro bg-surface-0 overflow-x-auto">
+            <span class="text-primary select-none">$</span> <span class="text-chalk/85 break-all">{INSTALL_CMD}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -683,15 +639,6 @@ const archLayers = [
       });
     });
 
-    // ── Spotlight cards: one delegated listener drives --mx/--my ──
-    document.addEventListener('pointermove', (e) => {
-      const card = (e.target as Element).closest?.('.spotlight-card');
-      if (!card) return;
-      const rect = card.getBoundingClientRect();
-      card.style.setProperty('--mx', `${e.clientX - rect.left}px`);
-      card.style.setProperty('--my', `${e.clientY - rect.top}px`);
-    }, { passive: true });
-
     // ── Install terminal: arm, then stagger lines when scrolled into view ──
     const term = document.getElementById('install-term');
     if (term && !reduceMotion) {
@@ -708,18 +655,6 @@ const archLayers = [
         });
       }, { threshold: 0.35 });
       termObserver.observe(term);
-    }
-
-    // ── Fleet illustration jitter (decorative only, not real telemetry) ──
-    if (!reduceMotion) {
-      const pings = document.querySelectorAll<HTMLElement>('.fleet-ping');
-      setInterval(() => {
-        pings.forEach((el) => {
-          const base = parseInt(el.dataset.ping || '10', 10);
-          const next = Math.max(1, base + Math.round((Math.random() - 0.5) * 6));
-          el.textContent = `${next}ms`;
-        });
-      }, 2600);
     }
   </script>
 

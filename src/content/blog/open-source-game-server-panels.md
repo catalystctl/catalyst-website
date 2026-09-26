@@ -2,6 +2,7 @@
 title: "Open Source Game Server Panels Compared: 2026 Edition"
 description: "Every open source game server management panel in 2026, compared on architecture, features, license, community, and maturity. Find the right panel for your self-hosted setup."
 pubDate: 2026-04-28
+updatedDate: 2026-09-25
 author: "Catalyst Team"
 audience: ["hobbyists", "businesses"]
 keywords:
@@ -11,11 +12,24 @@ keywords:
   - pterodactyl alternative
   - game panel comparison
   - free game server panel
+faqs:
+  - q: "What is the best free open source game server panel?"
+    a: "There is no single winner. Pterodactyl has the largest community and egg library, Catalyst adds containerd-native nodes, a native plugin system, and 50+ RBAC permissions, Pelican is Pterodactyl's fork with different governance, and PufferPanel is the lightest option for a handful of servers. All four are free to self-host."
+  - q: "Is Pterodactyl open source?"
+    a: "Yes. Pterodactyl's panel and its Wings daemon are both licensed under MIT, which is permissive: you can modify and redistribute them, including commercially, as long as you keep the copyright notice. You can self-host without paying per-server fees. Pterodactyl's lack of a native plugin API is the limitation that matters more than its licence."
+  - q: "Is Pterodactyl free for commercial game hosting?"
+    a: "Yes, you can run a commercial hosting business on Pterodactyl without licensing fees, because it is MIT-licensed software. The MIT licence lets you modify and redistribute the panel, including commercially, as long as you retain the copyright notice. Pelican, the community fork, relicensed the panel to AGPL-3.0, which additionally requires publishing modifications when you distribute it. Catalyst's panel is GPLv3 with an MIT/Apache-2.0 node agent."
+  - q: "Which open source game server panel is best for a small server?"
+    a: "For one to five servers, PufferPanel is the simplest and lightest. Catalyst is also practical at small scale because the panel installs with one Docker Compose command, and it scales to many nodes later without switching panels."
+  - q: "Do open source game server panels support multiple games?"
+    a: "Yes. Pterodactyl, Pelican, and Catalyst all support many games through templates or eggs, covering Minecraft Java and Bedrock, Counter-Strike 2, ARK, Rust, Valheim, Palworld, and more. Catalyst ships 258 egg definitions across 167 games and can import Pterodactyl eggs."
+  - q: "Do I need to know Linux to run a game server panel?"
+    a: "You need basic Linux commands to install the panel and its dependencies, but day-to-day management happens in the web interface. Catalyst installs with a single script, and the panel then handles consoles, files, backups, and users without SSH."
 ---
 
 > **TL;DR:** Four open-source panels dominate in 2026: **Pterodactyl** (largest community), **Pelican** (its fork), **Catalyst** (TS panel + Rust agent + containerd, in early testing), and **PufferPanel** (lightweight Go). Pick Pterodactyl for maturity, Catalyst for containerd-native nodes and plugins, Pelican for community preference, PufferPanel for simplicity.
 
-Self-hosting game servers doesn't mean you have to SSH into a box and run shell scripts. Open source game server panels give you a web interface, console access, file management, and automation - for free.
+Self-hosting game servers doesn't mean you have to SSH into a box and run shell scripts. Open source game server panels give you a web interface, console access, file management, and automation, for free.
 
 But which one should you use? This guide compares every significant open source game server panel available in 2026, so you can pick the right tool for your situation. For a focused look at modern Pterodactyl replacements, see [every Pterodactyl alternative compared](/blog/pterodactyl-alternatives-2026/).
 
@@ -23,12 +37,12 @@ But which one should you use? This guide compares every significant open source 
 
 If you're running one Minecraft server for three friends, a panel might seem like overkill. But even for small setups, panels provide real value:
 
-- **Web console access** - See server logs in real-time, send commands, without SSH
-- **File manager** - Edit configs, upload mods, manage worlds from your browser
-- **Scheduled tasks** - Automatic restarts, backups, and updates
-- **User management** - Give friends limited access instead of full server control
-- **Multi-server management** - Run multiple games from one dashboard
-- **Monitoring** - Resource usage, server status, crash detection
+- **Web console access**: See server logs in real-time, send commands, without SSH
+- **File manager**: Edit configs, upload mods, manage worlds from your browser
+- **Scheduled tasks**: Automatic restarts, backups, and updates
+- **User management**: Give friends limited access instead of full server control
+- **Multi-server management**: Run multiple games from one dashboard
+- **Monitoring**: Resource usage, server status, crash detection
 
 Once you've used a panel, going back to manual server management feels like editing documents without a word processor.
 
@@ -36,7 +50,7 @@ Once you've used a panel, going back to manual server management feels like edit
 
 ### Pterodactyl
 
-**License:** AGPL-3.0 | **Stack:** PHP + Go (Wings) + Docker | **Maturity:** Very high
+**License:** MIT | **Stack:** PHP + Go (Wings) + Docker | **Maturity:** Very high
 
 Pterodactyl is the most widely used open source game server panel. It's been around since 2015 and has the largest community, the most templates (eggs), and the most third-party resources.
 
@@ -48,7 +62,7 @@ Pterodactyl is the most widely used open source game server panel. It's been aro
 
 **Cons:**
 - PHP panel is heavier to operate than minimal alternatives
-- No native plugin system - customization often requires forking
+- No native plugin system, so customization often requires forking
 - Wings daemon adds operational complexity
 - Coarse permissions compared to granular RBAC
 - Installation is manual
@@ -57,7 +71,7 @@ Pterodactyl is the most widely used open source game server panel. It's been aro
 
 ### Pelican Panel
 
-**License:** MIT | **Stack:** PHP + Go (Wings) + Docker | **Maturity:** Medium
+**License:** AGPL-3.0 | **Stack:** PHP + Go (Wings) + Docker | **Maturity:** Medium
 
 Pelican is a fork of Pterodactyl with a different governance model. It's Pterodactyl's code with a different team making decisions.
 
@@ -78,7 +92,7 @@ Pelican is a fork of Pterodactyl with a different governance model. It's Pteroda
 
 **License:** Panel GPLv3, agent MIT/Apache-2.0 | **Stack:** TypeScript panel + Rust agent + containerd | **Maturity:** Early testing
 
-Catalyst is built from scratch — TypeScript Fastify panel (PostgreSQL + Redis) with a containerd-native Rust agent and a native plugin system. It's designed as a true alternative, not a fork.
+Catalyst is built from scratch: a TypeScript Fastify panel (PostgreSQL + Redis) with a containerd-native Rust agent and a native plugin system. It's designed as a true alternative, not a fork.
 
 **Pros:**
 - Live console, file manager, SFTP, backups, and scheduling in one panel
@@ -90,7 +104,7 @@ Catalyst is built from scratch — TypeScript Fastify panel (PostgreSQL + Redis)
 - containerd on game nodes (panel itself ships via Docker)
 
 **Cons:**
-- Early testing with a smaller community — expect churn
+- Early testing with a smaller community; expect churn
 - Fewer third-party themes and mods than Pterodactyl
 - Panel GPLv3 is more restrictive than MIT for some use cases
 
@@ -103,13 +117,13 @@ Catalyst is built from scratch — TypeScript Fastify panel (PostgreSQL + Redis)
 PufferPanel is a lightweight panel written in Go. It's simpler than Pterodactyl and designed for ease of use.
 
 **Pros:**
-- Written in Go - faster and lighter than PHP
+- Written in Go, faster and lighter than PHP
 - Simple, clean interface
 - Low resource requirements
 - Easy to set up
 
 **Cons:**
-- Limited feature set - fewer API endpoints, no plugin system
+- Limited feature set: fewer API endpoints, no plugin system
 - Smaller community and fewer templates
 - Less comprehensive admin tools
 - Not designed for commercial hosting scale
@@ -120,7 +134,7 @@ PufferPanel is a lightweight panel written in Go. It's simpler than Pterodactyl 
 
 | Feature | Pterodactyl | Pelican | Catalyst | PufferPanel |
 |---------|-------------|---------|----------|-------------|
-| License | AGPL-3.0 | MIT | Panel GPLv3 / agent MIT-Apache | Apache 2.0 |
+| License | MIT | AGPL-3.0 | Panel GPLv3 / agent MIT-Apache | Apache 2.0 |
 | Panel language | PHP | PHP | TypeScript | Go |
 | Container runtime (nodes) | Docker via Wings | Docker via Wings | containerd via Rust agent | Docker |
 | Node agent | Wings (Go) | Wings (Go) | Agent (Rust) | Built-in |
@@ -144,15 +158,15 @@ PufferPanel is a lightweight panel written in Go. It's simpler than Pterodactyl 
 
 ### Starting a hosting business (20+ servers)
 
-Evaluate both: **Catalyst** for API coverage, RBAC, and plugins in early testing; **Pterodactyl** for maturity and ecosystem. Do not bet production on latency headlines — test with your workload.
+Evaluate both: **Catalyst** for API coverage, RBAC, and plugins in early testing; **Pterodactyl** for maturity and ecosystem. Do not bet production on latency headlines. Test with your workload.
 
 ### Existing Pterodactyl user considering a switch
 
 **Catalyst** with the built-in migration tool. Import your servers, verify they work, and cut over. The migration tool handles nodes, users, eggs, servers, and files automatically.
 
-### Philosophically prefer MIT license
+### Philosophically prefer a permissive MIT license
 
-**Pterodactyl** or **Pelican**. GPLv3 requires you to share modifications if you distribute the software, which matters for some commercial use cases. MIT is more permissive.
+**Pterodactyl**. Its panel and Wings are both MIT, which is more permissive than Catalyst's GPLv3 panel or Pelican's AGPL-3.0. MIT lets you modify and redistribute, including commercially, provided you keep the copyright notice; copyleft licences add the requirement to publish your modifications when you distribute the software.
 
 ## The self-hosting advantage
 
@@ -167,4 +181,4 @@ All four panels are open source and free to use. That means:
 
 If you're new to game server panels, start with Catalyst's [quick start guide](https://docs.catalystctl.com/getting-started/quickstart/). One command installs the panel; game nodes need containerd plus the agent.
 
-For a broader comparison, check out [every Pterodactyl alternative in the 2026 buyer's guide](/blog/pterodactyl-alternatives-2026/) and the [three-way Pterodactyl vs Pelican vs Catalyst comparison](/blog/pterodactyl-vs-pelican-vs-catalyst/). For the infrastructure angle, see [why platforms are moving to Rust](/blog/why-game-server-platforms-moving-to-rust/).
+For a broader comparison, check out [every Pterodactyl alternative in the 2026 buyer's guide](/blog/pterodactyl-alternatives-2026/) and the [three-way Pterodactyl vs Pelican vs Catalyst comparison](/blog/pterodactyl-vs-pelican-vs-catalyst/). For the infrastructure angle, see [why platforms are moving to Rust](/blog/why-game-server-platforms-moving-to-rust/). If you are planning an install, size the host with the [Pterodactyl requirements checklist](/blog/pterodactyl-panel-requirements/) and follow the [installation walkthrough](/blog/how-to-install-a-game-server-panel/).

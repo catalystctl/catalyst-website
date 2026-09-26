@@ -2,6 +2,7 @@
 title: "Enterprise Game Server Management: Security, Compliance, and Scale"
 description: "How enterprises can manage game server infrastructure at scale. Covers security architecture, compliance requirements, RBAC, audit logging, and why containerd beats Docker for enterprise deployments."
 pubDate: 2026-04-15
+updatedDate: 2026-09-25
 author: "Catalyst Team"
 audience: ["enterprises", "hosting-providers"]
 keywords:
@@ -11,11 +12,24 @@ keywords:
   - containerd enterprise
   - game server rbac
   - game server audit logging
+faqs:
+  - q: "What is enterprise game server management?"
+    a: "It is running game server infrastructure for organisations that need multi-tenancy, formal access control, audit trails, compliance, and scale. Instead of one admin password for everything, enterprises need granular roles, per-action logging, isolated tenants, and API-driven automation that maps to existing change management."
+  - q: "How does RBAC work in Catalyst?"
+    a: "Catalyst ships a catalog of 59 permissions across 13 categories that you combine into roles. Roles can be scoped to specific servers and specific nodes, so a support role might restart servers but not delete them, and a node operator might only manage assigned nodes. Every role change is written to the audit log."
+  - q: "Does Catalyst include audit logging?"
+    a: "Yes, audit logging is built into the panel rather than added by a third-party plugin. It records logins, server creation and deletion, console commands, file operations, permission and role changes, API key usage, and node registration. Records live in PostgreSQL and can be exported through the API."
+  - q: "Is Catalyst SOC 2 or GDPR compliant?"
+    a: "Catalyst itself is not certified; it is open-source software. Its design supports compliance work: granular RBAC, audit logging, scoped expiring API keys, data minimisation, deletion and export through the API, and no telemetry phoning home. Your deployment still needs its own controls, policies, and audit."
+  - q: "Can Catalyst isolate multiple tenants on one host?"
+    a: "Yes. Every server runs in its own namespace with cgroup v2 resource limits, and Catalyst talks directly to containerd with no shared Docker socket. That removes the daemon-level privilege escalation path that a Docker socket exposes in multi-tenant hosting."
+  - q: "Does Catalyst support SSO or external identity providers?"
+    a: "Yes, through the plugin system. First-party plugins add OIDC single sign-on and Discord OAuth, and the plugin OAuth bridge lets extensions sign users in against external providers. That lets an enterprise connect the panel to its existing identity provider without forking the core."
 ---
 
 Game server management at the enterprise level isn't the same as running a Minecraft server for friends. When you're deploying game infrastructure for schools, esports organizations, military training simulations, or large hosting providers, the requirements change dramatically.
 
-Security, compliance, audit trails, and role-based access control aren't nice-to-haves - they're requirements that can make or break a deployment. This article covers what enterprise game server management actually requires and how to evaluate platforms against those requirements.
+Security, compliance, audit trails, and role-based access control aren't nice-to-haves; they're requirements that can make or break a deployment. This article covers what enterprise game server management actually requires and how to evaluate platforms against those requirements.
 
 ## What makes enterprise different
 
@@ -23,7 +37,7 @@ Enterprise game server deployments share some characteristics that hobbyist and 
 
 - **Multi-tenant by default.** Different departments, teams, or clients share the same infrastructure with strict isolation requirements.
 - **Compliance obligations.** GDPR, SOC 2, FERPA (education), or internal security policies dictate how data is handled, who can access it, and what must be logged.
-- **Formal access control.** Not "admin vs user" - granular, auditable role definitions that map to organizational structure.
+- **Formal access control.** Not "admin vs user," but granular, auditable role definitions that map to organizational structure.
 - **Operational rigor.** SLAs, incident response procedures, change management, and disaster recovery plans.
 - **Scale.** Hundreds or thousands of servers across multiple regions, managed by teams of operators.
 
@@ -31,7 +45,7 @@ Enterprise game server deployments share some characteristics that hobbyist and 
 
 ### Container isolation
 
-Game servers run arbitrary code - game binaries, mods, plugins, user-uploaded scripts. At enterprise scale, you need to trust that one compromised server can't affect others.
+Game servers run arbitrary code: game binaries, mods, plugins, user-uploaded scripts. At enterprise scale, you need to trust that one compromised server can't affect others.
 
 **Docker isolation (Pterodactyl/Pelican):**
 
@@ -39,7 +53,7 @@ Docker provides namespace isolation, but the Docker daemon itself is a single po
 
 **containerd isolation (Catalyst):**
 
-containerd is the container runtime that powers Kubernetes. It's designed for multi-tenant isolation from the ground up. Catalyst talks directly to containerd - no Docker daemon in the middle. This means:
+containerd is the container runtime that powers Kubernetes. It's designed for multi-tenant isolation from the ground up. Catalyst talks directly to containerd, with no Docker daemon in the middle. This means:
 
 - No shared daemon that's a single point of failure
 - Namespace isolation per server, matching Kubernetes best practices
@@ -185,7 +199,7 @@ Common enterprise integration patterns:
 
 Catalyst's architecture supports HA deployments:
 
-- **Stateless panel instances** behind a load balancer - no sticky sessions required
+- **Stateless panel instances** behind a load balancer (no sticky sessions required)
 - **PostgreSQL with streaming replication** for database HA
 - **Multiple nodes per region** for geographic redundancy
 - **Automated failover** via API-driven health checks
@@ -204,11 +218,11 @@ Backup schedules are configurable per server, and restore operations are availab
 
 If you're evaluating game server platforms for an enterprise deployment, the requirements go beyond "can it run a Minecraft server." You need:
 
-1. **Granular RBAC** - 50+ permissions that map to your organizational structure.
-2. **Audit logging** - Built-in, comprehensive, exportable. Not a third-party afterthought.
-3. **Containerd runtime** - Kubernetes-grade isolation, no Docker daemon risk.
-4. **API coverage** - 200+ route handlers for automation with RBAC.
-5. **Plugin extensibility** - Integration without forking. SSO, monitoring, ticketing, custom workflows.
-6. **Split stack** - TypeScript panel (Fastify/PostgreSQL/Redis) with a static Rust agent on nodes, minimal daemon on game hosts.
+1. **Granular RBAC:** 50+ permissions that map to your organizational structure.
+2. **Audit logging:** Built-in, comprehensive, exportable. Not a third-party afterthought.
+3. **Containerd runtime:** Kubernetes-grade isolation, no Docker daemon risk.
+4. **API coverage:** 200+ route handlers for automation with RBAC.
+5. **Plugin extensibility:** Integration without forking. SSO, monitoring, ticketing, custom workflows.
+6. **Split stack:** TypeScript panel (Fastify/PostgreSQL/Redis) with a static Rust agent on nodes, minimal daemon on game hosts.
 
 Catalyst is the only open source game server panel that delivers all six. [Compare it directly against Pterodactyl](/pterodactyl-alternative/#comparison) or [get started with a test deployment](https://docs.catalystctl.com/getting-started/quickstart/). For the runtime layer behind this architecture, see [containerd vs Docker for game servers](/blog/containerd-vs-docker-game-servers/). Building a business on top? Read [how to build a hosting business with Catalyst](/blog/game-hosting-business-with-catalyst/).

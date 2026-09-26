@@ -2,6 +2,7 @@
 title: "Why Game Server Platforms Are Moving from PHP to Rust"
 description: "The technical case for Rust in game server management. Why PHP's limitations matter at scale, how Rust solves them, and what the shift means for hosting providers and players."
 pubDate: 2026-04-22
+updatedDate: 2026-09-25
 author: "Catalyst Team"
 audience: ["enterprises", "hosting-providers"]
 keywords:
@@ -10,10 +11,23 @@ keywords:
   - game server performance
   - rust backend
   - game server architecture
-  - rust axum
+  - rust game server agent
+faqs:
+  - q: "Is Rust better than PHP for a game server panel?"
+    a: "Rust is a strong fit for the node-side agent, where a small static binary handles container operations and concurrent console streams. It is not automatically better for the panel itself, where database, cache, and framework choices dominate performance. Catalyst uses TypeScript on Fastify for the panel and Rust for the agent."
+  - q: "What language is the Pterodactyl panel written in?"
+    a: "Pterodactyl's panel is PHP built on Laravel, with a React frontend and MySQL or MariaDB for storage. Its node daemon, Wings, is written in Go and manages Docker containers on each host."
+  - q: "What language is the Catalyst panel written in?"
+    a: "Catalyst's panel is TypeScript on Fastify with PostgreSQL and Redis, and its frontend is React with Vite. Game nodes run a Rust agent, compiled as a static binary, that talks directly to containerd instead of the Docker daemon."
+  - q: "Does using Rust make game servers run faster?"
+    a: "The Rust agent speeds up node-side operations such as container start, stop, and console streaming, but a game server's tick rate depends mostly on CPU, memory, and the game software itself. Catalyst has not published a benchmark claiming a performance multiple, so test your own workload."
+  - q: "Should I switch game server panels because of the programming language?"
+    a: "Not on its own. Choose a panel on verified features, operations fit, and maturity. Language matters indirectly: it shapes deployment (static binary versus a daemon), concurrency limits for live consoles, and how much memory the node layer consumes."
+  - q: "Why use Rust for a node agent instead of Go?"
+    a: "Both compile to static binaries. Rust adds compile-time memory and data-race safety and has containerd client bindings, which suits an agent holding many concurrent container streams. Go remains a proven choice for this class of tooling, and Pterodactyl's Wings is a good example."
 ---
 
-PHP powered the web for two decades. It ran Facebook, Wikipedia, and - until recently - the most popular game server management panel in the world. But the game server landscape is changing, and PHP's limitations are becoming harder to ignore.
+PHP powered the web for two decades. It ran Facebook, Wikipedia, and, until recently, the most popular game server management panel in the world. But the game server landscape is changing, and PHP's limitations are becoming harder to ignore.
 
 This article explains why the industry is moving from PHP to Rust for game server infrastructure, what the technical differences mean in practice, and whether you should care.
 
@@ -31,7 +45,7 @@ PHP 8 introduced fiber-based concurrency, and Laravel Octane supports long-runni
 
 ### WebSocket handling
 
-Game server panels need live console streaming. Pterodactyl handles node-side streaming in Wings (Go). Catalyst handles node-side streaming in its Rust agent, relayed through the TypeScript panel gateway — not “no hop,” but a panel + agent split.
+Game server panels need live console streaming. Pterodactyl handles node-side streaming in Wings (Go). Catalyst handles node-side streaming in its Rust agent, relayed through the TypeScript panel gateway. That is a panel and agent split, not a single hop.
 
 In Rust, the agent can hold many concurrent container streams with a small static binary. That helps node density, but panel capacity still depends on PostgreSQL, Redis, and Node tuning.
 
@@ -53,7 +67,7 @@ Rust's ownership model prevents data races at compile time. This means you can w
 
 ### Single binary deployment (agent)
 
-The Rust agent compiles to a single static binary. Deploying the agent is copying one file and running it against containerd. The panel itself is TypeScript on Node.js with PostgreSQL + Redis via Docker Compose — not a single binary.
+The Rust agent compiles to a single static binary. Deploying the agent is copying one file and running it against containerd. The panel itself is TypeScript on Node.js with PostgreSQL + Redis via Docker Compose, not a single binary.
 
 ### containerd-native (nodes)
 
@@ -65,7 +79,7 @@ A static Rust agent binary starts fast with no interpreter. The Catalyst panel i
 - **Node recovery:** agent reconnects to containerd and resumes console streams.
 - **Development velocity:** small agent binary means quick deploys to nodes.
 
-## Honest performance note
+## Performance caveats
 
 This repo contains no published benchmark backing panel memory, latency, or throughput multiples. Treat “10x” tables as marketing, not measurement. What you can verify in code:
 
@@ -77,7 +91,7 @@ This repo contains no published benchmark backing panel memory, latency, or thro
 | Live console | Via Wings | Via panel gateway + Rust agent |
 | API | REST + WebSocket | 200+ route handlers with RBAC |
 
-Choose on ops fit and verified features — not on latency headlines.
+Choose on ops fit and verified features, not on latency headlines.
 
 ## What this means for different users
 
@@ -87,7 +101,7 @@ The stack difference is nice but not critical for a few servers. The bigger bene
 
 ### For hosting providers
 
-What matters is automation and access control: 200+ API route handlers, 50+ RBAC permissions, cron tasks, S3-compatible/SFTP backups, and Pterodactyl import. Test infrastructure costs with your workload — do not budget on “$200-500/month” headlines without measuring.
+What matters is automation and access control: 200+ API route handlers, 50+ RBAC permissions, cron tasks, S3-compatible/SFTP backups, and Pterodactyl import. Test infrastructure costs with your workload. Do not budget on “$200-500/month” headlines without measuring.
 
 ### For enterprises
 

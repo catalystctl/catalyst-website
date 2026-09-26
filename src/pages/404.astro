@@ -14,48 +14,39 @@ const links = [
 
 <Layout title="Page Not Found" description="The page you are looking for does not exist.">
 
-  <section class="relative overflow-hidden min-h-[70vh] flex items-center">
-    <div class="pointer-events-none absolute inset-0" aria-hidden="true">
-      <div class="absolute top-1/4 left-1/2 -translate-x-1/2 h-80 w-80 glow-orb text-primary/[0.08]"></div>
-      <div class="absolute bottom-0 right-1/4 h-48 w-48 glow-orb text-primary/[0.04]"></div>
-    </div>
-
-    <div class="relative max-w-6xl mx-auto px-4 py-16 sm:py-24 w-full">
+  <section class="min-h-[70vh] flex items-center">
+    <div class="max-w-6xl mx-auto px-4 py-16 sm:py-24 w-full">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
         <div class="lg:col-span-5">
-          <p class="font-mono text-sm text-primary mb-3">404</p>
-          <h1 class="font-display text-3xl sm:text-4xl font-bold text-foreground tracking-tight text-balance">
-            This route is offline.
+          <p class="deck-label deck-label--hazard mb-3">404</p>
+          <h1 class="font-display text-2xl sm:text-3xl font-semibold text-foreground tracking-tight text-balance">
+            Page not found.
           </h1>
-          <p class="mt-4 text-base text-zinc-400 leading-relaxed max-w-md text-pretty">
-            The page does not exist or moved. Pick a destination below, or jump straight to install.
+          <p class="mt-3 text-data text-muted-foreground leading-relaxed max-w-md text-pretty">
+            The page does not exist or has moved. Pick a destination below, or go straight to the install command.
           </p>
-          <div class="mt-8 flex flex-wrap gap-3">
-            <a href={B + "#install"} class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary-600 active:scale-[0.98] min-h-11 shadow-[0_0_0_1px_hsl(29_47%_50%/0.3),0_8px_28px_-8px_hsl(29_47%_56%/0.45)]">
-              Install panel
-            </a>
-            <a href={B} class="inline-flex items-center gap-2 rounded-lg border border-zinc-700/80 px-5 py-3 text-sm font-medium text-zinc-300 transition-all duration-200 hover:bg-surface-2 hover:text-zinc-100 active:scale-[0.98] min-h-11">
-              Go home
-            </a>
+          <div class="mt-6 flex flex-wrap gap-2">
+            <a href={B + "#install"} class="btn btn-md btn-primary">Install panel</a>
+            <a href={B} class="btn btn-md btn-outline">Go home</a>
           </div>
         </div>
 
         <div class="lg:col-span-7">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-px rounded-xl border border-zinc-800/60 overflow-hidden bg-zinc-800/60">
+          <div class="deck-panel overflow-hidden grid grid-cols-1 sm:grid-cols-2 gap-px bg-border/40">
             {links.map((link) => (
               <a
                 href={link.href}
-                class="group bg-surface-1 p-5 sm:p-6 transition-colors hover:bg-surface-2"
+                class="group bg-card p-4 transition-colors hover:bg-surface-1/40"
                 {...(link.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
               >
-                <h2 class="font-semibold text-foreground text-[15px] group-hover:text-primary transition-colors">{link.label}</h2>
-                <p class="mt-1.5 text-sm text-zinc-500">{link.blurb}</p>
+                <h2 class="font-display text-data font-semibold text-foreground group-hover:text-primary transition-colors">{link.label}</h2>
+                <p class="mt-1 text-micro text-muted-foreground">{link.blurb}</p>
               </a>
             ))}
           </div>
-          <p class="mt-6 text-xs text-zinc-600">
+          <p class="mt-4 text-micro text-muted-foreground/70">
             Think this is a bug?
-            <a href={GITHUB_URL + "/issues"} target="_blank" rel="noopener noreferrer" class="text-zinc-500 hover:text-zinc-300 transition-colors underline underline-offset-2 decoration-zinc-700">
+            <a href={GITHUB_URL + "/issues"} target="_blank" rel="noopener noreferrer" class="text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2 decoration-border">
               Open an issue on GitHub
             </a>
           </p>

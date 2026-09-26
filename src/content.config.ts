@@ -14,6 +14,16 @@ const blog = defineCollection({
     ogImage: z.string().optional(),
     category: z.string().optional(),
     featured: z.boolean().optional(),
+    // Per-post FAQ. Rendered visibly at the end of the article and emitted as
+    // FAQPage JSON-LD so answers can be surfaced in search/AI answer engines.
+    faqs: z
+      .array(
+        z.object({
+          q: z.string(),
+          a: z.string(),
+        })
+      )
+      .optional(),
   }),
 });
 

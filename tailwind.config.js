@@ -1,6 +1,16 @@
 import tailwindcssAnimate from 'tailwindcss-animate';
 
-/** @type {import('tailwindcss').Config} */
+/**
+ * Catalyst website theme.
+ *
+ * Mirrors the Catalyst panel's design system ("deck") so the marketing site and
+ * the product read as one surface. The panel ships a warm-charcoal neutral ramp,
+ * a 4px control radius, Oxanium display type, and JetBrains Mono tabular data.
+ * Values here are 1:1 with the panel's `:root` / `.dark` token blocks, with the
+ * brand accent pinned to the peach `--signal` used across the site.
+ *
+ * @type {import('tailwindcss').Config}
+ */
 export default {
   darkMode: ['class'],
   content: [
@@ -10,8 +20,14 @@ export default {
     extend: {
       fontFamily: {
         sans: ['"DM Sans Variable"', 'system-ui', 'sans-serif'],
-        display: ['"Outfit Variable"', 'system-ui', 'sans-serif'],
+        display: ['"Oxanium Variable"', 'system-ui', 'sans-serif'],
         mono: ['"JetBrains Mono Variable"', 'Fira Code', 'monospace'],
+      },
+      fontSize: {
+        // Panel micro-type scale
+        micro: ['.6875rem', { lineHeight: '1.35' }],
+        mini: ['.75rem', { lineHeight: '1.4' }],
+        data: ['.8125rem', { lineHeight: '1.45' }],
       },
       colors: {
         background: 'hsl(var(--background))',
@@ -29,17 +45,17 @@ export default {
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
-          50: 'hsl(29 45% 95%)',
-          100: 'hsl(29 45% 90%)',
-          200: 'hsl(29 46% 80%)',
-          300: 'hsl(29 47% 68%)',
-          400: 'hsl(29 47% 62%)',
-          500: 'hsl(29 47% 56%)',
-          600: 'hsl(29 47% 48%)',
-          700: 'hsl(29 45% 40%)',
-          800: 'hsl(30 42% 31%)',
-          900: 'hsl(30 40% 22%)',
-          950: 'hsl(32 45% 12%)',
+          50: 'hsl(var(--primary-50))',
+          100: 'hsl(var(--primary-100))',
+          200: 'hsl(var(--primary-200))',
+          300: 'hsl(var(--primary-300))',
+          400: 'hsl(var(--primary-400))',
+          500: 'hsl(var(--primary-500))',
+          600: 'hsl(var(--primary-600))',
+          700: 'hsl(var(--primary-700))',
+          800: 'hsl(var(--primary-800))',
+          900: 'hsl(var(--primary-900))',
+          950: 'hsl(var(--primary-950))',
         },
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
@@ -70,6 +86,16 @@ export default {
           DEFAULT: 'hsl(var(--info))',
           muted: 'hsl(var(--info-muted))',
         },
+        // Panel semantic neutrals
+        ink: 'hsl(var(--ink))',
+        chalk: 'hsl(var(--chalk))',
+        dust: 'hsl(var(--dust))',
+        edge: 'hsl(var(--edge))',
+        panel: {
+          DEFAULT: 'hsl(var(--panel))',
+          2: 'hsl(var(--panel-2))',
+        },
+        scrim: 'hsl(var(--scrim))',
         surface: {
           DEFAULT: 'hsl(var(--surface-1))',
           0: 'hsl(var(--surface-0))',
@@ -77,6 +103,7 @@ export default {
           2: 'hsl(var(--surface-2))',
           3: 'hsl(var(--surface-3))',
         },
+        // Cool zinc ramp, matching the panel's `.dark` block
         zinc: {
           50: 'hsl(var(--zinc-50))',
           100: 'hsl(var(--zinc-100))',
@@ -92,17 +119,25 @@ export default {
         },
       },
       borderRadius: {
-        lg: '0.5rem',
-        md: '0.375rem',
-        sm: '0.25rem',
-        xl: '0.75rem',
-        '2xl': '1rem',
+        // Control radius is 4px (`--radius`), frames step up from there.
+        sm: 'var(--radius)',
+        DEFAULT: 'var(--radius)',
+        md: 'calc(var(--radius) + 2px)',
+        lg: 'calc(var(--radius) + 4px)',
+        xl: 'calc(var(--radius) + 6px)',
+        '2xl': 'calc(var(--radius) + 10px)',
       },
       boxShadow: {
-        'surface-light': '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-        'surface-dark': '0 1px 2px 0 rgb(0 0 0 / 0.4)',
-        'elevated': '0 4px 12px -2px rgb(0 0 0 / 0.1)',
-        'elevated-dark': '0 4px 12px -2px rgb(0 0 0 / 0.6)',
+        panel: 'var(--shadow-panel)',
+        surface: 'var(--shadow-surface)',
+        elevated: 'var(--shadow-elevated)',
+      },
+      transitionTimingFunction: {
+        standard: 'var(--ease-standard)',
+      },
+      transitionDuration: {
+        fast: 'var(--duration-fast)',
+        normal: 'var(--duration-normal)',
       },
     },
   },

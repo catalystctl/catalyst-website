@@ -2,6 +2,7 @@
 title: "Setting Up Your First Game Server: A Complete Beginner's Guide"
 description: "Never ran a game server before? This guide covers everything from choosing hardware to installing Catalyst, creating your first server, and inviting friends to play. No experience required."
 pubDate: 2026-04-10
+updatedDate: 2026-09-25
 author: "Catalyst Team"
 audience: ["hobbyists"]
 keywords:
@@ -11,6 +12,19 @@ keywords:
   - minecraft server setup
   - game server hosting tutorial
   - self host game server
+faqs:
+  - q: "Do I need a powerful computer to run a game server?"
+    a: "For a small Minecraft server, 2 CPU cores, 4GB of RAM, and 20GB of storage are enough. An old desktop, a $50 used mini PC, or a $5-10 per month VPS all work. Bigger modpacks, more players, and heavier games raise the CPU and RAM you need."
+  - q: "How much RAM does a Minecraft server need?"
+    a: "A vanilla server for a few friends runs comfortably in 2GB. Plan for 4-8GB once you add plugins or more players, and 8-16GB for large modpacks. Always leave RAM for the operating system on top of what you give the server."
+  - q: "Can I run a game server on Windows?"
+    a: "You can, but every mainstream game server panel, including Catalyst, Pterodactyl, and Pelican, targets Linux. Ubuntu Server 22.04 or 24.04 LTS is the easiest host. You can keep using Windows on your own PC and manage the Linux server through the panel's web interface."
+  - q: "Do I need port forwarding to host a game server?"
+    a: "If the server is on your home network, yes, because your router blocks incoming connections by default. Forward the game port to the server's local IP. If you rent a VPS instead, the port is already reachable and no forwarding is needed. A mesh VPN such as Tailscale is a workaround when you cannot change router settings."
+  - q: "Do I need to know Docker to run a game server?"
+    a: "For Catalyst, Docker is used on the panel host: the panel, PostgreSQL, and Redis run as containers, and the installer sets them up for you. Game nodes use containerd plus the Catalyst agent instead of Docker. You do not need to write Dockerfiles or Compose files to get started."
+  - q: "How do I let my friends join my game server?"
+    a: "Give them your public IP address and the game port, for example your-public-ip:25565 for Minecraft. If your ISP changes your IP, use a free dynamic DNS hostname, or a mesh VPN so players connect over a private network without exposing a port at all."
 ---
 
 You want to run your own game server. Maybe you're tired of playing on public servers with 200ms ping and someone else's rules. Maybe your Discord group wants a private world. Maybe you just want to learn how this stuff works.
@@ -36,21 +50,21 @@ This can be:
 
 Ubuntu Server 22.04 or 24.04 is the easiest choice. If you're using a cloud VPS, most providers let you select Ubuntu during setup.
 
-If you've never used Linux before, don't worry - you only need a few commands, and we'll give you all of them.
+If you've never used Linux before, don't worry: you only need a few commands, and we'll give you all of them.
 
 ### An internet connection
 
 - At least 5 Mbps upload speed (check at [speedtest.net](https://speedtest.net))
-- Access to your router's admin panel (for port forwarding - we'll walk you through it)
+- Access to your router's admin panel (for port forwarding; we'll walk you through it)
 
 ## Step 1: Install Linux (if needed)
 
-If you're using a cloud VPS, skip this step - Linux is already installed.
+If you're using a cloud VPS, skip this step. Linux is already installed.
 
 If you're using an old PC:
 1. Download [Ubuntu Server](https://ubuntu.com/download/server) and flash it to a USB drive using [Rufus](https://rufus.ie) (Windows) or [Balena Etcher](https://etcher.balena.io) (Mac/Windows)
 2. Boot from the USB drive and follow the installer
-3. Choose "Install OpenSSH Server" when asked - this lets you manage the server remotely
+3. Choose "Install OpenSSH Server" when asked. This lets you manage the server remotely
 
 ## Step 2: Install Docker
 
@@ -113,11 +127,11 @@ You should see the node appear as "Online" in the nodes list.
 3. Set resources:
    - **Memory:** 2048MB (2GB) for a small Minecraft server
    - **CPU:** 100% (let it use a full core)
-   - **Disk:** 5000MB (5GB) - more than enough for a new world
+   - **Disk:** 5000MB (5GB), more than enough for a new world
 4. Select your node
 5. Click **Create**
 
-The server starts automatically. Click on it to see the console - you'll see the Minecraft server starting up in real time. When you see "Done (X.XXXs)!", the server is ready.
+The server starts automatically. Click on it to see the console. You'll see the Minecraft server starting up in real time. When you see "Done (X.XXXs)!", the server is ready.
 
 ## Step 6: Let your friends connect
 
@@ -132,7 +146,7 @@ Visit [whatismyip.com](https://whatismyip.com) from any device on your network. 
 Your router blocks incoming connections by default. You need to tell it "if someone connects on port 25565, send them to my server."
 
 1. Find your server's local IP: Run `ip addr` on your server. Look for something like `192.168.1.100`
-2. Log into your router (usually `http://192.168.1.1` - check the label on the back)
+2. Log into your router (usually `http://192.168.1.1`; check the label on the back)
 3. Find "Port Forwarding" (sometimes under "NAT" or "Advanced")
 4. Add a rule:
    - **External port:** 25565
@@ -154,13 +168,13 @@ Can't connect? Common issues:
 
 Through Catalyst's file manager, you can:
 
-- **Edit server.properties** - Change the server name, difficulty, game mode, max players
-- **Add operators** - Edit ops.json to give yourself and friends admin access
-- **Install mods** - Upload Forge or Fabric mod JARs to the mods folder
-- **Install plugins** - Upload Paper/Spigot plugins for server features
-- **Set up a whitelist** - Only allow specific players to join
+- **Edit server.properties**: Change the server name, difficulty, game mode, max players
+- **Add operators**: Edit ops.json to give yourself and friends admin access
+- **Install mods**: Upload Forge or Fabric mod JARs to the mods folder
+- **Install plugins**: Upload Paper/Spigot plugins for server features
+- **Set up a whitelist**: Only allow specific players to join
 
-You can do all of this from the Catalyst web interface - no SSH or command line needed.
+You can do all of this from the Catalyst web interface; no SSH or command line needed.
 
 ## Running more than one server
 
@@ -177,7 +191,7 @@ All your servers show up on one dashboard with their status, resource usage, and
 
 ### Backups
 
-Catalyst can automatically back up your server world and configuration. Set up a daily backup schedule in the server settings - if anything goes wrong, you can restore from the panel.
+Catalyst can automatically back up your server world and configuration. Set up a daily backup schedule in the server settings. If anything goes wrong, you can restore from the panel.
 
 ### Whitelist
 
@@ -215,4 +229,4 @@ If you want to host something specific next, our [Minecraft at home guide](/blog
 
 If you want to go deeper, the [Catalyst documentation](https://docs.catalystctl.com/) covers everything from node management to the plugin system to the full API reference.
 
-[Get started now](https://docs.catalystctl.com/getting-started/quickstart/) - your server is 60 seconds away.
+[Get started now](https://docs.catalystctl.com/getting-started/quickstart/): your server is 60 seconds away.

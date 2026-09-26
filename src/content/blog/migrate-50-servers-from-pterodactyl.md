@@ -2,6 +2,7 @@
 title: "How to Migrate 50+ Servers from Pterodactyl Without Downtime"
 description: "A practical migration playbook for moving 50 or more game servers from Pterodactyl to Catalyst. Includes pre-migration checks, phased migration strategies, and rollback procedures."
 pubDate: 2026-05-01
+updatedDate: 2026-09-25
 author: "Catalyst Team"
 audience: ["businesses", "hosting-providers"]
 keywords:
@@ -10,6 +11,19 @@ keywords:
   - move game servers
   - server migration without downtime
   - catalyst migration tool
+faqs:
+  - q: "How long does it take to migrate 50 servers from Pterodactyl to Catalyst?"
+    a: "Configuration data such as nodes, allocations, users, and eggs usually imports in 10 to 30 minutes. Server file transfers dominate the timeline: budget roughly 1 to 4 hours per node depending on data size. A full 50-server cutover typically spreads across one to three days when run node by node."
+  - q: "Can I migrate from Pterodactyl to Catalyst without downtime?"
+    a: "Yes, using a phased migration by node. Catalyst runs alongside Pterodactyl on separate hosts or ports, so customers keep playing on Pterodactyl until you validate a node on Catalyst and flip that node over. Each step is reversible."
+  - q: "Will my Pterodactyl eggs and server files transfer?"
+    a: "The migration tool imports servers, files, nodes, allocations, users, and eggs. Eggs are converted into Catalyst templates with startup commands, environment variables, and install scripts. Review eggs that rely on Docker-specific behaviour, because Catalyst game nodes run containerd instead of Docker."
+  - q: "Can I run Pterodactyl and Catalyst at the same time?"
+    a: "Yes. Use a separate host or different ports and make sure node allocations do not overlap. Running both in parallel is the core of a zero-downtime migration and gives you a clean rollback path for every node."
+  - q: "What happens if the migration fails?"
+    a: "Nothing is destroyed in Pterodactyl during the phased approach, so you can roll back at any phase. Stop the migrated servers in Catalyst and restart them on the original Wings node. Only decommission the old panel after at least 48 clean hours on Catalyst."
+  - q: "Do I need to change DNS or ports after migrating?"
+    a: "Port allocations are recreated on the target Catalyst node, so game ports stay the same where no conflict exists. Update your panel DNS only at the final cutover, and update billing, bot, and dashboard integrations to the Catalyst API in the API migration phase."
 ---
 
 Moving 50+ game servers from one panel to another sounds risky. Your customers are playing on those servers right now. A botched migration means downtime, data loss, and support tickets.
@@ -30,7 +44,7 @@ Before touching anything, document what you have:
 6. **API integrations:** What's connected to Pterodactyl's API? (WHMCS, Discord bots, custom dashboards, etc.)
 7. **DNS and SSL:** What domain is the panel on, and how is SSL configured?
 
-Run this from your Pterodactyl admin panel. Export the data if you can - you'll reference it during migration.
+Run this from your Pterodactyl admin panel. Export the data if you can; you'll reference it during migration.
 
 ### Choose your migration strategy
 
@@ -80,7 +94,7 @@ For each Wings node:
 
 2. **Migrate servers from this node.** In Catalyst's migration tool:
    - Select scope: "Node" and choose the specific node
-   - Start the migration - Catalyst imports server metadata and streams file data from Pterodactyl's Docker volumes to Catalyst's containerd storage
+   - Start the migration: Catalyst imports server metadata and streams file data from Pterodactyl's Docker volumes to Catalyst's containerd storage
    - Monitor progress in the migration dashboard
 
 3. **Verify a sample of migrated servers.** Before cutting over:
@@ -88,7 +102,7 @@ For each Wings node:
    - Verify they boot correctly
    - Check file ownership and permissions
    - Test console access
-   - If anything is wrong, the servers are still running on Pterodactyl - fix the issue and retry
+   - If anything is wrong, the servers are still running on Pterodactyl. Fix the issue and retry
 
 4. **Cut over the node.** Once you're confident:
    - Stop the servers on Pterodactyl for this node
@@ -149,7 +163,7 @@ Pterodactyl and Catalyst both use port allocation systems. During migration, Cat
 If something goes wrong during migration, you can roll back at any phase:
 
 - **Phase 0-1 rollback:** Simply stop using Catalyst. Nothing has changed in Pterodactyl.
-- **Phase 2 rollback (per-node):** Stop the migrated servers in Catalyst, restart them in Pterodactyl on the original Wings node. The Pterodactyl data hasn't been touched - it's still there.
+- **Phase 2 rollback (per-node):** Stop the migrated servers in Catalyst, restart them in Pterodactyl on the original Wings node. The Pterodactyl data hasn't been touched; it's still there.
 - **Phase 3 rollback:** Revert your API integrations to point at Pterodactyl. This is why you keep both panels running until Phase 4.
 
 The phased approach means you can always roll back to the last known-good state for any individual node.
@@ -171,7 +185,7 @@ Hosting providers who've migrated to Catalyst report:
 
 - **Zero data loss** when following the phased approach
 - **Average migration time** of 2-3 hours per node for a typical 20-server node
-- **Customer impact:** None when using the phased approach - players don't notice the migration
+- **Customer impact:** None when using the phased approach, and players don't notice the migration
 - **Post-migration benefits:** Lower memory usage per server (containerd is more efficient), faster API responses, and easier automation through Catalyst's plugin system
 
 ## Related reading
@@ -180,6 +194,6 @@ If you're weighing the switch, our [three-way panel comparison](/blog/pterodacty
 
 ## Ready to migrate?
 
-The [migration guide](/migrate-from-pterodactyl/) has step-by-step instructions for each phase. Catalyst's built-in migration tool handles the heavy lifting - you just need to plan the sequence and verify along the way. For why hosts pick Catalyst's runtime, read [containerd vs Docker deep-dive](/blog/containerd-vs-docker-game-servers/).
+The [migration guide](/migrate-from-pterodactyl/) has step-by-step instructions for each phase. Catalyst's built-in migration tool handles the heavy lifting; you just need to plan the sequence and verify along the way. For why hosts pick Catalyst's runtime, read [containerd vs Docker comparison](/blog/containerd-vs-docker-game-servers/).
 
-For large migrations (100+ servers), consider reaching out to the Catalyst community on GitHub for advice from hosts who've done it at your scale.
+For large migrations (100+ servers), consider reaching out to the Catalyst community on GitHub for advice from hosts who've done it at your scale. Before you start, skim the [2026 Pterodactyl security advisories](/blog/pterodactyl-panel-security-advisories/) to confirm your source panel is patched, and keep the [update guide](/blog/how-to-update-pterodactyl-panel/) handy for the node-by-node cutover.

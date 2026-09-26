@@ -1,21 +1,21 @@
 # Cloudflare Pages _headers
 # Cache static assets aggressively for performance
 
-# Fonts — long cache (1 year), immutable
+# Fonts: long cache (1 year), immutable
 /_astro/*.woff2
   Cache-Control: public, max-age=31536000, immutable
 
 /_astro/*.woff
   Cache-Control: public, max-age=31536000, immutable
 
-# CSS and JS bundles — long cache, immutable (content-hashed by Vite)
+# CSS and JS bundles: long cache, immutable (content-hashed by Vite)
 /_astro/*.css
   Cache-Control: public, max-age=31536000, immutable
 
 /_astro/*.js
   Cache-Control: public, max-age=31536000, immutable
 
-# Images — moderate cache
+# Images: moderate cache
 /img/*
   Cache-Control: public, max-age=86400, stale-while-revalidate=604800
 
@@ -46,7 +46,7 @@
 /og-default.png
   Cache-Control: public, max-age=86400
 
-# HTML pages — short cache, allow revalidation
+# HTML pages: short cache, allow revalidation
 /*.html
   Cache-Control: public, max-age=0, must-revalidate
 

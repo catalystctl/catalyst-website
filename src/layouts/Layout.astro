@@ -17,6 +17,8 @@ export interface Props {
   modifiedDate?: string;
   keywords?: string[];
   breadcrumbItems?: { name: string; href?: string }[];
+  pageType?: "WebPage" | "AboutPage" | "CollectionPage" | "ContactPage";
+  pageMainEntityId?: string;
   noIndex?: boolean;
 }
 
@@ -31,6 +33,8 @@ const {
   modifiedDate,
   keywords,
   breadcrumbItems,
+  pageType = "WebPage",
+  pageMainEntityId,
   noIndex,
 } = Astro.props;
 
@@ -61,91 +65,104 @@ const discordIcon = `<svg width="15" height="15" viewBox="0 0 24 24" fill="curre
 const isArticle = type === "article";
 const articleType = schemaType || (isArticle ? "TechArticle" : "Article");
 
-// Determine isPartOf URL based on article context
-const isPartOfUrl = Astro.url.pathname.includes("/blog/")
-  ? siteUrl + B + "blog/"
-  : siteUrl + B;
-const isPartOfName = Astro.url.pathname.includes("/blog/")
-  ? "Catalyst Blog"
-  : "Catalyst";
+// ── Structured data entity graph ──
+// One @id-addressable graph per page: Organization describes the project,
+// WebSite describes the site, SoftwareApplication describes the product, and a
+// page node ties them together. Article pages add a BlogPosting/TechArticle
+// node that the page points at as its mainEntity.
+const ORG_ID = siteUrl + "/#organization";
+const SITE_ID = siteUrl + "/#website";
+const APP_ID = siteUrl + "/#software";
+const PAGE_ID = fullUrl + "#webpage";
+const ARTICLE_ID = fullUrl + "#article";
+const CRUMB_ID = fullUrl + "#breadcrumb";
+const hasBreadcrumbs = Boolean(breadcrumbItems && breadcrumbItems.length > 0);
 
-const jsonLd = isArticle
+const softwareLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "@id": APP_ID,
+  "name": "Catalyst",
+  "description": description,
+  "url": siteUrl + B,
+  "applicationCategory": "ServerApplication",
+  "operatingSystem": "Linux",
+  "image": ogImageUrl,
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "programmingLanguage": ["TypeScript", "Rust"],
+  "license": "https://www.gnu.org/licenses/gpl-3.0.en.html",
+  "codeRepository": GITHUB_URL,
+  "sameAs": [GITHUB_URL, DISCORD_URL],
+  "publisher": { "@id": ORG_ID },
+  "isPartOf": { "@id": SITE_ID },
+  "featureList": [
+    "Live console via panel gateway to Rust agent",
+    "containerd runtime on game nodes",
+    "RBAC with 50+ granular permissions",
+    "200+ API route handlers",
+    "Plugin system for extensibility",
+    "Backups to local, S3-compatible, and SFTP",
+  ],
+};
+
+const articleLd = isArticle
   ? {
       "@context": "https://schema.org",
       "@type": articleType,
+      "@id": ARTICLE_ID,
       "headline": title,
       "description": description,
       "url": fullUrl,
       "image": ogImageUrl,
-      "author": {
-        "@type": "Organization",
-        "name": "Catalyst",
-        "url": GITHUB_URL,
-      },
-      "publisher": {
-        "@type": "Organization",
-        "name": "Catalyst",
-        "url": GITHUB_URL,
-        "logo": {
-          "@type": "ImageObject",
-          "url": siteUrl + B + "logo-512.png",
-          "width": 512,
-          "height": 512,
-        },
-      },
+      "author": { "@id": ORG_ID },
+      "publisher": { "@id": ORG_ID },
       ...(publishDate && { "datePublished": publishDate }),
       ...(modifiedDate && { "dateModified": modifiedDate }),
       ...(publishDate && !modifiedDate && { "dateModified": publishDate }),
       ...(keywords && keywords.length > 0 && { "keywords": keywords.join(", ") }),
-      "isPartOf": {
-        "@type": "WebSite",
-        "name": isPartOfName,
-        "url": isPartOfUrl,
-      },
-      "mainEntityOfPage": {
-        "@type": "WebPage",
-        "@id": fullUrl,
-      },
+      "isPartOf": { "@id": SITE_ID },
+      "mainEntityOfPage": { "@id": PAGE_ID },
+      ...(hasBreadcrumbs && { "breadcrumb": { "@id": CRUMB_ID } }),
       "speakable": {
         "@type": "SpeakableSpecification",
         "cssSelector": ["h1", ".doc p:first-of-type", "[data-speakable]"],
       },
     }
-  : {
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "Catalyst",
-      "description": description,
-      "url": siteUrl + import.meta.env.BASE_URL,
-      "applicationCategory": "ServerApplication",
-      "operatingSystem": "Linux",
-      "image": ogImageUrl,
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD",
-      },
-      "programmingLanguage": ["TypeScript", "Rust"],
-      "license": "https://www.gnu.org/licenses/gpl-3.0.en.html",
-      "codeRepository": GITHUB_URL,
-      "featureList": [
-        "Live console via panel gateway to Rust agent",
-        "containerd runtime on game nodes",
-        "RBAC with 50+ granular permissions",
-        "200+ API route handlers",
-        "Plugin system for extensibility",
-        "Backups to local, S3-compatible, and SFTP",
-      ],
-    };
+  : null;
 
-// Global Organization + WebSite entity graph (homepage or any page; idempotent via @id)
-const isHomepage = Astro.url.pathname === "/" || Astro.url.pathname === B;
+// The page's main entity: an explicit override, the article node, the project
+// itself on the about page, or the product everywhere else.
+const pageEntityId = pageMainEntityId
+  ? (pageMainEntityId.startsWith("http") ? pageMainEntityId : fullUrl + pageMainEntityId)
+  : isArticle
+    ? ARTICLE_ID
+    : pageType === "AboutPage"
+      ? ORG_ID
+      : APP_ID;
+
+const pageLd = {
+  "@context": "https://schema.org",
+  "@type": pageType,
+  "@id": PAGE_ID,
+  "url": fullUrl,
+  "name": title === "Home" ? "Catalyst" : fullTitle,
+  "description": description,
+  "inLanguage": "en-US",
+  "isPartOf": { "@id": SITE_ID },
+  "publisher": { "@id": ORG_ID },
+  "mainEntity": { "@id": pageEntityId },
+  ...(hasBreadcrumbs && { "breadcrumb": { "@id": CRUMB_ID } }),
+};
+
+// Publisher and site entities, referenced by @id from every page node above.
 const orgJsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  "@id": siteUrl + "/#organization",
+  "@id": ORG_ID,
   "name": "Catalyst",
   "url": siteUrl + B,
+  "description":
+    "Catalyst is an open-source game server panel: a TypeScript panel with a Rust node agent and containerd on game nodes.",
   "logo": {
     "@type": "ImageObject",
     "url": siteUrl + B + "logo-512.png",
@@ -154,36 +171,39 @@ const orgJsonLd = {
   },
   "sameAs": [GITHUB_URL, DISCORD_URL],
 };
+
 const websiteJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  "@id": siteUrl + "/#website",
+  "@id": SITE_ID,
   "name": "Catalyst",
   "url": siteUrl + B,
-  "publisher": { "@id": siteUrl + "/#organization" },
+  "publisher": { "@id": ORG_ID },
   "inLanguage": "en-US",
 };
 
-const breadcrumbLd = breadcrumbItems && breadcrumbItems.length > 0
+const breadcrumbLd = hasBreadcrumbs
   ? {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
+      "@id": CRUMB_ID,
       "itemListElement": [
         {
           "@type": "ListItem",
           "position": 1,
           "name": "Home",
-          "item": siteUrl + import.meta.env.BASE_URL,
+          "item": siteUrl + B,
         },
-        ...breadcrumbItems.map((item, i) => ({
+        ...(breadcrumbItems ?? []).map((item, i) => ({
           "@type": "ListItem",
           "position": i + 2,
           "name": item.name,
-          ...(item.href && { "item": siteUrl + import.meta.env.BASE_URL + item.href.replace(/^\//, "") }),
+          ...(item.href && { "item": siteUrl + B + item.href.replace(/^\//, "") }),
         })),
       ],
     }
   : null;
+
 ---
 
 <!doctype html>
@@ -256,10 +276,12 @@ const breadcrumbLd = breadcrumbItems && breadcrumbItems.length > 0
     <meta name="twitter:description" content={description} />
     {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
 
-    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
-    {breadcrumbLd && <script type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />}
+    <script type="application/ld+json" set:html={JSON.stringify(softwareLd)} />
+    {articleLd && <script type="application/ld+json" set:html={JSON.stringify(articleLd)} />}
+    <script type="application/ld+json" set:html={JSON.stringify(pageLd)} />
     <script type="application/ld+json" set:html={JSON.stringify(orgJsonLd)} />
     <script type="application/ld+json" set:html={JSON.stringify(websiteJsonLd)} />
+    {breadcrumbLd && <script type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />}
   </head>
 
   <body class="min-h-screen flex flex-col bg-background text-foreground">

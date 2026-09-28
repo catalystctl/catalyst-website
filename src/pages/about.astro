@@ -13,6 +13,7 @@ const DISCORD_URL = "https://discord.gg/mybxhmru3y";
   description="Catalyst is an open-source game server panel in early testing: TypeScript panel with Rust node agent and containerd. Meet the project and its principles."
   canonicalUrl="https://catalystctl.com/about/"
   breadcrumbItems={[{ name: "About" }]}
+  pageType="AboutPage"
 >
   <div class="max-w-6xl mx-auto px-4 pt-10 sm:pt-14 pb-16">
     <!-- Hero -->
@@ -115,19 +116,4 @@ const DISCORD_URL = "https://discord.gg/mybxhmru3y";
     </section>
   </div>
 
-  <script type="application/ld+json" set:html={JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "AboutPage",
-    "name": "About Catalyst",
-    "url": "https://catalystctl.com/about/",
-    "description": "Catalyst is an open-source game server panel in early testing: TypeScript panel with Rust node agent and containerd.",
-    "mainEntity": {
-      "@type": "Organization",
-      "@id": "https://catalystctl.com/#organization",
-      "name": "Catalyst",
-      "url": "https://catalystctl.com/",
-      "logo": "https://catalystctl.com/logo-512.png",
-      "sameAs": [GITHUB_URL, DISCORD_URL],
-    },
-  })} />
 </Layout>

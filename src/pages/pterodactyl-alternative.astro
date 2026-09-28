@@ -394,6 +394,7 @@ const heroStats = [
   <script type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
     "@type": "FAQPage",
+    "@id": "https://catalystctl.com/pterodactyl-alternative/#faq",
     "mainEntity": lookFor.map((item) => ({
       "@type": "Question",
       "name": item.title,
@@ -406,6 +407,7 @@ const heroStats = [
   <script type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
     "@type": "ItemList",
+    "@id": "https://catalystctl.com/pterodactyl-alternative/#comparison",
     "name": "Pterodactyl alternative comparison",
     "itemListElement": comparisons.flatMap((section) =>
       section.rows.map((row, i) => ({

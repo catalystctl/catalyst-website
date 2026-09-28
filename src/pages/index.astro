@@ -534,6 +534,7 @@ const ciTone = gh.ci?.state === "passing" ? "success" : gh.ci?.state === "failin
     <script type="application/ld+json" set:html={JSON.stringify({
       "@context": "https://schema.org",
       "@type": "FAQPage",
+      "@id": "https://catalystctl.com/#faq",
       "mainEntity": faqs.map((faq) => ({
         "@type": "Question",
         "name": faq.q,

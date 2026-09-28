@@ -24,6 +24,8 @@ const rest = posts.filter((post) => post !== featured);
   title="Game Server Guides and Tutorials"
   description="Guides, comparisons, and tutorials for game server management with Catalyst. For hobbyists, hosting providers, and enterprises."
   breadcrumbItems={[{ name: "Blog" }]}
+  pageType="CollectionPage"
+  pageMainEntityId="#list"
 >
 
   <script>
@@ -135,6 +137,7 @@ const rest = posts.filter((post) => post !== featured);
   <script type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
     "@type": "ItemList",
+    "@id": "https://catalystctl.com/blog/#list",
     "name": "Catalyst Blog",
     "itemListElement": posts.map((post, i) => ({
       "@type": "ListItem",

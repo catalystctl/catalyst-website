@@ -125,6 +125,7 @@ const compatibility = [
   description="Migrate from Pterodactyl to Catalyst automatically. Import nodes, users, eggs, servers, and files with Catalyst's built-in migration tool."
   canonicalUrl="https://catalystctl.com/migrate-from-pterodactyl/"
   breadcrumbItems={[{ name: "Pterodactyl Alternative", href: "pterodactyl-alternative/" }, { name: "Migrate" }]}
+  pageMainEntityId="#howto"
 >
   <script>
     const observer = new IntersectionObserver((entries) => {
@@ -300,6 +301,7 @@ const compatibility = [
     <script type="application/ld+json" set:html={JSON.stringify({
       "@context": "https://schema.org",
       "@type": "HowTo",
+      "@id": "https://catalystctl.com/migrate-from-pterodactyl/#howto",
       "name": "Migrate from Pterodactyl to Catalyst",
       "description": "Migrate your Pterodactyl nodes, users, eggs, servers, and files to Catalyst using the built-in auto-migration tool.",
       "totalTime": "PT1H",
@@ -318,6 +320,7 @@ const compatibility = [
     <script type="application/ld+json" set:html={JSON.stringify({
       "@context": "https://schema.org",
       "@type": "FAQPage",
+      "@id": "https://catalystctl.com/migrate-from-pterodactyl/#faq",
       "mainEntity": faqs.map(f => ({
         "@type": "Question",
         "name": f.q,

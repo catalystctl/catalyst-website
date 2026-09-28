@@ -43,7 +43,7 @@
 /site.webmanifest
   Cache-Control: public, max-age=86400
 
-/og-default.png
+/og-*.png
   Cache-Control: public, max-age=86400
 
 # HTML pages: short cache, allow revalidation

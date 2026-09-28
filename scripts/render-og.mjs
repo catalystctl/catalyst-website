@@ -12,13 +12,20 @@
  * FONTCONFIG_FILE is read when fontconfig initialises, so it must be set before
  * sharp is imported. Hence the dynamic import below.
  */
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { resolve } from 'path';
 
 const ROOT = resolve(import.meta.dirname, '..');
 const FONT_DIR = resolve(ROOT, 'scripts/og-fonts');
 const SVG_PATH = resolve(ROOT, 'public/og-default.svg');
-const PNG_PATH = resolve(ROOT, 'public/og-default.png');
+
+// The served file name lives in one place so the renderer and the layout cannot
+// disagree. Bumping it there invalidates every social platform's cached copy.
+const META = JSON.parse(readFileSync(resolve(ROOT, 'src/data/og-image.json'), 'utf8'));
+const PNG_PATH = resolve(ROOT, 'public', META.file);
+// Unversioned alias, kept in sync so HTML already cached against the old URL
+// still resolves to the current card instead of 404ing.
+const LEGACY_PNG_PATH = resolve(ROOT, 'public/og-default.png');
 
 // Variable TTFs from the Google Fonts repository.
 const FONTS = [
@@ -73,8 +80,11 @@ process.env.FONTCONFIG_PATH = FONT_DIR;
 const { default: sharp } = await import('sharp');
 
 await sharp(readFileSync(SVG_PATH), { density: 96 })
-  .resize(1200, 630, { fit: 'fill' })
+  .resize(META.width, META.height, { fit: 'fill' })
   .png({ compressionLevel: 9, quality: 100 })
   .toFile(PNG_PATH);
 
-console.log('Rendered public/og-default.png (1200x630)');
+if (LEGACY_PNG_PATH !== PNG_PATH) copyFileSync(PNG_PATH, LEGACY_PNG_PATH);
+
+console.log(`Rendered public/${META.file} (${META.width}x${META.height})`);
+if (LEGACY_PNG_PATH !== PNG_PATH) console.log('Synced public/og-default.png alias');

@@ -4,6 +4,7 @@ import '@fontsource-variable/oxanium';
 import '@fontsource-variable/jetbrains-mono';
 import '../styles/global.css';
 import githubStats from "../data/github-stats.json";
+import ogImageMeta from "../data/og-image.json";
 import ConsentBanner from "../components/ConsentBanner.astro";
 
 export interface Props {
@@ -45,7 +46,11 @@ const fullUrl = canonicalUrl || new URL(Astro.url.pathname, siteUrl).toString();
 const fullTitle = title === "Home"
   ? "Catalyst: Open-Source Game Server Panel (Early Testing)"
   : title.includes("Catalyst") ? title : `${title} - Catalyst`;
-const ogImageUrl = ogImage ? new URL(ogImage, siteUrl).toString() : siteUrl + B + "og-default.png";
+// The OG file name is versioned in src/data/og-image.json so that changing the
+// card produces a new URL. Social platforms cache images indefinitely per URL, so
+// without a bump they keep serving the previous card (or the failure they cached
+// while the old asset was unreachable).
+const ogImageUrl = ogImage ? new URL(ogImage, siteUrl).toString() : siteUrl + B + ogImageMeta.file;
 
 const DOCS_URL = "https://docs.catalystctl.com/";
 const DEMO_URL = "https://demo.catalystctl.com/";
@@ -266,8 +271,9 @@ const breadcrumbLd = hasBreadcrumbs
     {isArticle && <meta property="article:author" content="Catalyst Team" />}
     {isArticle && <meta property="article:section" content="Documentation" />}
     {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
-    {ogImageUrl && <meta property="og:image:width" content="1200" />}
-    {ogImageUrl && <meta property="og:image:height" content="630" />}
+    {ogImageUrl && <meta property="og:image:type" content={ogImageMeta.type} />}
+    {ogImageUrl && <meta property="og:image:width" content={String(ogImageMeta.width)} />}
+    {ogImageUrl && <meta property="og:image:height" content={String(ogImageMeta.height)} />}
     {ogImageUrl && <meta property="og:image:alt" content={fullTitle} />}
 
     <meta name="twitter:card" content="summary_large_image" />

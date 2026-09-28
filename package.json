@@ -11,6 +11,7 @@
     "build": "astro build",
     "preview": "npm run build && wrangler dev",
     "astro": "astro",
+    "og": "node scripts/render-og.mjs",
     "generate-types": "wrangler types",
     "deploy": "npm run build && wrangler deploy"
   },
@@ -26,6 +27,7 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "sharp": "^0.34.5",
     "wrangler": "^4.87.0"
   },
   "overrides": {

@@ -29,6 +29,9 @@ src/assets/screenshots/
 .pi-lens/
 .pi/
 
+# OG image renderer: fonts fetched on first run by scripts/render-og.mjs
+scripts/og-fonts/
+
 # wrangler files
 .wrangler
 .dev.vars*

@@ -6,7 +6,7 @@
   "contributors": 8,
   "stars": 28,
   "forks": 6,
-  "lastPushedAt": "2026-09-28T01:51:06Z",
+  "lastPushedAt": "2026-09-28T09:22:24Z",
   "latestRelease": {
     "tag": "v1.66.3",
     "publishedAt": "2026-09-28T01:58:31Z",
@@ -16,9 +16,9 @@
     "state": "passing",
     "label": "Passing",
     "conclusion": "success",
-    "workflow": "Code Quality: Push on main",
-    "finishedAt": "2026-09-28T01:52:52Z",
-    "url": "https://github.com/catalystctl/catalyst/actions/runs/36367554041"
+    "workflow": "Discord Notify",
+    "finishedAt": "2026-09-08T12:59:27Z",
+    "url": "https://github.com/catalystctl/catalyst/actions/runs/34228802750"
   },
-  "fetchedAt": "2026-09-28T06:41:18.595Z"
+  "fetchedAt": "2026-09-28T15:18:54.118Z"
 }

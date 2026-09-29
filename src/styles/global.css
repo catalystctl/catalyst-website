@@ -598,8 +598,9 @@ html, body, * {
 .doc blockquote strong { color: hsl(var(--chalk) / 0.9); }
 
 .doc table {
-  display: block;
+  display: table;
   width: 100%;
+  table-layout: auto;
   margin: 1.25rem 0 2rem;
   font-size: 0.875rem;
   line-height: 1.5;
@@ -607,8 +608,13 @@ html, body, * {
   border-radius: var(--deck-radius);
   border-collapse: separate;
   border-spacing: 0;
-  overflow-x: auto;
   text-indent: 0;
+}
+
+/* Let long tokens wrap so wide tables fit their column instead of overflowing. */
+.doc th,
+.doc td {
+  overflow-wrap: anywhere;
 }
 
 .doc th {

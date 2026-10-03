@@ -16,9 +16,9 @@
     "state": "passing",
     "label": "Passing",
     "conclusion": "success",
-    "workflow": "Label #273 [fnk4q]",
-    "finishedAt": "2026-10-03T06:56:26Z",
-    "url": "https://github.com/catalystctl/catalyst/actions/runs/37104604942"
+    "workflow": "Discord Notify",
+    "finishedAt": "2026-09-08T12:59:27Z",
+    "url": "https://github.com/catalystctl/catalyst/actions/runs/34228802750"
   },
-  "fetchedAt": "2026-10-03T17:11:49.585Z"
+  "fetchedAt": "2026-10-03T21:07:35.064Z"
 }

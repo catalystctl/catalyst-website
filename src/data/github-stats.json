@@ -13,12 +13,12 @@
     "url": "https://github.com/catalystctl/catalyst/releases/tag/v1.71.4"
   },
   "ci": {
-    "state": "failing",
-    "label": "Failing",
-    "conclusion": "failure",
-    "workflow": "E2E LXC Minecraft",
-    "finishedAt": "2026-10-04T09:16:10Z",
-    "url": "https://github.com/catalystctl/catalyst/actions/runs/37191562782"
+    "state": "passing",
+    "label": "Passing",
+    "conclusion": "success",
+    "workflow": "Discord Notify",
+    "finishedAt": "2026-05-20T19:00:14Z",
+    "url": "https://github.com/catalystctl/catalyst/actions/runs/26183601955"
   },
-  "fetchedAt": "2026-10-04T13:08:27.740Z"
+  "fetchedAt": "2026-10-04T18:05:36.414Z"
 }

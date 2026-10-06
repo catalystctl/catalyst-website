@@ -1,24 +1,24 @@
 {
   "repo": "catalystctl/catalyst",
   "repoUrl": "https://github.com/catalystctl/catalyst",
-  "commits": 1461,
-  "releases": 280,
+  "commits": 1463,
+  "releases": 281,
   "contributors": 8,
   "stars": 31,
   "forks": 6,
-  "lastPushedAt": "2026-10-06T03:32:03Z",
+  "lastPushedAt": "2026-10-06T11:48:44Z",
   "latestRelease": {
-    "tag": "v1.71.5",
-    "publishedAt": "2026-10-06T03:36:41Z",
-    "url": "https://github.com/catalystctl/catalyst/releases/tag/v1.71.5"
+    "tag": "v1.72.0",
+    "publishedAt": "2026-10-06T11:45:39Z",
+    "url": "https://github.com/catalystctl/catalyst/releases/tag/v1.72.0"
   },
   "ci": {
     "state": "passing",
     "label": "Passing",
     "conclusion": "success",
-    "workflow": "github_actions in / for actions/checkout - Update #1576623914",
-    "finishedAt": "2026-09-15T00:06:00Z",
-    "url": "https://github.com/catalystctl/catalyst/actions/runs/34911699042"
+    "workflow": "npm_and_yarn in / for @types/node, @typescript-eslint/eslint-plugin, @typescript-eslint/parser, @vitest/coverage-v8, globals, vitest, i18next-cli, typescript-eslint, vite - Update #1612878611",
+    "finishedAt": "2026-10-06T11:48:47Z",
+    "url": "https://github.com/catalystctl/catalyst/actions/runs/37458164741"
   },
-  "fetchedAt": "2026-10-06T07:28:47.127Z"
+  "fetchedAt": "2026-10-06T15:01:43.279Z"
 }

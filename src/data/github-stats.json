@@ -13,12 +13,12 @@
     "url": "https://github.com/catalystctl/catalyst/releases/tag/v1.71.4"
   },
   "ci": {
-    "state": "passing",
-    "label": "Passing",
+    "state": "running",
+    "label": "Running",
     "conclusion": "success",
-    "workflow": "Discord Notify",
-    "finishedAt": "2026-09-08T12:59:27Z",
-    "url": "https://github.com/catalystctl/catalyst/actions/runs/34228802750"
+    "workflow": "CodeQL",
+    "finishedAt": "2026-10-05T11:31:05Z",
+    "url": "https://github.com/catalystctl/catalyst/actions/runs/37302748509"
   },
-  "fetchedAt": "2026-10-05T18:19:20.980Z"
+  "fetchedAt": "2026-10-06T00:44:49.975Z"
 }

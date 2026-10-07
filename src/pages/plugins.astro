@@ -1,0 +1,144 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+export const prerender = false;
+
+const INDEX_URL = "https://raw.githubusercontent.com/catalystctl/catalyst-plugins/main/index.json";
+const REPO_URL = "https://github.com/catalystctl/catalyst-plugins";
+
+type Plugin = {
+  name: string;
+  displayName: string;
+  description: string;
+  author: string;
+  version: string;
+  downloadUrl: string;
+  homepage: string;
+  tags: string[];
+};
+
+type PluginIndex = { updatedAt?: string; plugins?: Plugin[] };
+
+let catalog: PluginIndex = {};
+try {
+  const response = await fetch(INDEX_URL, {
+    headers: { Accept: "application/json" },
+  });
+  if (response.ok) catalog = await response.json() as PluginIndex;
+} catch {
+  // Keep the marketplace useful during a transient GitHub/API outage.
+}
+
+const plugins = catalog.plugins ?? [];
+const updatedAt = catalog.updatedAt ? new Date(catalog.updatedAt) : null;
+const updatedLabel = updatedAt && !Number.isNaN(updatedAt.valueOf())
+  ? updatedAt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+  : "waiting for catalog";
+
+// The index is intentionally cached for one hour at the edge. The page is SSR,
+// so additions to catalyst-plugins appear without a website rebuild.
+Astro.response.headers.set("Cache-Control", "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400");
+---
+
+<Layout
+  title="Plugin Marketplace"
+  description="Browse the official Catalyst plugin marketplace. Free, open plugins for authentication, support, AI assistance, game servers, and more."
+  canonicalUrl="https://catalystctl.com/plugins/"
+  breadcrumbItems={[{ name: "Plugins" }]}
+  pageType="CollectionPage"
+>
+  <main class="max-w-6xl mx-auto px-4 pt-10 sm:pt-14 pb-16" id="plugins-marketplace">
+    <section class="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-8 items-end" data-speakable>
+      <div class="max-w-3xl">
+        <div class="flex items-center gap-2">
+          <span class="led-wrap"><span class="led-pulse bg-success"></span><span class="led bg-success"></span></span>
+          <span class="type-overline">Official marketplace · free for now</span>
+        </div>
+        <h1 class="mt-4 font-display text-[2rem] sm:text-[2.7rem] font-semibold text-foreground tracking-tight leading-[1.08] text-balance">
+          Extend Catalyst <span class="text-primary">without forking.</span>
+        </h1>
+        <p class="mt-4 max-w-2xl text-data sm:text-base text-muted-foreground leading-relaxed text-pretty">
+          Discover community and official plugins that add new workflows, integrations, and tools to your game server panel. Every listing links to its source and package.
+        </p>
+      </div>
+      <a href={REPO_URL} target="_blank" rel="noopener noreferrer" class="btn btn-md btn-outline shrink-0">
+        Submit a plugin
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
+      </a>
+    </section>
+
+    <div class="rule mt-10"></div>
+
+    <section class="mt-8" aria-labelledby="catalog-heading">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5">
+        <div>
+          <div class="flex items-center gap-3">
+            <h2 id="catalog-heading" class="font-display text-lg font-semibold text-foreground">Browse plugins</h2>
+            <span class="rounded-sm border border-primary/25 bg-primary/10 px-2 py-0.5 font-mono text-[11px] text-primary">{plugins.length} available</span>
+          </div>
+          <p class="mt-1 text-micro text-muted-foreground">Catalog synced hourly · last source update {updatedLabel}</p>
+        </div>
+        <label class="relative block sm:w-64">
+          <span class="sr-only">Search plugins</span>
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="m20 20-4-4"/></svg>
+          <input id="plugin-search" type="search" placeholder="Search plugins" class="h-9 w-full rounded-sm border border-border/70 bg-surface-1 pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground/70 outline-none focus:border-primary/60 focus:ring-1 focus:ring-primary/30" />
+        </label>
+      </div>
+
+      {plugins.length > 0 ? (
+        <div id="plugin-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+          {plugins.map((plugin) => (
+            <article class="plugin-card deck-panel flex flex-col p-4 min-h-56 transition-colors hover:border-primary/40" data-search={`${plugin.displayName} ${plugin.description} ${plugin.tags.join(" ")}`.toLowerCase()}>
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm border border-primary/25 bg-primary/10 font-display text-base font-semibold text-primary">{plugin.displayName.slice(0, 1).toUpperCase()}</div>
+                  <div class="min-w-0">
+                    <h3 class="font-display text-data font-semibold text-foreground truncate">{plugin.displayName}</h3>
+                    <p class="font-mono text-[11px] text-muted-foreground">v{plugin.version}</p>
+                  </div>
+                </div>
+                <span class="shrink-0 rounded-sm border border-success/25 bg-success/10 px-1.5 py-0.5 font-mono text-[10px] text-success">FREE</span>
+              </div>
+              <p class="mt-4 text-mini text-muted-foreground leading-relaxed line-clamp-3">{plugin.description}</p>
+              <div class="mt-auto pt-4 flex flex-wrap gap-1.5">
+                {plugin.tags.slice(0, 3).map((tag) => <span class="rounded-sm bg-surface-2 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">#{tag}</span>)}
+              </div>
+              <div class="mt-4 flex items-center gap-2 border-t border-border/60 pt-3">
+                <a href={plugin.downloadUrl} class="btn btn-sm btn-primary flex-1 justify-center">Download</a>
+                <a href={plugin.homepage} target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-quiet" aria-label={`View ${plugin.displayName} source`}>Source</a>
+              </div>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div class="deck-panel p-8 text-center">
+          <p class="font-display text-base font-semibold text-foreground">Catalog temporarily unavailable</p>
+          <p class="mt-2 text-mini text-muted-foreground">The source index could not be reached. Please try again shortly.</p>
+        </div>
+      )}
+      <p id="plugin-empty" class="hidden py-10 text-center text-mini text-muted-foreground">No plugins match your search.</p>
+    </section>
+
+    <section class="mt-12 deck-panel overflow-hidden grid grid-cols-1 sm:grid-cols-3 gap-px bg-border/40" aria-label="How the marketplace works">
+      <div class="bg-card p-4"><span class="type-overline">01 · Discover</span><h2 class="mt-2 font-display text-data font-semibold text-foreground">Choose an extension</h2><p class="mt-1.5 text-micro text-muted-foreground leading-relaxed">Review the description, tags, version, and source code before installing.</p></div>
+      <div class="bg-card p-4"><span class="type-overline">02 · Download</span><h2 class="mt-2 font-display text-data font-semibold text-foreground">Install from the panel</h2><p class="mt-1.5 text-micro text-muted-foreground leading-relaxed">Packages are verified with a checksum and land inert until you enable them.</p></div>
+      <div class="bg-card p-4"><span class="type-overline">03 · Contribute</span><h2 class="mt-2 font-display text-data font-semibold text-foreground">Share with the community</h2><p class="mt-1.5 text-micro text-muted-foreground leading-relaxed">Open a pull request in the official catalog to submit a plugin for review.</p></div>
+    </section>
+  </main>
+</Layout>
+
+<script>
+  const search = document.getElementById('plugin-search');
+  const cards = Array.from(document.querySelectorAll('.plugin-card'));
+  const empty = document.getElementById('plugin-empty');
+  search?.addEventListener('input', () => {
+    const query = search.value.trim().toLowerCase();
+    let visible = 0;
+    cards.forEach((card) => {
+      const matches = !query || (card.getAttribute('data-search') || '').includes(query);
+      card.classList.toggle('hidden', !matches);
+      if (matches) visible += 1;
+    });
+    empty?.classList.toggle('hidden', visible !== 0);
+  });
+</script>

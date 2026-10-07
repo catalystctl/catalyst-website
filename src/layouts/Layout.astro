@@ -57,6 +57,7 @@ const DEMO_URL = "https://demo.catalystctl.com/";
 const navLinks = [
   { href: B, label: "Home", match: (p: string) => p === B || p === "/" },
   { href: B + "pterodactyl-alternative/", label: "Compare", match: (p: string) => p.includes("pterodactyl-alternative") || p.includes("migrate-from-pterodactyl") },
+  { href: B + "plugins/", label: "Plugins", match: (p: string) => p.includes("/plugins") },
   { href: B + "blog/", label: "Blog", match: (p: string) => p.includes("/blog") },
   { href: DOCS_URL, label: "Docs", match: (_p: string) => false },
   { href: DEMO_URL, label: "Demo", match: (_p: string) => false },

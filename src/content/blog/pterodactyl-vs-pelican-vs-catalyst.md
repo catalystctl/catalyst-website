@@ -14,7 +14,7 @@ keywords:
   - best game server panel
 faqs:
   - q: "Is Pelican a fork of Pterodactyl?"
-    a: "Yes. Pelican is a community fork of Pterodactyl, so it shares the same PHP (Laravel) panel, Go Wings daemon, and Docker runtime. The projects differ in governance and roadmap, not architecture, which means Pelican inherits Pterodactyl's strengths and its limitations, including no native plugin API."
+    a: "Yes. Pelican is a community fork of Pterodactyl, so it shares the same PHP (Laravel) panel, Go Wings daemon, and Docker runtime. The projects differ in governance and roadmap, not architecture, which means Pelican inherits Pterodactyl's strengths and its limitations, though Pelican now offers its own plugin system."
   - q: "What is the main difference between Pterodactyl and Pelican?"
     a: "Governance. Both use the same codebase and the same PHP plus Docker-and-Wings architecture. Pelican is maintained by a different team with a community-driven model. If you want a structurally different panel, you need an alternative such as Catalyst rather than a fork."
   - q: "Is Catalyst faster than Pterodactyl?"
@@ -24,7 +24,7 @@ faqs:
   - q: "Does Catalyst support Pterodactyl eggs?"
     a: "Yes. Catalyst can import Pterodactyl eggs and convert them into Catalyst templates, transferring startup commands, environment variables, and install scripts. Review eggs that depend on Docker-specific behaviour, because Catalyst game nodes run containerd rather than Docker."
   - q: "Can I switch from Pterodactyl to Pelican?"
-    a: "Because Pelican is a fork, migration is closer to an upgrade than an import, and it keeps the same database and Wings node model. Moving from Pterodactyl or Pelican to Catalyst uses the built-in migration tool, which imports nodes, allocations, users, eggs, servers, and files."
+    a: "Because Pelican is a fork, migration is closer to an upgrade than an import, and it keeps the same database and Wings node model. Catalyst documents a built-in migration tool for Pterodactyl; Pelican compatibility should be verified separately before planning a cutover."
 ---
 
 > **TL;DR:** **Catalyst** is on a different ops model (TypeScript panel + Rust agent + containerd nodes) with native plugins and built-in Pterodactyl import. **Pterodactyl** and **Pelican** are the same PHP + Go Wings + Docker codebase with different teams. Pick Catalyst for containerd-native nodes and extensibility in early testing; Pterodactyl for maturity; Pelican for Pterodactyl governance without migration.
@@ -95,14 +95,14 @@ Catalyst's advantage is structural (containerd-native nodes, native plugins, 50+
 | Feature | Pterodactyl | Pelican | Catalyst |
 |---------|-------------|---------|----------|
 | API surface | REST + WebSocket | REST + WebSocket | 200+ route handlers |
-| Plugin system | No native API | No native API | Yes (hooks, routes, tasks) |
+| Plugin system | No native API | Yes (PHP plugins, routes, resources) | Yes (TypeScript hooks, routes, tasks) |
 | RBAC granularity | Roles + subusers | Roles + subusers | 50+ granular permissions |
 | API key scoping | API keys | API keys | Scoped + expiring |
 | Audit logging | Activity logs | Activity logs | Built-in audit logs |
 | Built-in migration tool | No | No | Yes (from Pterodactyl) |
 | Scheduled tasks | Schedules | Schedules | Cron tasks |
 
-The plugin system is the biggest differentiator. With Pterodactyl or Pelican, if you need custom API routes, new UI components, or integration with external services, you fork the project and maintain a separate codebase. With Catalyst, you write a TypeScript plugin that registers hooks, adds routes, and runs scheduled tasks, all without touching core code.
+Plugin approaches differ. Pelican supports plugins that can add routes and extend panel resources without forking; check its plugin documentation for version-specific capabilities. Catalyst uses TypeScript plugins with hooks, routes, and scheduled tasks. Pterodactyl does not offer a comparable native plugin API.
 
 The RBAC difference matters for hosting providers. Pterodactyl and Pelican give you admin or user. Catalyst lets you create precise roles: "support staff" can restart servers but not delete them; "billing admin" can view allocations but not access consoles; "node operator" can manage their assigned nodes but not others.
 
@@ -139,7 +139,7 @@ Pterodactyl has the largest community and the most third-party resources. Pelica
 
 ## Can you switch later?
 
-Yes. Catalyst has a built-in migration tool that imports Pterodactyl (and by extension, Pelican) nodes, allocations, users, eggs, servers, and file data. The migration runs from the admin panel. No manual scripting required.
+Catalyst's built-in migration tool is documented for Pterodactyl nodes, allocations, users, eggs, servers, and file data. Pelican import is not documented as supported; test compatibility with a pilot before making plans.
 
 Check out the [migration guide](/migrate-from-pterodactyl/) for details.
 

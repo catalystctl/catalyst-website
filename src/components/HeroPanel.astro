@@ -118,7 +118,7 @@ const activity = [
         <header class="hp-pagehead">
           <div class="hp-pagehead-main">
             <span class="deck-label">Overview</span>
-            <h1 class="hp-title">Dashboard</h1>
+            <div class="hp-title">Dashboard</div>
             <p class="hp-sub">Infrastructure overview for Demo Admin.</p>
           </div>
           <span class="hp-alertpill"><span class="hp-dot-warn"></span> 1 unacknowledged alert</span>
@@ -559,6 +559,10 @@ const activity = [
   @media (max-width: 640px) {
     .hp-cols { grid-template-columns: 1fr; }
     .hp-feed-item:nth-child(n+4) { display: none !important; }
+    .hp-row { gap: 0.4rem; }
+    .hp-row-label { width: 4.2rem; }
+    .hp-row-value { width: 4.5rem; }
+    .hp-row-hint { display: none; }
   }
 
   .hp-floor {

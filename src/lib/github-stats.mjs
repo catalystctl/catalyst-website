@@ -12,6 +12,8 @@
 export const REPO = "catalystctl/catalyst";
 export const REPO_URL = `https://github.com/${REPO}`;
 const API = `https://api.github.com/repos/${REPO}`;
+const REQUEST_TIMEOUT_MS = 8000;
+const request = (url, token) => fetch(url, { headers: headers(token), signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
 
 /** @param {string | undefined} token */
 function headers(token) {
@@ -32,7 +34,7 @@ function headers(token) {
  * @returns {Promise<number | null>}
  */
 async function countCollection(url, token) {
-  const res = await fetch(url, { headers: headers(token) });
+  const res = await request(url, token);
   if (!res.ok) return null;
 
   const link = res.headers.get("link");
@@ -50,17 +52,16 @@ async function countCollection(url, token) {
  * @param {string | undefined} token
  */
 async function fetchCiStatus(token) {
-  const res = await fetch(
-    `${API}/actions/runs?branch=main&per_page=20`,
-    { headers: headers(token) },
-  );
+  const res = await request(`${API}/actions/runs?branch=main&per_page=50`, token);
   if (!res.ok) return null;
 
   const data = await res.json();
-  const runs = Array.isArray(data.workflow_runs) ? data.workflow_runs : [];
+  // Status must describe product CI, not unrelated notifications or maintenance.
+  const runs = (Array.isArray(data.workflow_runs) ? data.workflow_runs : [])
+    .filter((r) => /^(ci|build|test|deploy)(\b|\s|$)/i.test(r.name ?? ""));
   if (runs.length === 0) return null;
 
-  const completed = runs.find((r) => r.status === "completed");
+  const completed = runs.find((r) => r.status === "completed" && ["success", "failure", "timed_out"].includes(r.conclusion));
   const running = runs.some((r) => r.status === "in_progress" || r.status === "queued");
 
   if (!completed) {
@@ -93,10 +94,10 @@ export async function fetchGitHubStats(options = {}) {
     countCollection(`${API}/releases?per_page=1`, token).catch(() => null),
     countCollection(`${API}/contributors?per_page=1&anon=1`, token).catch(() => null),
     fetchCiStatus(token).catch(() => null),
-    fetch(API, { headers: headers(token) })
+    request(API, token)
       .then((r) => (r.ok ? r.json() : null))
       .catch(() => null),
-    fetch(`${API}/releases/latest`, { headers: headers(token) })
+    request(`${API}/releases/latest`, token)
       .then((r) => (r.ok ? r.json() : null))
       .catch(() => null),
   ]);

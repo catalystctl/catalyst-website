@@ -1,5 +1,5 @@
 ---
-title: "How to Migrate 50+ Servers from Pterodactyl Without Downtime"
+title: "How to Migrate 50+ Servers from Pterodactyl Safely"
 description: "A practical migration playbook for moving 50 or more game servers from Pterodactyl to Catalyst. Includes pre-migration checks, phased migration strategies, and rollback procedures."
 pubDate: 2026-05-01
 updatedDate: 2026-09-25
@@ -15,11 +15,11 @@ faqs:
   - q: "How long does it take to migrate 50 servers from Pterodactyl to Catalyst?"
     a: "Configuration data such as nodes, allocations, users, and eggs usually imports in 10 to 30 minutes. Server file transfers dominate the timeline: budget roughly 1 to 4 hours per node depending on data size. A full 50-server cutover typically spreads across one to three days when run node by node."
   - q: "Can I migrate from Pterodactyl to Catalyst without downtime?"
-    a: "Yes, using a phased migration by node. Catalyst runs alongside Pterodactyl on separate hosts or ports, so customers keep playing on Pterodactyl until you validate a node on Catalyst and flip that node over. Each step is reversible."
+    a: "You can stage imports while the old servers remain online, but a safe final cutover normally requires stopping writes, syncing changed files, switching clients, and validating the new servers. Plan a short maintenance window and a rollback path."
   - q: "Will my Pterodactyl eggs and server files transfer?"
     a: "The migration tool imports servers, files, nodes, allocations, users, and eggs. Eggs are converted into Catalyst templates with startup commands, environment variables, and install scripts. Review eggs that rely on Docker-specific behaviour, because Catalyst game nodes run containerd instead of Docker."
   - q: "Can I run Pterodactyl and Catalyst at the same time?"
-    a: "Yes. Use a separate host or different ports and make sure node allocations do not overlap. Running both in parallel is the core of a zero-downtime migration and gives you a clean rollback path for every node."
+    a: "Yes. Use a separate host or different ports and make sure node allocations do not overlap. Running both panels in parallel helps you stage and validate, but do not run two writable copies of the same game world during cutover."
   - q: "What happens if the migration fails?"
     a: "Nothing is destroyed in Pterodactyl during the phased approach, so you can roll back at any phase. Stop the migrated servers in Catalyst and restart them on the original Wings node. Only decommission the old panel after at least 48 clean hours on Catalyst."
   - q: "Do I need to change DNS or ports after migrating?"
@@ -28,7 +28,7 @@ faqs:
 
 Moving 50+ game servers from one panel to another sounds risky. Your customers are playing on those servers right now. A botched migration means downtime, data loss, and support tickets.
 
-This guide provides a step-by-step playbook for migrating from Pterodactyl to Catalyst with zero customer-facing downtime. We've structured it based on real migration experiences from hosting providers who've made the switch.
+This guide outlines a phased migration plan designed to minimize disruption. Schedule a maintenance window for the final file sync and cutover; the steps below are a planning framework, not a guarantee of uninterrupted gameplay.
 
 ## Before you start: Pre-migration checklist
 
@@ -53,10 +53,10 @@ There are three approaches, each with different tradeoffs:
 | Strategy | Downtime | Complexity | Risk |
 |----------|----------|------------|------|
 | Big bang | Yes (planned window) | Low | Medium |
-| Phased (by node) | None | Medium | Low |
-| Parallel run | None | High | Lowest |
+| Phased (by node) | Short per-node cutovers | Medium | Lower with verification |
+| Parallel preparation | Final cutover still needed | High | Depends on sync plan |
 
-**For 50+ servers, we recommend phased migration by node.** It gives you zero customer downtime, manageable complexity, and a clear rollback path.
+**For 50+ servers, consider phased migration by node.** It limits the number of servers affected by each maintenance window and provides a clearer rollback path.
 
 ## Strategy: Phased migration by node
 
@@ -84,7 +84,7 @@ At this point, you've imported the metadata (users, eggs, allocations, node defi
 
 **Time:** 10-30 minutes depending on user count.
 
-### Phase 2: Migrate servers node by node (zero downtime)
+### Phase 2: Migrate servers node by node
 
 This is where the actual migration happens. The key principle: **migrate one node at a time, and keep both panels live during the transition.**
 
@@ -98,16 +98,16 @@ For each Wings node:
    - Monitor progress in the migration dashboard
 
 3. **Verify a sample of migrated servers.** Before cutting over:
-   - Start 2-3 migrated servers in Catalyst
+   - Start 2-3 migrated servers on isolated test allocations; avoid two writable copies of the same live world
    - Verify they boot correctly
    - Check file ownership and permissions
    - Test console access
    - If anything is wrong, the servers are still running on Pterodactyl. Fix the issue and retry
 
 4. **Cut over the node.** Once you're confident:
-   - Stop the servers on Pterodactyl for this node
-   - Start them on Catalyst
-   - Update DNS or load balancer to point to the Catalyst panel for these servers' customers
+   - Announce a maintenance window and stop the Pterodactyl servers to freeze world writes
+   - Perform a final sync of changed files and verify ownership and integrity
+   - Start the Catalyst servers, test game connections and ports, then update game and panel DNS or routing as needed
 
 5. **Monitor for 24-48 hours.** Watch the Catalyst logs, check server stability, and be ready to respond to customer reports.
 
@@ -179,14 +179,9 @@ The phased approach means you can always roll back to the last known-good state 
 | Phase 4: Decommission | 1 hour | Stop old services, update DNS |
 | **Total** | **1-3 days** | Spread across a week for safety |
 
-## Real results
+## Validate the outcome
 
-Hosting providers who've migrated to Catalyst report:
-
-- **Zero data loss** when following the phased approach
-- **Average migration time** of 2-3 hours per node for a typical 20-server node
-- **Customer impact:** None when using the phased approach, and players don't notice the migration
-- **Post-migration benefits:** Lower memory usage per server (containerd is more efficient), faster API responses, and easier automation through Catalyst's plugin system
+After each cutover, compare file counts and representative world data, check console logs and player connections, and monitor backups and integrations. Record the duration and any issues from your own pilot node before scheduling the rest of the fleet. Neither zero data loss nor specific performance gains can be assumed without verifying your workload.
 
 ## Related reading
 

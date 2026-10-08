@@ -49,10 +49,11 @@ export const GET: APIRoute = async ({ request, locals }) => {
       forks: stats.forks ?? seed.forks,
       lastPushedAt: stats.lastPushedAt ?? seed.lastPushedAt,
       latestRelease: stats.latestRelease ?? seed.latestRelease,
-      ci: stats.ci ?? seed.ci,
+      ci: stats.ci ?? (seed.ci?.workflow && !/^(ci|build|test|deploy)(\b|\s|$)/i.test(seed.ci.workflow) ? null : seed.ci),
     };
     
-    const response = payloadResponse(merged, true);
+    const stale = stats.commits === null && stats.releases === null && stats.contributors === null && stats.stars === null && stats.latestRelease === null;
+    const response = payloadResponse({ ...merged, fetchedAt: stale ? seed.fetchedAt : stats.fetchedAt, stale }, !stale);
 
     if (cache) {
       const store = cache.put(cacheKey, response.clone());

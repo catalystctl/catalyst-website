@@ -97,7 +97,7 @@ Choose on ops fit and verified features, not on latency headlines.
 
 ### For hobbyists
 
-The stack difference is nice but not critical for a few servers. The bigger benefit is ops shape: one-command panel install, containerd-native nodes, and native plugins if you outgrow basics.
+The stack difference is nice but not critical for a few servers. The bigger benefit is ops shape: guided panel installer, containerd-native nodes, and native plugins if you outgrow basics.
 
 ### For hosting providers
 
@@ -131,4 +131,4 @@ But if you're:
 
 Then the Rust advantage is real, measurable, and growing. Catalyst is the only game server panel built on Rust, and the performance numbers speak for themselves.
 
-[See the full comparison](/pterodactyl-alternative/#comparison) between Catalyst and Pterodactyl, or [try Catalyst yourself](https://docs.catalystctl.com/getting-started/quickstart/) in under 60 seconds. For the container layer behind this, read [containerd vs Docker](/blog/containerd-vs-docker-game-servers/), and for the business case, [building a hosting business with Catalyst](/blog/game-hosting-business-with-catalyst/).
+[See the full comparison](/pterodactyl-alternative/#comparison) between Catalyst and Pterodactyl, or [try Catalyst yourself](https://docs.catalystctl.com/admin/installation/) with the guided installation steps. For the container layer behind this, read [containerd vs Docker](/blog/containerd-vs-docker-game-servers/), and for the business case, [building a hosting business with Catalyst](/blog/game-hosting-business-with-catalyst/).

@@ -5,14 +5,14 @@ const B = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "") + "/";
 const GITHUB_URL = "https://github.com/catalystctl/catalyst";
 
 const links = [
-  { href: B, label: "Home", blurb: "Product overview and install" },
+  { href: B + "blog/", label: "Blog", blurb: "Guides and tutorials" },
   { href: "https://docs.catalystctl.com/", label: "Documentation", blurb: "Install, nodes, API, plugins", external: true },
   { href: B + "pterodactyl-alternative/", label: "Open comparison", blurb: "Catalyst vs Pterodactyl" },
   { href: "https://discord.gg/mybxhmru3y", label: "Discord", blurb: "Ask the community", external: true },
 ];
 ---
 
-<Layout title="Page Not Found" description="The page you are looking for does not exist.">
+<Layout title="Page Not Found" description="The page you are looking for does not exist." noIndex>
 
   <section class="min-h-[70vh] flex items-center">
     <div class="max-w-6xl mx-auto px-4 py-16 sm:py-24 w-full">
@@ -23,11 +23,11 @@ const links = [
             Page not found.
           </h1>
           <p class="mt-3 text-data text-muted-foreground leading-relaxed max-w-md text-pretty">
-            The page does not exist or has moved. Pick a destination below, or go straight to the install command.
+            The page does not exist or has moved. Browse the guides below or return to the homepage.
           </p>
           <div class="mt-6 flex flex-wrap gap-2">
-            <a href={B + "#install"} class="btn btn-md btn-primary">Install panel</a>
-            <a href={B} class="btn btn-md btn-outline">Go home</a>
+            <a href={B} class="btn btn-md btn-primary">Go home</a>
+            <a href={B + "blog/"} class="btn btn-md btn-outline">Browse guides</a>
           </div>
         </div>
 

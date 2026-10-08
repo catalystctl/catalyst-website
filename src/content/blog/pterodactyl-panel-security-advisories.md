@@ -1,6 +1,6 @@
 ---
 title: "Pterodactyl Panel Security Advisories in 2026: Every CVE and How to Patch"
-description: "A dated, sourced timeline of Pterodactyl Panel releases and 2026 CVEs — CVE-2026-26016, CVE-2026-54593, CVE-2026-61609, CVE-2026-86177 — with affected and fixed versions, plus a hardening checklist."
+description: "A dated, sourced timeline of Pterodactyl Panel releases and 2026 CVEs, including CVE-2026-26016, CVE-2026-54593, CVE-2026-61609, and CVE-2026-86177, with affected and fixed versions plus a hardening checklist."
 pubDate: 2026-09-25
 author: "Catalyst Team"
 audience: ["businesses", "hosting-providers", "enterprises"]
@@ -69,27 +69,27 @@ Older advisories fixed in the same period: CVE-2025-68954, CVE-2025-69197, and C
 
 ## What each advisory means
 
-### CVE-2026-26016 — node token scope
+### CVE-2026-26016: node token scope
 
 Fixed in Panel v1.12.1. The release scoped remote node access tokens so a node can only reach servers that belong to the same node. Previously, a node could access information and control the installation status of any server in the system. The same release began revoking SFTP sessions when a user changes their password or their account is deleted, and raised the default client API rate limit from 128 to 256 requests per minute.
 
 **Action:** Update the panel to at least v1.12.1, then rotate node tokens as a precaution and review node activity in your logs.
 
-### CVE-2026-54593 — Wings JWT scoping
+### CVE-2026-54593: Wings JWT scoping
 
 The Wings `/upload/file` endpoint accepted any valid panel-signed JWT containing `server_uuid`, `user_uuid`, and `unique_id` claims without checking the token's intended purpose. Because the panel issues JWTs with those same claims for lower-privilege operations such as WebSocket authentication and backup downloads, an authenticated subuser could replay a token to upload files without holding the `file.create` permission.
 
 **Affects:** Pterodactyl Panel before v1.12.3 and Wings before v1.12.2.
 **Action:** Update both the panel and Wings, because the fix spans them. Then review subuser file permissions and audit logs for unexpected uploads.
 
-### CVE-2026-61609 — authentication rate-limit lockout
+### CVE-2026-61609: authentication rate-limit lockout
 
 From v1.7.0 until v1.13.0, the authentication rate limiter in `RouteServiceProvider::configureRateLimiting()` applied a single global bucket to the login and two-factor checkpoint endpoints instead of keying by IP address or account. Because the bucket was shared panel-wide, an unauthenticated attacker could exhaust it and lock every user out of authentication, including administrators.
 
 **Affects:** v1.7.0 up to v1.13.0.
 **Action:** Update to at least v1.13.0. This is a denial of service, not data exposure, but a panel-wide login lockout is operationally severe for a hosting business.
 
-### CVE-2026-86177 — scheduled-task permission escalation
+### CVE-2026-86177: scheduled-task permission escalation
 
 Pterodactyl Panel before v1.14.1 failed to validate action-specific permissions when creating scheduled tasks. A subuser with only the `schedule.update` permission could create a task, immediately trigger it, and run game-server console commands, change server power state, or create backups beyond their assigned authority.
 

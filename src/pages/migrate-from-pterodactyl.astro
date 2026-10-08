@@ -11,9 +11,9 @@ const autoSteps = [
   {
     number: "1",
     title: "Deploy Catalyst",
-    description: "Install on the target host with the one-line script. Compose, secrets, and panel bootstrap land automatically.",
+    description: "Run the installer to generate Compose files and secrets, review .env, then start the panel manually and complete the setup wizard.",
     details: [
-      "curl -fsSL https://raw.githubusercontent.com/catalystctl/catalyst/main/install.sh | bash",
+      "curl -fsSL https://github.com/catalystctl/catalyst/releases/latest/download/install.sh | sudo bash",
       "Edit the generated .env and set PUBLIC_URL",
       "docker compose up -d for panel, API, and database",
       "Provision a Catalyst node and confirm it is online",
@@ -25,7 +25,7 @@ const autoSteps = [
     description: "Create API keys on the old panel and verify reachability from Catalyst Admin → Migration.",
     details: [
       "Create an Application API key (ptla_*) with full read access",
-      "Create a Client API key (ptlc_*) for files and backups",
+      "For files and backups, also create an optional Client API key (ptlc_*)",
       "Enter the Pterodactyl URL and keys in Catalyst",
       "Run Test Connection before you import anything",
     ],
@@ -44,12 +44,12 @@ const autoSteps = [
   {
     number: "4",
     title: "Verify and cut over",
-    description: "Boot a few servers, check files, flip DNS, then wind down Pterodactyl.",
+    description: "Test on isolated allocations, stop old workloads, sync final changes, then start Catalyst and verify connections.",
     details: [
-      "Start a migrated server and watch the Catalyst console",
-      "Confirm ownership, permissions, and configs",
-      "Point DNS A records at the Catalyst panel",
-      "Stop Pterodactyl and watch Catalyst logs for 24-48 hours",
+      "Pilot servers on isolated ports and verify ownership, permissions, files, and backups",
+      "Stop source servers to freeze writes, then sync and verify final file changes",
+      "Start target servers and check game ports, client connections, and required DNS changes",
+      "Keep the old installation stopped but available for rollback; monitor Catalyst logs",
     ],
   },
 ];
@@ -88,7 +88,7 @@ const faqs = [
   },
   {
     q: "How long does migration take?",
-    a: "Config (users, eggs, nodes, allocations, metadata) finishes in minutes. File transfer scales with data size and network. Under 50 servers often lands in under an hour.",
+    a: "Configuration imports can finish in minutes, but transferring files and validating servers depends on data size, network speed, and the number of nodes. Budget a separate cutover window and verify each server before switching traffic.",
   },
   {
     q: "Is there an automatic migration tool?",
@@ -128,15 +128,21 @@ const compatibility = [
   pageMainEntityId="#howto"
 >
   <script>
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('revealed');
-          observer.unobserve(entry.target);
-        }
+    if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+      document.querySelectorAll('[data-reveal], [data-reveal-stagger]').forEach((el) => {
+        if (el.getBoundingClientRect().top < window.innerHeight) return;
+        el.classList.add('reveal-ready');
+        observer.observe(el);
       });
-    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
-    document.querySelectorAll('[data-reveal], [data-reveal-stagger]').forEach((el) => observer.observe(el));
+    }
   </script>
 
   <!-- Hero -->
@@ -174,8 +180,8 @@ const compatibility = [
               <span class="deck-label">Expected timings</span>
             </div>
             {[
-              { label: "Typical under 50 servers", value: "<1 hour" },
-              { label: "Fresh panel install", value: "60s" },
+              { label: "Configuration import", value: "Often minutes" },
+              { label: "Files and cutover", value: "Varies" },
               { label: "Import path", value: "Auto" },
             ].map((row) => (
               <div class="deck-row grid-cols-[minmax(0,1fr)_auto]">
@@ -304,7 +310,6 @@ const compatibility = [
       "@id": "https://catalystctl.com/migrate-from-pterodactyl/#howto",
       "name": "Migrate from Pterodactyl to Catalyst",
       "description": "Migrate your Pterodactyl nodes, users, eggs, servers, and files to Catalyst using the built-in auto-migration tool.",
-      "totalTime": "PT1H",
       "step": autoSteps.map((step, i) => ({
         "@type": "HowToStep",
         "position": i + 1,
@@ -341,11 +346,11 @@ const compatibility = [
           Install Catalyst, then import your fleet.
         </h2>
         <p class="mt-3 text-mini sm:text-data text-muted-foreground">
-          Deploy Catalyst in about a minute, then import your Pterodactyl data from the admin panel.
+          Install and configure the panel and a node, then import your Pterodactyl data from the admin panel. Allow time to transfer files and validate servers.
         </p>
         <div class="mt-5 flex flex-wrap gap-2">
           <a href={B + "#install"} class="btn btn-md btn-primary">Install panel</a>
-          <a href="https://docs.catalystctl.com/" class="btn btn-md btn-outline">Read the docs</a>
+          <a href="https://docs.catalystctl.com/admin/migration/" class="btn btn-md btn-outline">Migration docs</a>
           <a href={DISCORD_URL} target="_blank" rel="noopener noreferrer" class="btn btn-md btn-quiet">Join Discord</a>
         </div>
       </div>

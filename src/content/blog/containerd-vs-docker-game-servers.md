@@ -79,42 +79,11 @@ Every layer adds:
 - **Attack surface**: More code running means more potential vulnerabilities
 - **Failure points**: More processes that can crash
 
-## Performance benchmarks
+## Performance: measure your own workload
 
-We ran identical game server workloads on Docker and containerd, measuring the differences.
+Docker uses containerd under the hood, while Catalyst's agent talks to containerd directly. Removing a daemon from the game-node path can simplify operations, but it does **not** establish a universal memory or speed advantage. Game-server performance depends on the workload, container configuration, kernel, storage, network, and versions in use.
 
-### Per-container memory overhead
-
-| Metric | Docker | containerd | Savings |
-|--------|--------|------------|---------|
-| Daemon process memory | ~80MB (dockerd) | ~20MB (containerd) | 75% |
-| Per-container overhead | ~8MB | ~3MB | 62% |
-| 50 containers total | ~480MB | ~170MB | 65% |
-| 200 containers total | ~1.7GB | ~620MB | 64% |
-
-The Docker daemon itself uses 60MB more than containerd at baseline. The per-container overhead is smaller but adds up: 200 containers saves over 1GB of RAM with containerd.
-
-**What this means for hosting providers:** On a 64GB node running 200 Minecraft servers, containerd gives you 1GB more RAM for actual game servers. That's 4-5 additional servers per node, which is $20-50/month of additional revenue per node.
-
-### Container startup time
-
-| Operation | Docker | containerd | Faster |
-|-----------|--------|------------|--------|
-| Cold start (new container) | 1.2s | 0.8s | 33% |
-| Warm start (existing image) | 0.6s | 0.4s | 33% |
-| Stop container | 0.5s | 0.3s | 40% |
-| Restart container | 1.1s | 0.7s | 36% |
-
-Container operations are 30-40% faster with containerd because there's no Docker daemon API in the critical path. Catalyst communicates with containerd directly over gRPC.
-
-### Image pulling
-
-| Operation | Docker | containerd |
-|-----------|--------|------------|
-| Pull 500MB image (first time) | 8.2s | 7.8s |
-| Pull cached image | 0.3s | 0.2s |
-
-Image pulling is similar because both use the same underlying image distribution mechanism. The small difference comes from Docker's extra API layer.
+We have not published a reproducible head-to-head benchmark for these panels. Before planning capacity or estimating hosting revenue, measure daemon memory, per-server memory, cold and warm starts, image pulls, and restart times on your own nodes with matching workloads. Avoid treating architectural differences as guaranteed percentage gains.
 
 ## Operational differences
 
@@ -201,4 +170,4 @@ The result is a game server panel that uses less RAM per server, starts containe
 
 Docker is a developer convenience tool that adds overhead for production workloads. containerd is a production runtime designed for scale. For game server management at any serious scale, containerd is the better choice, and Catalyst is the only panel that uses it natively.
 
-[See how Catalyst's performance compares](/pterodactyl-alternative/#comparison) to Docker-based panels, or [try it yourself](https://docs.catalystctl.com/getting-started/quickstart/) with a one-line install. For the compliance and RBAC story that enterprises pair with this, see [enterprise management](/blog/enterprise-game-server-management/).
+[See how Catalyst's performance compares](/pterodactyl-alternative/#comparison) to Docker-based panels, or [try it yourself](https://docs.catalystctl.com/admin/installation/) with a one-line install. For the compliance and RBAC story that enterprises pair with this, see [enterprise management](/blog/enterprise-game-server-management/).

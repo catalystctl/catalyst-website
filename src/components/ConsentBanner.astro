@@ -7,7 +7,7 @@
   aria-live="polite"
   aria-label="Cookie consent"
 >
-  <div class="max-w-2xl mx-auto rounded-lg border border-border/70 bg-surface-1/95 backdrop-blur-xl shadow-elevated p-5 sm:p-6">
+  <div class="max-w-2xl max-h-[calc(100dvh-2rem)] overflow-y-auto mx-auto rounded-lg border border-border/70 bg-surface-1/95 backdrop-blur-xl shadow-elevated p-5 sm:p-6">
     <h2 class="deck-label">We use cookies</h2>
     <p class="mt-2 text-mini text-chalk/70 leading-relaxed">
       We use cookies to measure traffic and improve the docs. Choose Accept to allow
@@ -20,15 +20,15 @@
       </label>
       <label class="flex items-center justify-between gap-4 text-mini">
         <span class="text-chalk/85">Analytics</span>
-        <input id="consent-toggle-analytics" type="checkbox" checked class="h-4 w-4 accent-primary" />
+        <input id="consent-toggle-analytics" type="checkbox" class="h-4 w-4 accent-primary" />
       </label>
       <label class="flex items-center justify-between gap-4 text-mini">
         <span class="text-chalk/85">Advertising</span>
-        <input id="consent-toggle-ads" type="checkbox" checked class="h-4 w-4 accent-primary" />
+        <input id="consent-toggle-ads" type="checkbox" class="h-4 w-4 accent-primary" />
       </label>
       <label class="flex items-center justify-between gap-4 text-mini">
         <span class="text-chalk/85">Functional</span>
-        <input id="consent-toggle-functional" type="checkbox" checked class="h-4 w-4 accent-primary" />
+        <input id="consent-toggle-functional" type="checkbox" class="h-4 w-4 accent-primary" />
       </label>
     </div>
     <div class="mt-4 flex flex-col sm:flex-row sm:items-center gap-2">
@@ -50,7 +50,7 @@
         id="consent-customize"
         type="button"
         class="inline-flex items-center justify-center rounded-sm px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground/90"
-        aria-expanded="false"
+        aria-expanded="false" aria-controls="consent-prefs"
       >
         Customize
       </button>
@@ -77,7 +77,9 @@
   function read() {
     try {
       var raw = localStorage.getItem(KEY);
-      return raw ? JSON.parse(raw) : null;
+      if (!raw) return null;
+      var state = JSON.parse(raw);
+      return state && typeof state.analytics === "boolean" && typeof state.ads === "boolean" && typeof state.functional === "boolean" ? state : null;
     } catch {
       return null;
     }
@@ -99,7 +101,7 @@
     }
   }
 
-  function pushConsent(state) {
+  function pushConsent(state, recordChoice) {
     window.dataLayer = window.dataLayer || [];
     var granted = function (v) {
       return v ? "granted" : "denied";
@@ -118,6 +120,8 @@
     } else {
       window.dataLayer.push({ event: "consent_update", consent: update });
     }
+    if (state.analytics || state.ads) window.catalystLoadAnalytics?.();
+    if (!recordChoice) return;
     window.dataLayer.push({
       event: "consent_choice",
       consent_analytics: state.analytics,
@@ -126,12 +130,26 @@
     });
   }
 
+  var returnFocus = null;
   function hide() {
     banner.classList.add("hidden");
+    prefs?.classList.add("hidden");
+    saveBtn?.classList.add("hidden");
+    customizeBtn?.setAttribute("aria-expanded", "false");
+    if (customizeBtn) customizeBtn.textContent = "Customize";
+    if (returnFocus && returnFocus.isConnected) returnFocus.focus();
+    returnFocus = null;
   }
 
   function show() {
+    returnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    var stored = read();
+    for (var [id, value] of [["consent-toggle-analytics", stored?.analytics], ["consent-toggle-ads", stored?.ads], ["consent-toggle-functional", stored?.functional]]) {
+      var toggle = document.getElementById(id);
+      if (toggle instanceof HTMLInputElement) toggle.checked = value ?? false;
+    }
     banner.classList.remove("hidden");
+    document.getElementById("consent-accept")?.focus();
   }
 
   function choose(state) {
@@ -143,7 +161,7 @@
       ts: new Date().toISOString(),
     };
     write(full);
-    pushConsent(full);
+    pushConsent(full, true);
     hide();
   }
 
@@ -177,5 +195,13 @@
   } else {
     window.setTimeout(show, 600);
   }
+  banner.addEventListener("keydown", function (event) {
+    if (event.key !== "Tab") return;
+    var items = Array.from(banner.querySelectorAll('button:not(.hidden), input:not([disabled])'))
+      .filter(function (el) { return !el.closest('.hidden'); });
+    var first = items[0], last = items[items.length - 1];
+    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+  });
 })();
 </script>

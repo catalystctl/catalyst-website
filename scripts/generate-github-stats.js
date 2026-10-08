@@ -2,9 +2,8 @@
 /**
  * Writes src/data/github-stats.json at build time.
  *
- * This is the seed the page renders on first paint. The live values come from
- * /api/github-stats.json at runtime (edge cached hourly), so a stale seed only
- * ever shows for the moment before that request resolves.
+ * The site renders this build-time snapshot. The API endpoint is available
+ * separately; the page does not request it automatically.
  *
  * Never fails the build: on API errors it keeps any existing seed, or writes an
  * empty payload so imports stay valid.
@@ -40,9 +39,23 @@ async function main() {
     const stats = await fetchGitHubStats({
       token: process.env.GITHUB_TOKEN || process.env.GH_TOKEN,
     });
-    writeFileSync(OUT, JSON.stringify(stats, null, 2) + "\n");
+    let previous = EMPTY;
+    if (existsSync(OUT)) {
+      try { previous = { ...EMPTY, ...JSON.parse(readFileSync(OUT, "utf8")) }; } catch { /* invalid seed */ }
+    }
+    const fields = ["commits", "releases", "contributors", "stars", "forks", "lastPushedAt", "latestRelease", "ci"];
+    const usable = fields.some((key) => stats[key] !== null && stats[key] !== undefined);
+    if (!usable && existsSync(OUT)) {
+      console.warn("! GitHub API unavailable; retaining the previous stats snapshot");
+      return;
+    }
+    const merged = { ...previous, ...stats };
+    for (const key of fields) if (stats[key] === null || stats[key] === undefined) merged[key] = previous[key];
+    if (!usable) merged.fetchedAt = previous.fetchedAt;
+    if (stats.ci === null && previous.ci?.workflow && !/^(ci|build|test|deploy)(\b|\s|$)/i.test(previous.ci.workflow)) merged.ci = null;
+    writeFileSync(OUT, JSON.stringify(merged, null, 2) + "\n");
     console.log(
-      `✓ Generated github-stats.json (${stats.commits ?? "?"} commits, ${stats.releases ?? "?"} releases, ${stats.contributors ?? "?"} contributors, CI ${stats.ci?.state ?? "unknown"})`,
+      `✓ Generated github-stats.json (${merged.commits ?? "?"} commits, ${merged.releases ?? "?"} releases, ${merged.contributors ?? "?"} contributors, CI ${merged.ci?.state ?? "unknown"})`,
     );
     return;
   } catch (err) {

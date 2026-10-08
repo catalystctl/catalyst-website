@@ -1,6 +1,6 @@
 ---
 title: "How to Install a Game Server Panel in 2026: Pterodactyl vs Catalyst"
-description: "A practical walkthrough of installing a game server panel, comparing the manual Pterodactyl and Wings setup with Catalyst's one-command Docker Compose install and Rust agent."
+description: "A practical walkthrough of installing a game server panel, comparing the manual Pterodactyl and Wings setup with Catalyst's guided Docker Compose installer and Rust agent."
 pubDate: 2026-09-25
 author: "Catalyst Team"
 audience: ["hobbyists", "businesses", "hosting-providers"]
@@ -16,7 +16,7 @@ faqs:
   - q: "How do I install the Pterodactyl panel?"
     a: "Pterodactyl's panel install is manual: install PHP 8.1+, Composer, MySQL or MariaDB, Redis, and Nginx or Apache, download the panel, install its Composer dependencies, run the interactive environment setup and database migrations, create an admin user, then configure the queue worker, cron job, and web server. Each game node then needs Docker and Wings installed and configured separately."
   - q: "How long does it take to install a game server panel?"
-    a: "A manual Pterodactyl install typically takes 30 to 60 minutes for the panel and another 15 to 30 minutes per node, depending on your familiarity with PHP, Nginx, and Docker. Catalyst's panel installs with one script that brings up its containers, and each node needs containerd plus the agent, which is usually much faster."
+    a: "A manual Pterodactyl install typically takes 30 to 60 minutes for the panel and another 15 to 30 minutes per node, depending on your familiarity with PHP, Nginx, and Docker. Catalyst's installer prepares the Compose stack and secrets; you then review the configuration, start the containers, and install containerd plus the agent on each node."
   - q: "Do I need Docker to install a game server panel?"
     a: "Pterodactyl needs Docker on every game node for Wings to run containers. Catalyst uses Docker only on the panel host, where the panel, PostgreSQL, and Redis run as a Compose stack, and uses containerd plus the Rust agent on game nodes. Either way you need a container runtime on the machines that host games."
   - q: "How do I update a game server panel?"
@@ -27,7 +27,7 @@ faqs:
     a: "Put the panel behind TLS, keep the database and Redis private, open only the ports you need, create a non-admin support role, configure off-host backups, and test restoring one before you rely on it. Then create a first server from a template and confirm the console, files, and SFTP all work."
 ---
 
-> **TL;DR:** Pterodactyl's install is manual on two layers: a PHP/Laravel panel with MySQL, Redis, and a web server, then Docker plus Wings on every node. **Catalyst** installs the panel with one script that brings up four containers and pairs each node with a Rust agent and containerd. Both need 64-bit Linux; neither supports Windows as a host.
+> **TL;DR:** Pterodactyl's install is manual on two layers: a PHP/Laravel panel with MySQL, Redis, and a web server, then Docker plus Wings on every node. **Catalyst** installs the panel with one script that prepares a four-container Compose stack for you to review and start and pairs each node with a Rust agent and containerd. Both need 64-bit Linux; neither supports Windows as a host.
 
 Installing a game server panel is the step where most people get stuck. The panels themselves are free, but the setup differs enormously between a manual PHP deployment and a panel that ships its own containers.
 
@@ -85,10 +85,10 @@ Catalyst deliberately collapses the setup.
 One script handles the panel host:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/catalystctl/catalyst/main/install.sh | bash
+curl -fsSL https://github.com/catalystctl/catalyst/releases/latest/download/install.sh | sudo bash
 ```
 
-The installer runs a guided setup, generates secure secrets, writes your `.env`, and brings up four containers through Docker Compose: the frontend, the backend panel, PostgreSQL, and Redis. You set `PUBLIC_URL` to your domain or IP, then start the stack:
+The installer prompts for `PUBLIC_URL`, generates secrets, and writes `.env` and Compose files. It does **not** start the stack. Review the configuration, then launch the frontend, backend, PostgreSQL, and Redis containers:
 
 ```bash
 cd catalyst-docker
@@ -148,6 +148,6 @@ The install is not finished when the login page loads. Do these next:
 
 ## Bottom line
 
-Pterodactyl's install is a manual PHP deployment plus a per-node Wings setup. Catalyst's is a one-command panel install plus a single Rust agent per node. Both end in the same place: a web panel managing game servers across one or more machines.
+Pterodactyl's install is a manual PHP deployment plus a per-node Wings setup. Catalyst's is a guided panel installer plus a single Rust agent per node. Both end in the same place: a web panel managing game servers across one or more machines.
 
 Whichever you install, spend more time on the post-install checklist than on the install itself. TLS, private database access, least-privilege roles, and tested off-host backups are what keep a game hosting setup healthy.

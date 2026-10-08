@@ -12,13 +12,6 @@
     "publishedAt": "2026-10-07T21:02:07Z",
     "url": "https://github.com/catalystctl/catalyst/releases/tag/v1.76.1"
   },
-  "ci": {
-    "state": "passing",
-    "label": "Passing",
-    "conclusion": "success",
-    "workflow": "Code Quality: Push on main",
-    "finishedAt": "2026-10-07T20:59:13Z",
-    "url": "https://github.com/catalystctl/catalyst/actions/runs/37685912361"
-  },
-  "fetchedAt": "2026-10-07T21:13:09.984Z"
+  "ci": null,
+  "fetchedAt": "2026-10-07T21:12:31.479Z"
 }

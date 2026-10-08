@@ -99,7 +99,7 @@ const verdicts = [
       "You want containerd-native nodes with a TypeScript panel",
       "You need plugins without forking core",
       "You want live console, files, SFTP, and backups in one panel",
-      "You prefer a one-command panel install (Docker Compose)",
+      "You prefer a guided panel installer (Docker Compose)",
       "You need granular RBAC with 50+ permissions",
       "You want 200+ API route handlers for automation and accept early-testing churn",
     ],
@@ -154,15 +154,21 @@ const heroStats = [
   breadcrumbItems={[{ name: "Pterodactyl Alternative" }]}
 >
   <script>
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('revealed');
-          observer.unobserve(entry.target);
-        }
+    if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+      document.querySelectorAll('[data-reveal], [data-reveal-stagger]').forEach((el) => {
+        if (el.getBoundingClientRect().top < window.innerHeight) return;
+        el.classList.add('reveal-ready');
+        observer.observe(el);
       });
-    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
-    document.querySelectorAll('[data-reveal], [data-reveal-stagger]').forEach((el) => observer.observe(el));
+    }
   </script>
 
   <!-- Hero -->
@@ -213,7 +219,7 @@ const heroStats = [
   <section class="max-w-6xl mx-auto px-4 py-6" aria-label="What is Catalyst" data-speakable>
     <div class="max-w-3xl deck-panel px-4 py-4" data-reveal>
       <p class="text-mini sm:text-data text-chalk/85 leading-relaxed">
-        <strong class="text-foreground font-semibold">Catalyst</strong> is an open-source game server panel in early testing: a TypeScript panel with a Rust node agent and containerd on game nodes. It includes a live console, a native plugin system, 50+ RBAC permissions, and a one-command panel install. Panel GPLv3, agent MIT/Apache-2.0. Migration from Pterodactyl is via built-in import, not drop-in.
+        <strong class="text-foreground font-semibold">Catalyst</strong> is an open-source game server panel in early testing: a TypeScript panel with a Rust node agent and containerd on game nodes. It includes a live console, a native plugin system, 50+ RBAC permissions, and a guided panel installer. Panel GPLv3, agent MIT/Apache-2.0. Migration from Pterodactyl is via built-in import, not drop-in.
       </p>
     </div>
   </section>
@@ -269,8 +275,8 @@ const heroStats = [
 
     <div class="mt-6 max-w-3xl space-y-3 text-mini sm:text-data text-muted-foreground leading-relaxed" data-reveal>
       <h3 class="font-display text-data font-semibold text-foreground">Why hosts look past Pelican and PufferPanel</h3>
-      <p>Pelican forks Pterodactyl with a new team but keeps the PHP + Go Wings + Docker stack. If you want containerd-native nodes with native plugins, Catalyst is the early-testing option with a TypeScript panel and Rust agent.</p>
-      <p>PufferPanel is lighter and written in Go, a step up from PHP for small fleets. It still lacks Catalyst depth: no native plugin system, narrower API, thinner permissions.</p>
+      <p>Pelican forks Pterodactyl with a new team but keeps the PHP + Go Wings + Docker stack. Pelican has its own plugin system; if you want containerd-native nodes and TypeScript plugins instead, Catalyst is an early-testing option with a Rust agent.</p>
+      <p>PufferPanel is a lighter Go-based option for smaller deployments. Compare its documented API and permissions against your requirements rather than assuming one stack fits every fleet.</p>
     </div>
   </section>
 

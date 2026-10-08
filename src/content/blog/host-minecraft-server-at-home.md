@@ -69,34 +69,18 @@ If you're running this on your desktop alongside other things, that works too; j
 One command:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/catalystctl/catalyst/main/install.sh | bash
+curl -fsSL https://github.com/catalystctl/catalyst/releases/latest/download/install.sh | sudo bash
 ```
 
-This downloads the Catalyst Docker Compose setup, generates secure secrets, and creates your `.env` file.
-
-Next, configure your public URL:
-
-```bash
-cd catalyst-docker
-nano .env
-# Set PUBLIC_URL to your public IP or domain
-```
-
-Then start the panel:
-
-```bash
-docker compose up -d
-```
-
-Catalyst is now running at `http://localhost`. Open it in your browser and create your admin account.
+The installer prompts for your panel URL, writes the Docker Compose setup, generates secrets, and creates `.env`. It does not start the containers. Review `catalyst-docker/.env`, then follow the [official start instructions](https://docs.catalystctl.com/admin/installation/#start-the-stack): use the TLS overlay if you configured an HTTPS URL, or start the plain Compose stack for HTTP. Open the `PUBLIC_URL` you chose and complete the first-time setup wizard.
 
 ## Step 3: Set up a node
 
 A "node" in Catalyst is the machine that actually runs your game servers. If you're running everything on one machine, the panel and the node are the same box.
 
 1. In the Catalyst admin panel, go to Nodes → Register Node
-2. Follow the instructions to install the Catalyst agent on your machine
-3. The agent is a lightweight Rust binary. Download it, configure it with your panel URL and token, and run it
+2. Copy the generated node installation command from the panel and follow the [node setup guide](https://docs.catalystctl.com/admin/nodes/installing/)
+3. Verify that containerd and the Rust agent are running and the node appears online
 
 The agent connects back to the panel and reports its status. You should see it appear as "online" in the nodes list.
 
@@ -180,4 +164,4 @@ If you outgrow your home setup, the same Catalyst panel can manage remote nodes 
 
 Want to compare Catalyst before you commit? See [how Catalyst compares to Pterodactyl](/pterodactyl-alternative/#comparison). Existing Pterodactyl user? Our [migration guide](/migrate-from-pterodactyl/) walks through the import.
 
-Ready to get started? [Install Catalyst](https://docs.catalystctl.com/getting-started/quickstart/) and have your server running in under five minutes.
+Ready to get started? [Install Catalyst](https://docs.catalystctl.com/admin/installation/) and follow the panel, node, and Minecraft setup steps.

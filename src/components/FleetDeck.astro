@@ -1,8 +1,8 @@
 ---
 /**
  * FleetDeck: the panel's server ledger, reproduced for the marketing site.
- * Filter tabs, inline search, mono resource meters, status LEDs and a
- * keyboard-hint status bar. Static data; filtering runs client-side.
+ * Scope filters, inline search, mono resource meters and status LEDs.
+ * Static illustrative data; filtering runs client-side.
  */
 const GAME_HUE: Record<string, string> = {
   minecraft: "var(--game-minecraft)",
@@ -60,18 +60,18 @@ const COLS = "grid-cols-1 md:grid-cols-[minmax(0,1fr)_7rem_9rem_5.5rem_4.5rem] x
 <div class="deck-panel overflow-hidden" data-fleet-deck>
   <!-- Toolbar -->
   <div class="deck-toolbar">
-    <div class="deck-tabs" role="tablist" aria-label="Server scope">
-      <button type="button" class="deck-tab is-active" role="tab" aria-selected="true" data-filter="all">
+    <div class="deck-tabs" role="group" aria-label="Filter servers by scope">
+      <button type="button" class="deck-tab is-active" aria-pressed="true" data-filter="all">
         <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>
         <span>All</span>
         <span class="deck-tab-count">{counts.all}</span>
       </button>
-      <button type="button" class="deck-tab" role="tab" aria-selected="false" data-filter="owned">
+      <button type="button" class="deck-tab" aria-pressed="false" data-filter="owned">
         <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>
         <span>Owned</span>
         <span class="deck-tab-count">{counts.owned}</span>
       </button>
-      <button type="button" class="deck-tab" role="tab" aria-selected="false" data-filter="other">
+      <button type="button" class="deck-tab" aria-pressed="false" data-filter="other">
         <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
         <span>Other</span>
         <span class="deck-tab-count">{counts.other}</span>
@@ -80,7 +80,7 @@ const COLS = "grid-cols-1 md:grid-cols-[minmax(0,1fr)_7rem_9rem_5.5rem_4.5rem] x
 
     <label class="deck-field">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.34-4.34"/></svg>
-      <input type="search" class="deck-input" placeholder="Search by name or node..." aria-label="Search servers" data-search />
+      <input type="search" class="deck-input" placeholder="Search by server, game or address..." aria-label="Search servers" data-search />
     </label>
 
     <select class="deck-select" aria-label="All statuses" data-status>
@@ -92,25 +92,23 @@ const COLS = "grid-cols-1 md:grid-cols-[minmax(0,1fr)_7rem_9rem_5.5rem_4.5rem] x
   </div>
 
   <!-- Header -->
-  <div class:list={["deck-row hidden md:grid border-b border-border/50 bg-surface-1/40", COLS]} role="row">
-    <span class="deck-th" role="columnheader">Server</span>
-    <span class="deck-th hidden md:block" role="columnheader">Game</span>
-    <span class="deck-th hidden justify-end xl:flex" role="columnheader">CPU</span>
-    <span class="deck-th hidden justify-end xl:flex" role="columnheader">RAM</span>
-    <span class="deck-th hidden justify-end xl:flex" role="columnheader">Disk</span>
-    <span class="deck-th hidden md:block" role="columnheader">Address</span>
-    <span class="deck-th hidden md:block" role="columnheader">State</span>
-    <span class="deck-th text-right" role="columnheader">Actions</span>
+  <div class:list={["deck-row hidden md:grid border-b border-border/50 bg-surface-1/40", COLS]}>
+    <span class="deck-th">Server</span>
+    <span class="deck-th hidden md:block">Game</span>
+    <span class="deck-th hidden justify-end xl:flex">CPU</span>
+    <span class="deck-th hidden justify-end xl:flex">RAM</span>
+    <span class="deck-th hidden justify-end xl:flex">Disk</span>
+    <span class="deck-th hidden md:block">Address</span>
+    <span class="deck-th hidden md:block">State</span>
+    <span class="deck-th text-right">Actions</span>
   </div>
 
   <!-- Rows -->
   <div data-rows>
     {servers.map((s) => (
       <div
-        class:list={["deck-row border-b border-border/40 last:border-b-0 focus-visible:bg-primary/10 outline-none", COLS]}
-        role="row"
-        tabindex="0"
-        data-name={`${s.name} ${s.game}`.toLowerCase()}
+        class:list={["deck-row border-b border-border/40 last:border-b-0", COLS]}
+        data-name={`${s.name} ${s.game} ${s.address}`.toLowerCase()}
         data-state={s.state}
         data-owned={s.owned ? "1" : "0"}
       >
@@ -161,7 +159,7 @@ const COLS = "grid-cols-1 md:grid-cols-[minmax(0,1fr)_7rem_9rem_5.5rem_4.5rem] x
         </span>
 
         <!-- Actions -->
-        <span class="flex items-center justify-end gap-1">
+        <span class="hidden items-center justify-end gap-1 md:flex" aria-hidden="true">
           <span class="deck-icon-btn" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg></span>
           <span class="deck-icon-btn" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></span>
           <span class="deck-icon-btn" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 17l6-6-6-6"/><path d="M12 19h8"/></svg></span>
@@ -170,7 +168,7 @@ const COLS = "grid-cols-1 md:grid-cols-[minmax(0,1fr)_7rem_9rem_5.5rem_4.5rem] x
     ))}
   </div>
 
-  <div class="hidden px-3 py-6 text-center text-mini text-muted-foreground" data-empty>No servers match this filter.</div>
+  <div class="hidden px-3 py-6 text-center text-mini text-muted-foreground" role="status" data-empty>No servers match this filter.</div>
 
   <!-- Status bar -->
   <div class="deck-statusbar">
@@ -191,11 +189,7 @@ const COLS = "grid-cols-1 md:grid-cols-[minmax(0,1fr)_7rem_9rem_5.5rem_4.5rem] x
         <span class="type-overline">Issues</span>
       </span>
     </div>
-    <div class="hidden flex-wrap items-center gap-x-3 gap-y-1 sm:flex">
-      <span class="deck-keyhint"><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
-      <span class="deck-keyhint"><kbd>↵</kbd> open</span>
-      <span class="deck-keyhint"><kbd>⌘</kbd> actions</span>
-    </div>
+    <span class="text-micro text-muted-foreground">Illustrative data · <a href="https://demo.catalystctl.com/" class="underline underline-offset-2 hover:text-foreground">Explore the live demo</a></span>
   </div>
 </div>
 
@@ -232,7 +226,7 @@ const COLS = "grid-cols-1 md:grid-cols-[minmax(0,1fr)_7rem_9rem_5.5rem_4.5rem] x
         tabs.forEach((t) => {
           const on = t === tab;
           t.classList.toggle('is-active', on);
-          t.setAttribute('aria-selected', on ? 'true' : 'false');
+          t.setAttribute('aria-pressed', on ? 'true' : 'false');
         });
         apply();
       });

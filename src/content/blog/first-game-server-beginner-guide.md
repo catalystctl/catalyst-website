@@ -66,57 +66,38 @@ If you're using an old PC:
 2. Boot from the USB drive and follow the installer
 3. Choose "Install OpenSSH Server" when asked. This lets you manage the server remotely
 
-## Step 2: Install Docker
+## Step 2: Prepare the panel host
 
-Docker is the software that runs your game server in an isolated container. It keeps your server separate from the rest of your system.
+Docker Compose runs the Catalyst panel and its supporting services. Game servers run separately on a node with containerd and the Catalyst Rust agent; the panel alone cannot host a game server.
 
-Connect to your server (via SSH or directly) and run:
-
-```bash
-curl -fsSL https://get.docker.com | sh
-sudo usermod -aG docker $USER
-```
-
-Log out and back in for the group change to take effect. Verify it works:
-
-```bash
-docker --version
-```
-
-You should see something like `Docker version 27.x.x`.
+Connect to your Linux host over SSH or locally. Have `curl`, `tar`, `openssl`, and sudo access available. The supported Catalyst installer checks Docker and Compose and offers to install Docker when needed; you do not need to add your everyday account to the root-equivalent `docker` group just to follow this guide.
 
 ## Step 3: Install Catalyst
 
 Catalyst is the panel that gives you a web interface to manage your game servers. One command:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/catalystctl/catalyst/main/install.sh | bash
+curl -fsSL https://github.com/catalystctl/catalyst/releases/latest/download/install.sh | sudo bash
 ```
 
-This downloads everything and creates a configuration file. Edit it:
+The installer prompts for your panel URL, writes the Compose files and secrets, and does not start the stack. Review its configuration:
 
 ```bash
 cd catalyst-docker
 nano .env
 ```
 
-Find the line that says `PUBLIC_URL=` and set it to your server's IP address or domain. Save and exit (Ctrl+X, Y, Enter).
+Confirm that `PUBLIC_URL` matches the URL you entered during installation. Save any changes and exit (Ctrl+X, Y, Enter).
 
-Start the panel:
-
-```bash
-docker compose up -d
-```
-
-Open a web browser and go to `http://your-server-ip`. You should see the Catalyst login page. Create your admin account.
+Start the panel with `docker compose up -d` for an HTTP deployment. If your `PUBLIC_URL` is HTTPS, follow the [TLS overlay instructions](https://docs.catalystctl.com/admin/installation/#start-the-stack) **instead**. Open the configured `PUBLIC_URL` in a browser and complete the first-time setup wizard to create your admin account.
 
 ## Step 4: Set up a node
 
 A "node" is the machine that actually runs game servers. Since you're running everything on one machine, the panel and the node are the same box.
 
 1. In Catalyst, go to **Nodes → Register Node**
-2. Follow the instructions to download and run the Catalyst agent on your machine
-3. The agent is a small program that connects to the panel and reports "I'm here and ready to run servers"
+2. Copy the generated node-install command and follow the [official node guide](https://docs.catalystctl.com/admin/nodes/installing/); it prepares containerd and the agent
+3. Verify the agent reports back to the panel and the node is online
 
 You should see the node appear as "Online" in the nodes list.
 
@@ -229,4 +210,4 @@ If you want to host something specific next, our [Minecraft at home guide](/blog
 
 If you want to go deeper, the [Catalyst documentation](https://docs.catalystctl.com/) covers everything from node management to the plugin system to the full API reference.
 
-[Get started now](https://docs.catalystctl.com/getting-started/quickstart/): your server is 60 seconds away.
+[Get started now](https://docs.catalystctl.com/admin/installation/): follow the panel and node setup steps before deploying your first server.

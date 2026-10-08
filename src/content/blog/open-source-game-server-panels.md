@@ -82,7 +82,7 @@ Pelican is a fork of Pterodactyl with a different governance model. It's Pteroda
 
 **Cons:**
 - Same architectural limitations as Pterodactyl (it's the same codebase)
-- No plugin system
+- Plugin ecosystem is newer than Pterodactyl's broader modification community
 - Smaller community than Pterodactyl
 - Fork creates ecosystem fragmentation
 
@@ -138,7 +138,7 @@ PufferPanel is a lightweight panel written in Go. It's simpler than Pterodactyl 
 | Panel language | PHP | PHP | TypeScript | Go |
 | Container runtime (nodes) | Docker via Wings | Docker via Wings | containerd via Rust agent | Docker |
 | Node agent | Wings (Go) | Wings (Go) | Agent (Rust) | Built-in |
-| Plugin system | No native API | No native API | Yes | No |
+| Plugin system | No native API | Yes (PHP plugins) | Yes (TypeScript plugins) | No |
 | API surface | REST + WebSocket | REST + WebSocket | 200+ route handlers | Limited |
 | RBAC granularity | Roles + subusers | Roles + subusers | 50+ perms | Basic |
 | Live console | Via Wings | Via Wings | Via panel + agent | Built-in |
@@ -179,6 +179,6 @@ All four panels are open source and free to use. That means:
 
 ## Getting started
 
-If you're new to game server panels, start with Catalyst's [quick start guide](https://docs.catalystctl.com/getting-started/quickstart/). One command installs the panel; game nodes need containerd plus the agent.
+If you're new to game server panels, start with Catalyst's [quick start guide](https://docs.catalystctl.com/admin/installation/). One command installs the panel; game nodes need containerd plus the agent.
 
 For a broader comparison, check out [every Pterodactyl alternative in the 2026 buyer's guide](/blog/pterodactyl-alternatives-2026/) and the [three-way Pterodactyl vs Pelican vs Catalyst comparison](/blog/pterodactyl-vs-pelican-vs-catalyst/). For the infrastructure angle, see [why platforms are moving to Rust](/blog/why-game-server-platforms-moving-to-rust/). If you are planning an install, size the host with the [Pterodactyl requirements checklist](/blog/pterodactyl-panel-requirements/) and follow the [installation walkthrough](/blog/how-to-install-a-game-server-panel/).

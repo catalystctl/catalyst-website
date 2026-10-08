@@ -29,7 +29,7 @@ faqs:
     a: "Catalyst's panel needs a Linux host with Docker and Docker Compose, which run the panel, PostgreSQL, and Redis as four containers, and installs with one script. Game nodes need containerd plus the Catalyst agent rather than Docker and Wings. There is no PHP, MySQL, Composer, or manual web-server setup."
 ---
 
-> **TL;DR:** The Pterodactyl **panel** needs Linux with PHP 8.1+, Composer, MySQL 5.7+/MariaDB 10.2+, Redis, and Nginx or Apache, in roughly 1GB of RAM. Each **Wings node** needs 64-bit Linux, root, Docker, and cgroup-capable kernel support, plus one game port per server. [Catalyst](/pterodactyl-alternative/) swaps the panel stack for a one-command Docker Compose install and replaces Wings plus Docker with a Rust agent and containerd.
+> **TL;DR:** The Pterodactyl **panel** needs Linux with PHP 8.1+, Composer, MySQL 5.7+/MariaDB 10.2+, Redis, and Nginx or Apache, in roughly 1GB of RAM. Each **Wings node** needs 64-bit Linux, root, Docker, and cgroup-capable kernel support, plus one game port per server. [Catalyst](/pterodactyl-alternative/) swaps the panel stack for a guided Docker Compose installer and replaces Wings plus Docker with a Rust agent and containerd.
 
 Before you install a game server panel, you want to know exactly what it needs. Pterodactyl has one of the longer requirement lists of any self-hosted panel because its panel and node layers are separate PHP and Go applications with their own dependencies.
 
@@ -126,7 +126,7 @@ A single public IP works for small installs. Hosting providers usually allocate 
 
 Catalyst changes two layers:
 
-- **Panel:** a Linux host with Docker and Docker Compose. The install script brings up four containers (frontend, backend, PostgreSQL, and Redis) and generates secrets. There is no PHP, Composer, MySQL, Nginx, or Apache to install by hand.
+- **Panel:** a Linux host with Docker and Docker Compose. The installer prepares the frontend, backend, PostgreSQL, and Redis Compose stack and generates secrets; you review and start it afterward. There is no PHP, Composer, MySQL, Nginx, or Apache to install by hand.
 - **Nodes:** containerd plus the Catalyst agent, a Rust static binary. Nodes do not run Docker or Wings. The agent serves SFTP itself on port 2022 and talks directly to containerd, so the Docker socket does not exist on game nodes.
 
 Everything else is familiar: 64-bit Linux, root for the container runtime and firewall, and one game port per server.

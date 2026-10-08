@@ -24,7 +24,7 @@ faqs:
   - q: "Which Pterodactyl alternative is easiest to install?"
     a: "Catalyst installs the panel with a single Docker Compose script, then needs containerd plus the Catalyst agent on each game node. Pterodactyl and Pelican require manual panel and Wings setup. PufferPanel has a simple installer but a smaller feature set."
   - q: "Is Pelican better than Pterodactyl?"
-    a: "Pelican is a fork of Pterodactyl, so it inherits the same PHP plus Docker-and-Wings architecture and the same limitations, including no native plugin system. It differs mainly in governance and roadmap. Choose it if you want Pterodactyl's behaviour under a community-led team, not a different architecture."
+    a: "Pelican is a fork of Pterodactyl, so it inherits the same PHP plus Docker-and-Wings architecture and the same limitations, although Pelican now supports its own plugins. It differs mainly in governance and roadmap. Choose it if you want Pterodactyl's behaviour under a community-led team, not a different architecture."
   - q: "What is the difference between Pterodactyl and Catalyst?"
     a: "Pterodactyl uses PHP (Laravel), Docker via the Wings daemon, and MySQL. Catalyst uses a TypeScript Fastify panel with PostgreSQL and Redis, and a Rust agent that talks directly to containerd on game nodes. Catalyst adds a native plugin system, 50+ RBAC permissions, and 200+ API route handlers."
 ---
@@ -79,8 +79,8 @@ Pelican is a fork of Pterodactyl with a different team and roadmap. It shares th
 - Egg compatibility with Pterodactyl
 
 **Weaknesses:**
-- Same PHP + Docker architecture as Pterodactyl (same performance characteristics)
-- No plugin system (same limitation as Pterodactyl)
+- PHP + Docker architecture may not suit teams looking for a different node runtime
+- Newer plugin ecosystem than established Pterodactyl modifications
 - Fork means two projects dividing the same ecosystem
 
 **Best for:** People who want "Pterodactyl but with a different team" and don't need architectural changes.
@@ -111,7 +111,7 @@ PufferPanel is a lightweight game server panel written in Go. It's simpler and l
 | Container runtime (nodes) | containerd via Rust agent | Docker via Wings | Docker via Wings | Docker |
 | Live console | Via panel + agent | Via Wings | Via Wings | Built-in |
 | API surface | 200+ route handlers | REST + WebSocket | REST + WebSocket | Limited |
-| Plugin system | Yes | No native API | No native API | No |
+| Plugin system | Yes (TypeScript) | No native API | Yes (PHP plugins) | No |
 | RBAC permissions | 50+ granular | Roles + subusers | Roles + subusers | Basic |
 | Panel install | One command (Compose) | Manual | Manual | Simple |
 | Migration from Pterodactyl | Built-in | N/A | Fork upgrade | Manual |

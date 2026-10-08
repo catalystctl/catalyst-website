@@ -88,35 +88,9 @@ You can write a WHMCS module or billing integration in a few hours using these e
 
 ### Option 2: Catalyst plugin
 
-Catalyst's plugin system lets you write a TypeScript extension that runs inside the panel:
+Catalyst's plugin system lets you write a TypeScript extension that runs inside the panel. The supported lifecycle uses `onLoad` to register routes with `ctx.registerRoute` and `onEnable` to subscribe to documented events with `ctx.on`. See the [backend plugin guide](https://docs.catalystctl.com/api/plugins/backend/) for a working template, supported event names, and security guidance before building a billing integration.
 
-```typescript
-// A billing plugin that listens for server events
-export default {
-  name: 'billing-sync',
-  hooks: {
-    'server.created': async (ctx, server) => {
-      // Notify billing system
-      await ctx.fetch('https://billing.example.com/api/provision', {
-        method: 'POST',
-        body: JSON.stringify({ serverId: server.id, userId: server.ownerId }),
-      });
-    },
-    'server.suspended': async (ctx, server) => {
-      // Update billing status
-    },
-  },
-  routes: {
-    // Webhook endpoint for billing callbacks
-    'POST /billing/webhook': async (ctx) => {
-      const event = await ctx.req.json();
-      // Handle billing events
-    },
-  },
-};
-```
-
-This approach is more reliable than an external module, because the plugin runs inside the panel process: no network hops, no synchronization issues.
+Plugins run in the backend process, so validate webhook signatures, handle retries and idempotency, and isolate failures: a plugin exception can affect the panel. For external billing systems, an API integration may be easier to operate safely.
 
 ## Pricing your services
 
@@ -258,4 +232,4 @@ If you're building a hosting business, the differences matter:
 
 Migrating from Pterodactyl? Our [migration guide for 50+ servers](/blog/migrate-50-servers-from-pterodactyl/) and the [automated import walkthrough](/migrate-from-pterodactyl/) cover the full cutover.
 
-Catalyst is free, open source, and GPLv3. There are no licensing costs or per-server fees. [Get started](https://docs.catalystctl.com/getting-started/quickstart/) and have your first server running in under a minute. For enterprise requirements, see [enterprise management and compliance](/blog/enterprise-game-server-management/).
+Catalyst is free, open source, and GPLv3. There are no licensing costs or per-server fees. [Get started](https://docs.catalystctl.com/admin/installation/) and plan your panel, node, and first-server setup. For enterprise requirements, see [enterprise management and compliance](/blog/enterprise-game-server-management/).

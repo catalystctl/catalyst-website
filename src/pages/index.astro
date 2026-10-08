@@ -11,14 +11,14 @@ const B = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "") + "/";
 const GITHUB_URL = "https://github.com/catalystctl/catalyst";
 const DISCORD_URL = "https://discord.gg/mybxhmru3y";
 const DEMO_URL = "https://demo.catalystctl.com/";
-const INSTALL_CMD = "curl -fsSL https://raw.githubusercontent.com/catalystctl/catalyst/main/install.sh | bash";
+const INSTALL_CMD = "curl -fsSL https://github.com/catalystctl/catalyst/releases/latest/download/install.sh | sudo bash";
 
 const steps = [
   {
     n: "01",
     title: "Install the panel.",
-    body: "One script brings up panel, PostgreSQL, and Redis via Docker Compose. Secrets generated, TLS-ready reverse-proxy examples included.",
-    code: "$ curl -fsSL … | bash",
+    body: "The installer prepares Docker Compose and generates secrets. Review the configuration, then start the panel, PostgreSQL, and Redis stack.",
+    code: "$ curl -fsSL … | sudo bash",
   },
   {
     n: "02",
@@ -36,7 +36,7 @@ const steps = [
 
 const bigStats = [
   { value: "Live", label: "Console, files, and metrics", hint: "WebSocket console via panel gateway to the Rust agent, plus SFTP and file manager.", live: true, meter: null },
-  { value: "1 cmd", label: "Panel install", hint: "One script with Docker Compose for panel, PostgreSQL, and Redis.", live: false, meter: null },
+  { value: "1 cmd", label: "Panel install", hint: "One installer prepares Compose files; you review and start the stack.", live: false, meter: null },
   { value: "200+", label: "API route handlers", hint: "Fastify + Prisma across servers, nodes, users, files, backups, and plugins. RBAC-aware.", live: false, meter: null },
   { value: "50+", label: "Granular RBAC permissions", hint: "Roles across servers, nodes, templates, users, backups, files, and alerts.", live: false, meter: null },
 ];
@@ -125,7 +125,7 @@ const archLayers = [
   { name: "Linux", detail: "Panel: Docker hosts · Nodes: containerd + root", tone: "dim" },
 ];
 
-const ciTone = gh.ci?.state === "passing" ? "success" : gh.ci?.state === "failing" ? "danger" : "generic";
+const ciTone = gh.ci?.state === "passing" ? "bg-success" : gh.ci?.state === "failing" ? "bg-danger" : "bg-muted-foreground/50";
 ---
 
 <Layout title="Home" description="Catalyst is an open-source game server panel with a TypeScript panel, Rust node agent, and containerd runtime. 200+ API route handlers, 50+ RBAC permissions, 258 egg definitions. Early testing.">
@@ -140,12 +140,12 @@ const ciTone = gh.ci?.state === "passing" ? "success" : gh.ci?.state === "failin
             <span class="type-overline">Open source · GPLv3 · early testing</span>
           </div>
 
-          <h1 class="mt-4 font-display text-[2rem] sm:text-[2.6rem] font-semibold text-foreground tracking-tight leading-[1.1] text-balance" data-reveal>
+          <h1 class="mt-4 font-display text-[2rem] sm:text-[2.6rem] font-semibold text-foreground tracking-tight leading-[1.1] text-balance">
             The open-source game server panel built on <span class="text-primary">containerd.</span>
           </h1>
 
           <p class="mt-4 max-w-lg text-data sm:text-base text-muted-foreground leading-relaxed" data-reveal>
-            An open-source game server panel built on a TypeScript panel, a Rust node agent, and a containerd-native runtime. Live console, file manager, and a one-command panel install.
+            An open-source game server panel built on a TypeScript panel, a Rust node agent, and a containerd-native runtime. Live console, file manager, and a guided panel installer.
           </p>
 
           <div class="mt-6 flex flex-wrap items-center gap-2" data-reveal>
@@ -196,7 +196,7 @@ const ciTone = gh.ci?.state === "passing" ? "success" : gh.ci?.state === "failin
                 <span class="type-overline">Releases</span>
               </a>
               <a href={gh.ci?.url ?? `${gh.repoUrl}/actions`} target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 hover:text-foreground">
-                <span class={`led bg-${ciTone === "generic" ? "muted-foreground/50" : ciTone}`}></span>
+                <span class={`led ${ciTone}`}></span>
                 <span class="type-overline">CI {gh.ci?.label ?? "unknown"}</span>
               </a>
               <a href={`${gh.repoUrl}/graphs/contributors`} target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 hover:text-foreground">
@@ -469,7 +469,7 @@ const ciTone = gh.ci?.state === "passing" ? "success" : gh.ci?.state === "failin
     </div>
 
     <p class="mt-4 text-mini text-muted-foreground" data-reveal>
-      Panel install is one command. Game nodes need containerd plus the Rust agent; see <a href="https://docs.catalystctl.com/" class="text-chalk/85 hover:text-foreground underline underline-offset-2 decoration-border transition-colors">node setup in docs</a>.
+      The installer prepares the panel stack; review its configuration and start Compose separately. Game nodes need containerd plus the Rust agent; see <a href="https://docs.catalystctl.com/" class="text-chalk/85 hover:text-foreground underline underline-offset-2 decoration-border transition-colors">node setup in docs</a>.
     </p>
   </section>
 
@@ -590,7 +590,7 @@ const ciTone = gh.ci?.state === "passing" ? "success" : gh.ci?.state === "failin
           Install Catalyst on your own hardware.
         </h2>
         <p class="mt-3 text-mini sm:text-data text-muted-foreground max-w-md">
-          Open source in early testing. Panel GPLv3, agent MIT/Apache-2.0. One-command panel install.
+          Open source in early testing. Panel GPLv3, agent MIT/Apache-2.0. Guided panel installation.
         </p>
 
         <div class="mt-5 flex flex-wrap items-center gap-2">
@@ -618,33 +618,43 @@ const ciTone = gh.ci?.state === "passing" ? "success" : gh.ci?.state === "failin
   <script>
     // ── Scroll reveal ──
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('revealed');
-          observer.unobserve(entry.target);
-        }
+    if ('IntersectionObserver' in window && !reduceMotion) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+      document.querySelectorAll('[data-reveal], [data-reveal-stagger]').forEach((el) => {
+        if (el.getBoundingClientRect().top < window.innerHeight) return;
+        el.classList.add('reveal-ready');
+        observer.observe(el);
       });
-    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
-    document.querySelectorAll('[data-reveal], [data-reveal-stagger]').forEach((el) => observer.observe(el));
+    }
 
     // ── Copy buttons ──
     document.querySelectorAll('.copy-btn').forEach((btn) => {
       btn.addEventListener('click', async () => {
         const text = btn.getAttribute('data-copy') || '';
-        await navigator.clipboard.writeText(text);
         const original = btn.innerHTML;
-        btn.innerHTML = '<svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg> Copied';
-        btn.classList.add('copied');
-        setTimeout(() => { btn.innerHTML = original; btn.classList.remove('copied'); }, 2000);
+        try {
+          await navigator.clipboard.writeText(text);
+          btn.innerHTML = '✓ Copied';
+          btn.classList.add('copied');
+        } catch {
+          btn.textContent = 'Copy failed';
+          btn.setAttribute('title', 'Select the command above and copy it manually');
+        }
+        setTimeout(() => { btn.innerHTML = original; btn.classList.remove('copied'); btn.removeAttribute('title'); }, 2000);
       });
     });
 
     // ── Install terminal: arm, then stagger lines when scrolled into view ──
     const term = document.getElementById('install-term');
-    if (term && !reduceMotion) {
+    if (term && !reduceMotion && 'IntersectionObserver' in window) {
       const lines = term.querySelectorAll('.inst-line');
-      term.classList.add('term-armed');
       const termObserver = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
           if (!entry.isIntersecting) return;
@@ -654,8 +664,10 @@ const ciTone = gh.ci?.state === "passing" ? "success" : gh.ci?.state === "failin
           term.classList.add('term-play');
           termObserver.disconnect();
         });
-      }, { threshold: 0.35 });
+      }, { threshold: 0, rootMargin: '0px 0px 80px 0px' });
       termObserver.observe(term);
+      if (term.getBoundingClientRect().top > window.innerHeight) term.classList.add('term-armed');
+      setTimeout(() => term.classList.add('term-play'), 2500);
     }
   </script>
 

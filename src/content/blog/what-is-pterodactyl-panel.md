@@ -29,7 +29,7 @@ faqs:
     a: "Common choices are Pelican, a community fork of Pterodactyl with the same architecture, PufferPanel, a lightweight Go panel, and Catalyst, which replaces the PHP panel with TypeScript, the Wings daemon with a Rust agent, and Docker with containerd on game nodes. Pick based on whether you want a fork or a different architecture."
 ---
 
-> **TL;DR:** The **Pterodactyl panel** is an open-source web control panel for game servers — the software, not the pterosaur. A PHP (Laravel) panel talks to **Wings**, a Go daemon on each game node, which runs servers as Docker containers using templates called **eggs**. It is free under the MIT licence and very mature, but the stack is ageing and has no native plugin system. [Catalyst](/pterodactyl-alternative/) is a structurally different alternative: TypeScript panel, Rust node agent, and containerd-native nodes.
+> **TL;DR:** The **Pterodactyl panel** is an open-source web control panel for game servers. It is software, not the pterosaur. A PHP (Laravel) panel talks to **Wings**, a Go daemon on each game node, which runs servers as Docker containers using templates called **eggs**. It is free under the MIT licence and very mature, but the stack is ageing and has no native plugin system. [Catalyst](/pterodactyl-alternative/) is a structurally different alternative: TypeScript panel, Rust node agent, and containerd-native nodes.
 
 If you have looked into hosting a Minecraft, Rust, ARK, or Counter-Strike server, you have almost certainly run into the Pterodactyl panel. It has been the default self-hosted game server control panel for about a decade, and it powers a large share of small and mid-sized hosting companies.
 
@@ -145,7 +145,7 @@ Consider an **alternative** if any of these are true:
 - You are running many servers and want finer access control
 - You need custom integrations without forking the panel
 - You want to align game nodes with containerd or Kubernetes tooling
-- You want a one-command panel install and less per-node maintenance
+- You want a guided panel installer and less per-node maintenance
 - You are moving off PHP for operational or performance reasons
 
 If you decide to switch, [Catalyst's migration tool](/migrate-from-pterodactyl/) imports nodes, allocations, users, eggs, servers, and files, and you can run both panels side by side during cutover. Our [50-server migration playbook](/blog/migrate-50-servers-from-pterodactyl/) covers the phased approach.
@@ -154,14 +154,14 @@ If you decide to switch, [Catalyst's migration tool](/migrate-from-pterodactyl/)
 
 If you are working with Pterodactyl, these guides go deeper on each part of the stack:
 
-- [Pterodactyl panel requirements](/blog/pterodactyl-panel-requirements/) — exact specs for the panel and Wings nodes
-- [How to install a game server panel](/blog/how-to-install-a-game-server-panel/) — the manual Pterodactyl path vs a one-command install
-- [How to update Pterodactyl and Wings](/blog/how-to-update-pterodactyl-panel/) — safe update order and rollback
-- [Fix common Pterodactyl errors](/blog/fix-pterodactyl-panel-errors/) — red hearts, 500s, and invalid MAC
-- [Pterodactyl security advisories in 2026](/blog/pterodactyl-panel-security-advisories/) — every CVE with fixed versions
-- [Backing up game servers](/blog/game-server-backup-guide/) — what to back up, where, and how to test restores
-- [Pterodactyl eggs explained](/blog/pterodactyl-eggs-explained/) — nests, import, and custom eggs
-- [The Pterodactyl API guide](/blog/pterodactyl-panel-api-guide/) — Application vs Client API and automation
+- [Pterodactyl panel requirements](/blog/pterodactyl-panel-requirements/): exact specs for the panel and Wings nodes
+- [How to install a game server panel](/blog/how-to-install-a-game-server-panel/): the manual Pterodactyl path vs a guided installation
+- [How to update Pterodactyl and Wings](/blog/how-to-update-pterodactyl-panel/): safe update order and rollback
+- [Fix common Pterodactyl errors](/blog/fix-pterodactyl-panel-errors/): red hearts, 500s, and invalid MAC
+- [Pterodactyl security advisories in 2026](/blog/pterodactyl-panel-security-advisories/): every CVE with fixed versions
+- [Backing up game servers](/blog/game-server-backup-guide/): what to back up, where, and how to test restores
+- [Pterodactyl eggs explained](/blog/pterodactyl-eggs-explained/): nests, import, and custom eggs
+- [The Pterodactyl API guide](/blog/pterodactyl-panel-api-guide/): Application vs Client API and automation
 
 ## Bottom line
 

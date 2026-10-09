@@ -1,0 +1,19 @@
+{
+  "linkset": [
+    {
+      "anchor": "https://catalystctl.com/api/",
+      "link": [
+        {
+          "rel": "service-desc",
+          "href": "https://catalystctl.com/openapi.json",
+          "type": "application/vnd.oai.openapi+json;version=3.0"
+        },
+        {
+          "rel": "service-doc",
+          "href": "https://docs.catalystctl.com/api/reference/",
+          "type": "text/html"
+        }
+      ]
+    }
+  ]
+}

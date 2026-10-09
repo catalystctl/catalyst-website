@@ -1,0 +1,18 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Catalyst API",
+    "description": "The Catalyst game server management API. See the API documentation for authentication, pagination, errors, and endpoint usage.",
+    "version": "1.0.0",
+    "license": {
+      "name": "GNU General Public License v3.0",
+      "url": "https://www.gnu.org/licenses/gpl-3.0.html"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://catalystctl.com/api"
+    }
+  ],
+  "paths": {}
+}

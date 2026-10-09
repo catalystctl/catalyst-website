@@ -282,6 +282,53 @@ const breadcrumbLd = hasBreadcrumbs
   </head>
 
   <body class="min-h-screen flex flex-col bg-background text-foreground">
+    <script is:inline>
+      (() => {
+        const modelContext = navigator.modelContext;
+        if (!modelContext?.registerTool) return;
+
+        const controller = new AbortController();
+        const tools = [
+          {
+            name: "search_plugins",
+            description: "Search the Catalyst plugin marketplace.",
+            inputSchema: {
+              type: "object",
+              properties: { query: { type: "string", description: "Plugin name or keyword." } },
+              required: ["query"],
+              additionalProperties: false,
+            },
+            execute: async ({ query }) => {
+              const url = new URL("/plugins/", window.location.origin);
+              url.searchParams.set("q", query);
+              window.location.href = url.toString();
+              return { url: url.toString(), query };
+            },
+          },
+          {
+            name: "navigate",
+            description: "Navigate to a Catalyst website destination.",
+            inputSchema: {
+              type: "object",
+              properties: {
+                destination: { type: "string", enum: ["home", "plugins", "blog", "docs", "about"] },
+              },
+              required: ["destination"],
+              additionalProperties: false,
+            },
+            execute: ({ destination }) => {
+              const paths = { home: "/", plugins: "/plugins/", blog: "/blog/", docs: "https://docs.catalystctl.com/", about: "/about/" };
+              const url = paths[destination] || paths.home;
+              window.location.href = url;
+              return { url };
+            },
+          },
+        ];
+
+        for (const tool of tools) modelContext.registerTool(tool, { signal: controller.signal });
+        window.addEventListener("pagehide", () => controller.abort(), { once: true });
+      })();
+    </script>
     <a href="#main-content" class="skip-link">Skip to content</a>
 
     <header class="sticky top-0 z-50 border-b border-border/70 bg-surface-1/40 backdrop-blur-xl">

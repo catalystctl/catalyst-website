@@ -5,7 +5,7 @@
   "releases": 294,
   "contributors": 8,
   "stars": 34,
-  "forks": 6,
+  "forks": 5,
   "lastPushedAt": "2026-10-10T05:01:22Z",
   "latestRelease": {
     "tag": "v1.79.3",
@@ -13,5 +13,5 @@
     "url": "https://github.com/catalystctl/catalyst/releases/tag/v1.79.3"
   },
   "ci": null,
-  "fetchedAt": "2026-10-11T05:35:30.359Z"
+  "fetchedAt": "2026-10-11T12:38:41.281Z"
 }

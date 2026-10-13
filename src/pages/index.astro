@@ -187,21 +187,21 @@ const ciTone = gh.ci?.state === "passing" ? "bg-success" : gh.ci?.state === "fai
             <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
               <a href={`${gh.repoUrl}/commits/main`} target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 hover:text-foreground">
                 <span class="led bg-muted-foreground/50"></span>
-                <span class="font-mono text-micro tabular-nums text-muted-foreground">{formatCount(gh.commits) ?? "?"}</span>
+                <span class="font-mono text-micro tabular-nums text-muted-foreground" data-stat="commits">{formatCount(gh.commits) ?? "?"}</span>
                 <span class="type-overline">Commits</span>
               </a>
               <a href={`${gh.repoUrl}/releases`} target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 hover:text-foreground">
                 <span class="led bg-muted-foreground/50"></span>
-                <span class="font-mono text-micro tabular-nums text-muted-foreground">{formatCount(gh.releases) ?? "?"}</span>
+                <span class="font-mono text-micro tabular-nums text-muted-foreground" data-stat="releases">{formatCount(gh.releases) ?? "?"}</span>
                 <span class="type-overline">Releases</span>
               </a>
-              <a href={gh.ci?.url ?? `${gh.repoUrl}/actions`} target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 hover:text-foreground">
-                <span class={`led ${ciTone}`}></span>
-                <span class="type-overline">CI {gh.ci?.label ?? "unknown"}</span>
+              <a href={gh.ci?.url ?? `${gh.repoUrl}/actions`} data-stat="ci-href" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 hover:text-foreground">
+                <span class={`led ${ciTone}`} data-stat="ci-dot"></span>
+                <span class="type-overline" data-stat="ci-label">CI {gh.ci?.label ?? "unknown"}</span>
               </a>
               <a href={`${gh.repoUrl}/graphs/contributors`} target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 hover:text-foreground">
                 <span class="led bg-muted-foreground/50"></span>
-                <span class="font-mono text-micro tabular-nums text-muted-foreground">{formatCount(gh.contributors) ?? "?"}</span>
+                <span class="font-mono text-micro tabular-nums text-muted-foreground" data-stat="contributors">{formatCount(gh.contributors) ?? "?"}</span>
                 <span class="type-overline">Contributors</span>
               </a>
             </div>

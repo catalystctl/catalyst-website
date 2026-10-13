@@ -142,6 +142,27 @@ The site implements comprehensive SEO best practices:
 - **Cloudflare Pages** headers for caching and security
 - **Semantic HTML** with proper heading hierarchy and ARIA labels
 
+## GitHub stats
+
+The homepage numbers (commits, releases, CI, contributors) and the header
+release badge are live, not baked into the build:
+
+- `GET /api/github-stats.json` fetches the repo from GitHub, caches the payload
+  at the edge, and refreshes it in the background once it is about an hour old.
+- The prerendered HTML carries the `src/data/github-stats.json` seed for first
+  paint and no-JS visitors; a small script swaps in the live values.
+
+Nothing has to be committed or rebuilt for the numbers to change. To lift
+GitHub's anonymous 60 requests/hour limit, set a read-only token as a Worker
+secret:
+
+```sh
+npx wrangler secret put GITHUB_TOKEN
+```
+
+In CI the same secret is bound automatically from the `STATS_GITHUB_TOKEN`
+repository secret (see `.github/workflows/deploy.yml`).
+
 ## License
 
 [GPL-3.0](https://github.com/catalystctl/catalyst/blob/main/LICENSE)

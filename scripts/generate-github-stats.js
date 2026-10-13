@@ -2,8 +2,10 @@
 /**
  * Writes src/data/github-stats.json at build time.
  *
- * The site renders this build-time snapshot. The API endpoint is available
- * separately; the page does not request it automatically.
+ * This snapshot is only the fallback: pages render it for first paint and for
+ * no-JS visitors, then /api/github-stats.json refreshes the numbers live from
+ * the edge (see src/pages/api/github-stats.json.ts). The site never needs a
+ * rebuild, a deploy, or a scheduled CI job to show current stats.
  *
  * Never fails the build: on API errors it keeps any existing seed, or writes an
  * empty payload so imports stay valid.

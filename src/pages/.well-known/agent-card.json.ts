@@ -11,9 +11,11 @@ const card = {
   capabilities: [
     { id: "server-management", name: "Server management", description: "Manage game servers, nodes, files, and backups." },
     { id: "plugin-discovery", name: "Plugin discovery", description: "Discover Catalyst plugins from the marketplace." },
+    { id: "template-catalog", name: "Template catalog", description: "Find importable server templates (eggs) for the panel." },
   ],
   skills: [
     { id: "search-plugins", name: "Search plugins", description: "Find plugins in the Catalyst marketplace." },
+    { id: "search-templates", name: "Search templates", description: "Find importable server templates in the Catalyst template catalog." },
     { id: "read-documentation", name: "Read documentation", description: "Navigate Catalyst documentation and guides." },
   ],
 };

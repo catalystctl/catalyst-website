@@ -6,12 +6,13 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "prebuild": "node scripts/generate-github-stats.js",
+    "prebuild": "node scripts/generate-github-stats.js && node scripts/generate-templates.js",
     "dev": "astro dev",
     "build": "astro build",
     "preview": "npm run build && wrangler dev",
     "astro": "astro",
     "og": "node scripts/render-og.mjs",
+    "templates": "node scripts/generate-templates.js",
     "generate-types": "wrangler types",
     "deploy": "npm run build && wrangler deploy"
   },

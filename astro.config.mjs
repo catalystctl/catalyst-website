@@ -59,6 +59,8 @@ export default defineConfig({
         if (url === 'https://catalystctl.com/' || url === 'https://catalystctl.com') item.priority = 1.0;
         else if (url.includes('/pterodactyl-alternative')) item.priority = 0.9;
         else if (url === 'https://catalystctl.com/blog/' || url === 'https://catalystctl.com/blog') item.priority = 0.85;
+        else if (url === 'https://catalystctl.com/plugins/' || url === 'https://catalystctl.com/plugins') item.priority = 0.85;
+        else if (url === 'https://catalystctl.com/templates/' || url === 'https://catalystctl.com/templates') item.priority = 0.85;
         else if (url.includes('/migrate-from-pterodactyl')) item.priority = 0.85;
         else if (url.includes('/about')) item.priority = 0.8;
         else if (url.includes('/blog/')) item.priority = 0.75;

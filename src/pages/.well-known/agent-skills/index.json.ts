@@ -4,9 +4,9 @@ const index = {
     {
       name: "catalyst-website",
       type: "skill-md",
-      description: "Understand and navigate the Catalyst website, product, plugins, and documentation.",
+      description: "Understand and navigate the Catalyst website, product, plugins, templates, and documentation.",
       url: "https://catalystctl.com/skills/catalyst-website/SKILL.md",
-      digest: "sha256:6621ff9a98430a09760e06ad9cba2c0589975c8dea9fed21cd7e3edacf08cf98",
+      digest: "sha256:5de7dfcece514f2686800b576c81e8941a352f14ac5c72c96116efabd24d6b22",
     },
   ],
 };

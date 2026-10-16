@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "repo": "catalystctl/catalyst-templates",
+  "repoUrl": "https://github.com/catalystctl/catalyst-templates",
+  "updatedAt": "2026-10-16T16:09:13.327Z",
+  "discovered": 2,
+  "templates": [
+    {
+      "slug": "enshrouded",
+      "name": "enshrouded",
+      "displayName": "Enshrouded (Catalyst)",
+      "description": "Enshrouded dedicated server — a survival, crafting and Action-RPG game set in a sprawling voxel continent. Enshrouded ships a WINDOWS-ONLY dedicated server (Steam app 2278520, oslist=windows), so this template runs it through GE-Proton. That detail is what makes the stock egg break: ghcr.io/ptero-eggs/steamcmd:proton (built 2026-06-22, Debian 12 / glibc 2.36) ships GE-Proton10-34, whose lsteamclient shim implements SteamUtils008/009/010 but NOT SteamUtils011. Enshrouded 1.0 (2026-10-15) requires SteamUtils011, so the server dies during Steamworks init — before it ever writes enshrouded_server.log. The visible symptom is a bare exit-code-1 crash loop with `tail: cannot open './logs/enshrouded_server.log'`. This template pins ghcr.io/ptero-eggs/steamcmd:ubuntu_24.04 (Ubuntu 24.04 / glibc 2.39, ships libvulkan1 and Xvfb) and installs GE-Proton11-9 at install time (its lsteamclient exports SteamUtils011, 258 references). Xvfb is started before Proton because a headless Wine/Proton prefix needs an X display. GE-Proton11-9 is a glibc-2.38+ build, so it CANNOT run on the bookworm-based steamcmd:proton image — the distro, not just the Proton version, is part of the fix. Verified end-to-end on Catalyst: server reaches `[Session] 'HostOnline' (up)!` and listens on UDP 15637.",
+      "author": "catalyst",
+      "category": "games",
+      "categoryLabel": "Games",
+      "genre": "survival",
+      "genreLabel": "Survival",
+      "path": "games/survival/enshrouded/egg-enshrouded-catalyst.json",
+      "dir": "games/survival/enshrouded",
+      "homepage": "https://github.com/catalystctl/catalyst-templates/tree/main/games/survival/enshrouded",
+      "sourceUrl": "https://github.com/catalystctl/catalyst-templates/blob/main/games/survival/enshrouded/egg-enshrouded-catalyst.json",
+      "downloadUrl": "https://raw.githubusercontent.com/catalystctl/catalyst-templates/main/games/survival/enshrouded/egg-enshrouded-catalyst.json",
+      "eggFormat": "PTDL_v2",
+      "exportedAt": "2026-10-16T00:00:00+00:00",
+      "dockerImages": [
+        {
+          "label": "Ubuntu 24.04 + GE-Proton11-9",
+          "image": "ghcr.io/ptero-eggs/steamcmd:ubuntu_24.04"
+        }
+      ],
+      "runtimes": [
+        "steam",
+        "proton",
+        "windows"
+      ],
+      "runtimeLabels": [
+        "SteamCMD",
+        "Proton / Wine",
+        "Windows-only"
+      ],
+      "features": [
+        "steam_disk_space"
+      ],
+      "ports": [
+        15637
+      ],
+      "variableCount": 11,
+      "variables": [
+        "ENS_PROTON_VERSION",
+        "SRV_NAME",
+        "MAX_PLAYERS",
+        "SRV_PW",
+        "SRV_PW2",
+        "SRV_PW3",
+        "SRV_PW4",
+        "SRCDS_APPID",
+        "WINDOWS_INSTALL",
+        "AUTO_UPDATE",
+        "VALIDATE"
+      ],
+      "tags": [
+        "games",
+        "survival",
+        "steam",
+        "proton",
+        "windows",
+        "steam-disk-space",
+        "steamcmd",
+        "enshrouded"
+      ],
+      "monogram": "E"
+    },
+    {
+      "slug": "fastdl",
+      "name": "fastdl",
+      "displayName": "FastDL (Caddy) - HL1/Source Content Server",
+      "description": "Standalone FastDL (fast download) web server for Half-Life 1 and Source engine games. Serves client download content (maps, models, sounds, materials) from ./fastdl/<gamedir>/ with byte-Range support, 304 revalidation, correct MIME types and a browsable directory index — the HTTP features engines need to download custom content at line speed. Works with Counter-Strike 1.6, Garry's Mod, CS:S, TF2, HL2:DM, Sven Co-op and any game supporting sv_downloadurl. Upload content via SFTP into ./fastdl/<gamedir>/ (e.g. fastdl/cstrike/ or fastdl/garrysmod/), then set on each game server: sv_downloadurl \"http://<node-ip>:<this-port>\". The runtime is a single static Caddy binary on a minimal Alpine image — no database, no scripting, ~64 MB RAM. HL1/Source FastDL is plain HTTP; put a reverse proxy or CDN in front for HTTPS (it must pass Range requests through).",
+      "author": "catalyst",
+      "category": "web-servers",
+      "categoryLabel": "Web Servers",
+      "genre": null,
+      "genreLabel": null,
+      "path": "web-servers/fastdl/egg-fastdl-caddy.json",
+      "dir": "web-servers/fastdl",
+      "homepage": "https://github.com/catalystctl/catalyst-templates/tree/main/web-servers/fastdl",
+      "sourceUrl": "https://github.com/catalystctl/catalyst-templates/blob/main/web-servers/fastdl/egg-fastdl-caddy.json",
+      "downloadUrl": "https://raw.githubusercontent.com/catalystctl/catalyst-templates/main/web-servers/fastdl/egg-fastdl-caddy.json",
+      "eggFormat": "PTDL_v2",
+      "exportedAt": "2026-08-31T00:00:00+00:00",
+      "dockerImages": [
+        {
+          "label": "Alpine 3.22",
+          "image": "alpine:3.22"
+        }
+      ],
+      "runtimes": [
+        "caddy",
+        "alpine"
+      ],
+      "runtimeLabels": [
+        "Caddy",
+        "Alpine"
+      ],
+      "features": [],
+      "ports": [],
+      "variableCount": 2,
+      "variables": [
+        "FD_CADDY_VERSION",
+        "FD_MAX_CONNECTIONS"
+      ],
+      "tags": [
+        "web servers",
+        "caddy",
+        "alpine",
+        "fastdl",
+        "half-life",
+        "source"
+      ],
+      "monogram": "F"
+    }
+  ]
+}

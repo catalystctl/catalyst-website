@@ -24,6 +24,8 @@ The website is built with [Astro](https://astro.build) and [Tailwind CSS](https:
 | Page | Description |
 |------|-------------|
 | **[Homepage](https://catalystctl.com/)** | Overview with features, quick start, architecture diagram, and live demo CTA |
+| **[Plugins](https://catalystctl.com/plugins/)** | Plugin marketplace, synced hourly from `catalyst-plugins` |
+| **[Templates](https://catalystctl.com/templates/)** | Template catalog with search and category/genre/runtime filters, synced hourly from `catalyst-templates` |
 | **[Pterodactyl Alternative](https://catalystctl.com/pterodactyl-alternative/)** | Why switch + detailed Catalyst vs Pterodactyl comparison tables |
 | **[Migrate from Pterodactyl](https://catalystctl.com/migrate-from-pterodactyl/)** | Step-by-step migration guide with auto-migration tool details |
 | **[Live Demo](https://demo.catalystctl.com/)** | Interactive demo panel with a mock Minecraft server (hosted separately) |
@@ -110,15 +112,21 @@ The `wrangler.jsonc` configures the Cloudflare adapter. Static pages are prerend
 │   └── _headers                  # Cloudflare cache/security headers
 ├── scripts/
 │   ├── generate-github-stats.js  # Generates GitHub stats JSON data
+│   ├── generate-templates.js     # Generates the template catalog JSON snapshot
 │   ├── render-og.mjs             # Renders OG SVG → PNG
 ├── src/
 │   ├── content/blog/             # Blog markdown files
-│   ├── data/                     # JSON data files (GitHub stats)
+│   ├── data/                     # JSON data files (GitHub stats, template catalog)
 │   ├── layouts/
 │   │   └── Layout.astro          # Shared layout (header, footer, SEO, JSON-LD)
+│   ├── lib/
+│   │   ├── github-stats.mjs      # GitHub stats fetcher
+│   │   └── templates.mjs         # Template catalog builder (tree + egg JSON)
 │   ├── pages/
 │   │   ├── 404.astro             # Custom 404 page
 │   │   ├── index.astro           # Homepage
+│   │   ├── plugins.astro         # Plugin marketplace
+│   │   ├── templates.astro       # Template catalog (filters, search, sort)
 │   │   ├── pterodactyl-alternative.astro  # Pterodactyl alternative + comparison
 │   │   └── migrate-from-pterodactyl.astro # Migration guide
 │   ├── styles/global.css         # Tailwind + Obsidian design tokens
@@ -141,6 +149,24 @@ The site implements comprehensive SEO best practices:
 - **robots.txt** with sitemap reference
 - **Cloudflare Pages** headers for caching and security
 - **Semantic HTML** with proper heading hierarchy and ARIA labels
+
+## Template catalog
+
+`/templates/` is SSR, like the plugin marketplace. On each request it lists the
+`catalystctl/catalyst-templates` repository tree, reads every egg JSON the panel
+importer would accept (`egg-*.json`), and normalizes it into a catalog entry:
+category, genre, runtimes, ports, variables, tags, and a direct raw download
+URL. The result is edge-cached for an hour, so merging a template into the
+catalog repo shows up on the site without a website rebuild.
+
+Filtering, search, and sorting are client-side over the rendered cards, with
+state mirrored into the URL (`?q=`, `?category=`, `?genre=`, `?runtime=`,
+`?sort=`) so a filtered view is linkable and shareable.
+
+`src/data/templates.json` is a committed snapshot written by
+`scripts/generate-templates.js` during `prebuild`. It is the fallback when
+GitHub is unreachable and keeps `astro dev` working offline. Regenerate it
+manually with `npm run templates`.
 
 ## GitHub stats
 

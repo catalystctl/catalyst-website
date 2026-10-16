@@ -58,6 +58,7 @@ const navLinks = [
   { href: B, label: "Home", match: (p: string) => p === B || p === "/" },
   { href: B + "pterodactyl-alternative/", label: "Compare", match: (p: string) => p.includes("pterodactyl-alternative") || p.includes("migrate-from-pterodactyl") },
   { href: B + "plugins/", label: "Plugins", match: (p: string) => p.includes("/plugins") },
+  { href: B + "templates/", label: "Templates", match: (p: string) => p.includes("/templates") },
   { href: B + "blog/", label: "Blog", match: (p: string) => p.includes("/blog") },
   { href: DOCS_URL, label: "Docs", match: (_p: string) => false },
   { href: DEMO_URL, label: "Demo", match: (_p: string) => false },
@@ -306,18 +307,34 @@ const breadcrumbLd = hasBreadcrumbs
             },
           },
           {
+            name: "search_templates",
+            description: "Search the Catalyst template catalog for importable server templates.",
+            inputSchema: {
+              type: "object",
+              properties: { query: { type: "string", description: "Game, application, or keyword." } },
+              required: ["query"],
+              additionalProperties: false,
+            },
+            execute: async ({ query }) => {
+              const url = new URL("/templates/", window.location.origin);
+              url.searchParams.set("q", query);
+              window.location.href = url.toString();
+              return { url: url.toString(), query };
+            },
+          },
+          {
             name: "navigate",
             description: "Navigate to a Catalyst website destination.",
             inputSchema: {
               type: "object",
               properties: {
-                destination: { type: "string", enum: ["home", "plugins", "blog", "docs", "about"] },
+                destination: { type: "string", enum: ["home", "plugins", "templates", "blog", "docs", "about"] },
               },
               required: ["destination"],
               additionalProperties: false,
             },
             execute: ({ destination }) => {
-              const paths = { home: "/", plugins: "/plugins/", blog: "/blog/", docs: "https://docs.catalystctl.com/", about: "/about/" };
+              const paths = { home: "/", plugins: "/plugins/", templates: "/templates/", blog: "/blog/", docs: "https://docs.catalystctl.com/", about: "/about/" };
               const url = paths[destination] || paths.home;
               window.location.href = url;
               return { url };
@@ -542,6 +559,8 @@ const breadcrumbLd = hasBreadcrumbs
             <h2 class="deck-label mb-3">Resources</h2>
             <ul class="space-y-2">
               <li><a href={DOCS_URL} class="text-mini text-muted-foreground hover:text-foreground transition-colors">Docs</a></li>
+              <li><a href={B + "plugins/"} class="text-mini text-muted-foreground hover:text-foreground transition-colors">Plugins</a></li>
+              <li><a href={B + "templates/"} class="text-mini text-muted-foreground hover:text-foreground transition-colors">Templates</a></li>
               <li><a href={B + "blog/"} class="text-mini text-muted-foreground hover:text-foreground transition-colors">Blog</a></li>
               <li><a href="https://github.com/catalystctl/catalyst/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer" class="text-mini text-muted-foreground hover:text-foreground transition-colors">Contributing</a></li>
             </ul>

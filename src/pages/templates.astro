@@ -1,0 +1,469 @@
+---
+import Layout from "../layouts/Layout.astro";
+import seed from "../data/templates.json";
+import { env as workerEnv } from "cloudflare:workers";
+import { fetchTemplates, CATEGORIES, GENRES, RUNTIMES, REPO_URL } from "../lib/templates.mjs";
+
+export const prerender = false;
+
+type Template = {
+  slug: string;
+  name: string;
+  displayName: string;
+  description: string;
+  author: string;
+  category: string;
+  categoryLabel: string;
+  genre: string | null;
+  genreLabel: string | null;
+  path: string;
+  dir: string;
+  homepage: string;
+  sourceUrl: string;
+  downloadUrl: string;
+  eggFormat: string;
+  exportedAt: string | null;
+  dockerImages: { label: string; image: string }[];
+  runtimes: string[];
+  runtimeLabels: string[];
+  features: string[];
+  ports: number[];
+  variableCount: number;
+  variables: string[];
+  tags: string[];
+  monogram: string;
+};
+type Catalog = {
+  schemaVersion: number;
+  repo: string;
+  repoUrl: string;
+  updatedAt: string | null;
+  discovered: number;
+  templates: Template[];
+};
+
+// The catalog is assembled live from the templates repo (tree + egg JSON), then
+// edge-cached. When GitHub is unreachable the committed build-time snapshot in
+// src/data/templates.json keeps the page complete instead of empty.
+// GITHUB_TOKEN is an optional Worker secret; without it GitHub's anonymous
+// 60 requests/hour limit applies.
+const TOKEN = (workerEnv as Record<string, string | undefined> | undefined)?.GITHUB_TOKEN;
+
+let catalog = seed as unknown as Catalog;
+let live = false;
+try {
+  const fetched = (await fetchTemplates({ token: TOKEN })) as Catalog;
+  if (fetched.templates.length > 0) {
+    catalog = fetched;
+    live = true;
+  }
+} catch {
+  // Keep the committed snapshot; the page still renders a real catalog.
+}
+
+const templates = catalog.templates ?? [];
+const updatedAt = catalog.updatedAt ? new Date(catalog.updatedAt) : null;
+const updatedLabel = updatedAt && !Number.isNaN(updatedAt.valueOf())
+  ? updatedAt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+  : "bundled snapshot";
+
+// ── Facets: only surface filters that actually match something in the catalog.
+const count = (items: string[]) => items.reduce((acc, key) => acc.set(key, (acc.get(key) ?? 0) + 1), new Map<string, number>());
+const categoryCounts = count(templates.map((t) => t.category));
+const genreCounts = count(templates.map((t) => t.genre).filter(Boolean) as string[]);
+const runtimeCounts = count(templates.flatMap((t) => t.runtimes));
+
+const categories = Object.entries(CATEGORIES)
+  .filter(([key]) => categoryCounts.has(key))
+  .map(([key, meta]) => ({ key, label: meta.label, blurb: meta.blurb, count: categoryCounts.get(key) ?? 0 }));
+const genres = Object.entries(GENRES)
+  .filter(([key]) => genreCounts.has(key))
+  .map(([key, label]) => ({ key, label, count: genreCounts.get(key) ?? 0 }));
+const runtimes = Object.entries(RUNTIMES)
+  .filter(([key]) => runtimeCounts.has(key))
+  .map(([key, label]) => ({ key, label, count: runtimeCounts.get(key) ?? 0 }));
+
+const haystack = (t: Template) =>
+  [
+    t.displayName,
+    t.description,
+    t.author,
+    t.categoryLabel,
+    t.genreLabel ?? "",
+    t.runtimeLabels.join(" "),
+    t.tags.join(" "),
+    t.variables.join(" "),
+    t.path,
+  ]
+    .join(" ")
+    .toLowerCase();
+
+const itemListLd = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "Catalyst Template Catalog",
+  description: "Importable Pterodactyl-format egg templates for the Catalyst game server panel.",
+  numberOfItems: templates.length,
+  itemListElement: templates.map((t, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    name: t.displayName,
+    url: t.homepage,
+  })),
+};
+
+// The page is SSR because the catalog is fetched per request; let the edge hold
+// it for an hour so a template merge shows up without a website rebuild.
+Astro.response.headers.set("Cache-Control", "public, max-age=300, s-maxage=3600, stale-while-revalidate=86400");
+---
+
+<Layout
+  title="Template Catalog"
+  description="Browse importable Catalyst game server templates: game servers, FastDL and web servers, databases, voice servers, and more. Filter by category, genre, and runtime, then import the egg JSON into your panel."
+  canonicalUrl="https://catalystctl.com/templates/"
+  breadcrumbItems={[{ name: "Templates" }]}
+  pageType="CollectionPage"
+  keywords={["Catalyst templates", "game server templates", "Pterodactyl eggs", "egg JSON", "game panel templates"]}
+>
+  <main class="max-w-6xl mx-auto px-4 pt-10 sm:pt-14 pb-16" id="template-catalog">
+    <section class="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-8 items-end" data-speakable>
+      <div class="max-w-3xl">
+        <div class="flex items-center gap-2">
+          <span class="led-wrap"><span class="led-pulse bg-success"></span><span class="led bg-success"></span></span>
+          <span class="type-overline">Official template catalog · import-ready eggs</span>
+        </div>
+        <h1 class="mt-4 font-display text-[2rem] sm:text-[2.7rem] font-semibold text-foreground tracking-tight leading-[1.08] text-balance">
+          Start from a template, <span class="text-primary">not a blank disk.</span>
+        </h1>
+        <p class="mt-4 max-w-2xl text-data sm:text-base text-muted-foreground leading-relaxed text-pretty">
+          Every template is a Pterodactyl-format egg with its install script, variables, ports, and startup command already wired. Search the catalog, filter by category or genre, then import the JSON straight into your panel.
+        </p>
+      </div>
+      <a href={REPO_URL} target="_blank" rel="noopener noreferrer" class="btn btn-md btn-outline shrink-0">
+        Contribute a template
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
+      </a>
+    </section>
+
+    <div class="rule mt-10"></div>
+
+    <section class="mt-8" aria-labelledby="catalog-heading">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5">
+        <div>
+          <div class="flex items-center gap-3">
+            <h2 id="catalog-heading" class="font-display text-lg font-semibold text-foreground">Browse templates</h2>
+            <span class="rounded-sm border border-primary/25 bg-primary/10 px-2 py-0.5 font-mono text-[11px] text-primary"><span id="template-count">{templates.length}</span> available</span>
+          </div>
+          <p class="mt-1 text-micro text-muted-foreground">
+            {live ? "Live from the catalog repo" : "Bundled catalog snapshot"} · synced hourly · last source update {updatedLabel}
+          </p>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-2 sm:w-auto">
+          <label class="relative block sm:w-72">
+            <span class="sr-only">Search templates</span>
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="m20 20-4-4"/></svg>
+            <input id="template-search" type="search" placeholder="Search templates, games, runtimes…" autocomplete="off" class="h-9 w-full rounded-sm border border-border/70 bg-surface-1 pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground/70 outline-none focus:border-primary/60 focus:ring-1 focus:ring-primary/30" />
+          </label>
+          <label class="relative block sm:w-44">
+            <span class="sr-only">Sort templates</span>
+            <select id="template-sort" class="h-9 w-full appearance-none rounded-sm border border-border/70 bg-surface-1 pl-3 pr-8 text-sm text-foreground outline-none focus:border-primary/60 focus:ring-1 focus:ring-primary/30">
+              <option value="name">Sort: A–Z</option>
+              <option value="newest">Sort: Recently updated</option>
+              <option value="category">Sort: Category</option>
+            </select>
+            <svg class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
+          </label>
+        </div>
+      </div>
+
+      {templates.length > 0 ? (
+        <div class="space-y-3">
+          <div class="flex flex-wrap items-center gap-1.5" role="group" aria-label="Filter by category">
+            <span class="mr-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground/70">Category</span>
+            <button type="button" class="filter-chip" data-filter="category" data-value="all" aria-pressed="true">All <span class="chip-count">{templates.length}</span></button>
+            {categories.map((c) => (
+              <button type="button" class="filter-chip" data-filter="category" data-value={c.key} aria-pressed="false" title={c.blurb}>
+                {c.label} <span class="chip-count">{c.count}</span>
+              </button>
+            ))}
+          </div>
+
+          {genres.length > 0 && (
+            <div class="flex flex-wrap items-center gap-1.5" role="group" aria-label="Filter by genre">
+              <span class="mr-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground/70">Genre</span>
+              <button type="button" class="filter-chip" data-filter="genre" data-value="all" aria-pressed="true">All</button>
+              {genres.map((g) => (
+                <button type="button" class="filter-chip" data-filter="genre" data-value={g.key} aria-pressed="false">
+                  {g.label} <span class="chip-count">{g.count}</span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {runtimes.length > 1 && (
+            <div class="flex flex-wrap items-center gap-1.5" role="group" aria-label="Filter by runtime">
+              <span class="mr-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground/70">Runtime</span>
+              <button type="button" class="filter-chip" data-filter="runtime" data-value="all" aria-pressed="true">Any</button>
+              {runtimes.map((r) => (
+                <button type="button" class="filter-chip" data-filter="runtime" data-value={r.key} aria-pressed="false">
+                  {r.label} <span class="chip-count">{r.count}</span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          <div class="flex items-center justify-between gap-3 pt-1">
+            <p id="template-summary" class="text-micro text-muted-foreground" aria-live="polite">Showing all {templates.length} templates</p>
+            <button type="button" id="template-clear" class="hidden text-micro text-primary hover:text-primary-400 transition-colors">Clear filters</button>
+          </div>
+        </div>
+      ) : null}
+
+      {templates.length > 0 ? (
+        <div id="template-grid" class="mt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+          {templates.map((t) => (
+            <article
+              class="template-card deck-panel flex flex-col p-4 min-h-[15.5rem] transition-colors hover:border-primary/40"
+              data-search={haystack(t)}
+              data-category={t.category}
+              data-genre={t.genre ?? ""}
+              data-runtimes={t.runtimes.join(" ")}
+              data-name={t.displayName.toLowerCase()}
+              data-exported={t.exportedAt ?? ""}
+            >
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm border border-primary/25 bg-primary/10 font-display text-base font-semibold text-primary">{t.monogram}</div>
+                  <div class="min-w-0">
+                    <h3 class="font-display text-data font-semibold text-foreground truncate" title={t.displayName}>{t.displayName}</h3>
+                    <p class="font-mono text-[11px] text-muted-foreground truncate">{t.author} · {t.eggFormat}</p>
+                  </div>
+                </div>
+                <span class="shrink-0 rounded-sm border border-border/70 bg-surface-2 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">{t.genreLabel ?? t.categoryLabel}</span>
+              </div>
+
+              <p class="mt-3.5 text-mini text-muted-foreground leading-relaxed line-clamp-3">{t.description}</p>
+
+              {(t.ports.length > 0 || t.dockerImages.length > 0 || t.variableCount > 0) && (
+                <div class="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[10px] text-muted-foreground/80">
+                  {t.ports.length > 0 && <span class="rounded-sm bg-surface-2 px-1.5 py-0.5">{t.ports.length === 1 ? "port" : "ports"} {t.ports.join(", ")}</span>}
+                  {t.dockerImages.length > 0 && <span class="rounded-sm bg-surface-2 px-1.5 py-0.5">{t.dockerImages.length} image{t.dockerImages.length === 1 ? "" : "s"}</span>}
+                  {t.variableCount > 0 && <span class="rounded-sm bg-surface-2 px-1.5 py-0.5">{t.variableCount} variables</span>}
+                </div>
+              )}
+
+              <div class="mt-auto pt-3.5 flex flex-wrap gap-1.5">
+                {t.tags.slice(0, 5).map((tag) => (
+                  <button type="button" class="template-tag" data-tag={tag} title={`Search “${tag}”`}>#{tag}</button>
+                ))}
+              </div>
+
+              <div class="mt-3 flex items-center gap-2 border-t border-border/60 pt-3">
+                <a href={t.downloadUrl} class="btn btn-sm btn-primary flex-1 justify-center" download aria-label={`Download the ${t.displayName} egg JSON`}>Get egg</a>
+                <a href={t.homepage} target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-quiet" aria-label={`View ${t.displayName} source and README`}>Source</a>
+              </div>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div class="mt-4 deck-panel p-8 text-center">
+          <p class="font-display text-base font-semibold text-foreground">Catalog temporarily unavailable</p>
+          <p class="mt-2 text-mini text-muted-foreground">The source repository could not be reached and no snapshot is bundled. Please try again shortly.</p>
+        </div>
+      )}
+      <p id="template-empty" class="hidden py-10 text-center text-mini text-muted-foreground">No templates match your filters. Try a different search or clear the filters.</p>
+    </section>
+
+    <section class="mt-12 deck-panel overflow-hidden grid grid-cols-1 sm:grid-cols-3 gap-px bg-border/40" aria-label="How to use a template">
+      <div class="bg-card p-4"><span class="type-overline">01 · Find</span><h2 class="mt-2 font-display text-data font-semibold text-foreground">Pick a template</h2><p class="mt-1.5 text-micro text-muted-foreground leading-relaxed">Search or filter by category, genre, and runtime. Open the source to read the README and requirements.</p></div>
+      <div class="bg-card p-4"><span class="type-overline">02 · Import</span><h2 class="mt-2 font-display text-data font-semibold text-foreground">Add it to the panel</h2><p class="mt-1.5 text-micro text-muted-foreground leading-relaxed">Download the egg JSON, then import it under Admin → Templates. Variables and the install script come with it.</p></div>
+      <div class="bg-card p-4"><span class="type-overline">03 · Deploy</span><h2 class="mt-2 font-display text-data font-semibold text-foreground">Create the server</h2><p class="mt-1.5 text-micro text-muted-foreground leading-relaxed">Create a server from the template and watch the install run live in the console.</p></div>
+    </section>
+  </main>
+
+  <script type="application/ld+json" set:html={JSON.stringify(itemListLd)} />
+</Layout>
+
+<style>
+  .filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    height: 1.75rem;
+    padding-inline: 0.625rem;
+    border: 1px solid hsl(var(--border) / 0.7);
+    border-radius: var(--radius);
+    background: hsl(var(--surface-1));
+    font-family: 'JetBrains Mono Variable', monospace;
+    font-size: 11px;
+    color: hsl(var(--muted-foreground));
+    transition: color var(--duration-fast) var(--ease-standard), border-color var(--duration-fast) var(--ease-standard), background var(--duration-fast) var(--ease-standard);
+  }
+  .filter-chip:hover { color: hsl(var(--foreground)); border-color: hsl(var(--border)); }
+  .filter-chip[aria-pressed="true"] {
+    color: hsl(var(--primary));
+    border-color: hsl(var(--primary) / 0.4);
+    background: hsl(var(--primary) / 0.1);
+  }
+  .chip-count {
+    font-size: 10px;
+    color: hsl(var(--muted-foreground) / 0.75);
+  }
+  .filter-chip[aria-pressed="true"] .chip-count { color: hsl(var(--primary) / 0.75); }
+
+  .template-tag {
+    border-radius: var(--radius);
+    background: hsl(var(--surface-2));
+    padding: 0.125rem 0.375rem;
+    font-family: 'JetBrains Mono Variable', monospace;
+    font-size: 10px;
+    color: hsl(var(--muted-foreground));
+    transition: color var(--duration-fast) var(--ease-standard), background var(--duration-fast) var(--ease-standard);
+  }
+  .template-tag:hover { color: hsl(var(--foreground)); background: hsl(var(--surface-3)); }
+</style>
+
+<script>
+  (() => {
+    const search = document.getElementById("template-search") as HTMLInputElement | null;
+    const sort = document.getElementById("template-sort") as HTMLSelectElement | null;
+    const grid = document.getElementById("template-grid");
+    const cards = grid ? Array.from(grid.querySelectorAll<HTMLElement>(".template-card")) : [];
+    const empty = document.getElementById("template-empty");
+    const countEl = document.getElementById("template-count");
+    const summary = document.getElementById("template-summary");
+    const clear = document.getElementById("template-clear");
+    const chips = Array.from(document.querySelectorAll<HTMLButtonElement>(".filter-chip"));
+
+    if (cards.length === 0) return;
+
+    const state = { q: "", category: "all", genre: "all", runtime: "all", sort: "name" };
+
+    const labelFor = (filter: "category" | "genre" | "runtime", value: string) =>
+      chips.find((chip) => chip.dataset.filter === filter && chip.dataset.value === value)?.textContent?.trim().replace(/\s+\d+$/, "") ?? value;
+
+    function readUrl() {
+      const params = new URLSearchParams(window.location.search);
+      state.q = (params.get("q") ?? "").trim().toLowerCase();
+      state.category = params.get("category") ?? "all";
+      state.genre = params.get("genre") ?? "all";
+      state.runtime = params.get("runtime") ?? "all";
+      const sortParam = params.get("sort");
+      if (sortParam === "newest" || sortParam === "category" || sortParam === "name") state.sort = sortParam;
+      if (search) search.value = params.get("q") ?? "";
+      if (sort) sort.value = state.sort;
+    }
+
+    function writeUrl() {
+      const params = new URLSearchParams();
+      if (state.q) params.set("q", state.q);
+      if (state.category !== "all") params.set("category", state.category);
+      if (state.genre !== "all") params.set("genre", state.genre);
+      if (state.runtime !== "all") params.set("runtime", state.runtime);
+      if (state.sort !== "name") params.set("sort", state.sort);
+      const query = params.toString();
+      window.history.replaceState(null, "", query ? `${window.location.pathname}?${query}` : window.location.pathname);
+    }
+
+    function matches(card: HTMLElement) {
+      if (state.category !== "all" && card.dataset.category !== state.category) return false;
+      if (state.genre !== "all" && card.dataset.genre !== state.genre) return false;
+      if (state.runtime !== "all" && !(card.dataset.runtimes ?? "").split(" ").includes(state.runtime)) return false;
+      if (state.q && !(card.dataset.search ?? "").includes(state.q)) return false;
+      return true;
+    }
+
+    function sortKey(card: HTMLElement) {
+      if (state.sort === "newest") return card.dataset.exported ?? "";
+      if (state.sort === "category") return `${card.dataset.category ?? ""} ${card.dataset.name ?? ""}`;
+      return card.dataset.name ?? "";
+    }
+
+    function apply() {
+      let visible = 0;
+      for (const card of cards) {
+        const ok = matches(card);
+        card.classList.toggle("hidden", !ok);
+        if (ok) visible += 1;
+      }
+
+      const ordered = cards.slice().sort((a, b) => {
+        const av = sortKey(a);
+        const bv = sortKey(b);
+        return state.sort === "newest" ? bv.localeCompare(av) : av.localeCompare(bv);
+      });
+      if (grid) for (const card of ordered) grid.appendChild(card);
+
+      if (countEl) countEl.textContent = String(visible);
+      empty?.classList.toggle("hidden", visible !== 0);
+
+      for (const chip of chips) {
+        const filter = chip.dataset.filter as "category" | "genre" | "runtime";
+        chip.setAttribute("aria-pressed", String(chip.dataset.value === state[filter]));
+      }
+
+      const active: string[] = [];
+      if (state.q) active.push(`“${state.q}”`);
+      if (state.category !== "all") active.push(labelFor("category", state.category));
+      if (state.genre !== "all") active.push(labelFor("genre", state.genre));
+      if (state.runtime !== "all") active.push(labelFor("runtime", state.runtime));
+
+      if (summary) {
+        summary.textContent = active.length === 0
+          ? `Showing all ${cards.length} templates`
+          : `Showing ${visible} of ${cards.length} templates · ${active.join(" · ")}`;
+      }
+      clear?.classList.toggle("hidden", active.length === 0);
+
+      writeUrl();
+    }
+
+    search?.addEventListener("input", () => {
+      state.q = search.value.trim().toLowerCase();
+      apply();
+    });
+
+    sort?.addEventListener("change", () => {
+      state.sort = (sort.value as typeof state.sort) || "name";
+      apply();
+    });
+
+    for (const chip of chips) {
+      chip.addEventListener("click", () => {
+        const filter = chip.dataset.filter as "category" | "genre" | "runtime";
+        const value = chip.dataset.value ?? "all";
+        // Clicking an active chip again returns that facet to "all".
+        state[filter] = state[filter] === value && value !== "all" ? "all" : value;
+        apply();
+      });
+    }
+
+    for (const tag of document.querySelectorAll<HTMLButtonElement>(".template-tag")) {
+      tag.addEventListener("click", () => {
+        const value = tag.dataset.tag ?? "";
+        state.q = value.toLowerCase();
+        if (search) search.value = value;
+        apply();
+      });
+    }
+
+    clear?.addEventListener("click", () => {
+      state.q = "";
+      state.category = "all";
+      state.genre = "all";
+      state.runtime = "all";
+      if (search) search.value = "";
+      apply();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "/" && document.activeElement !== search && !(event.target instanceof HTMLInputElement) && !(event.target instanceof HTMLSelectElement)) {
+        event.preventDefault();
+        search?.focus();
+      }
+    });
+
+    readUrl();
+    apply();
+  })();
+</script>
